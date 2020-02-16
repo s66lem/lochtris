@@ -1,17 +1,17 @@
-���e
-�@�e�g���X�̊J���p�[�t�F�N�g�N���A�̗��K���ł��܂��B
+内容
+　テトリスの開幕パーフェクトクリアの練習ができます。
 
-�V�ѕ�
+遊び方
 --------------------------------------------------------
-�@1. https://github.com/sakuramochi84/ttpc ���J��
-�@2.�uClone or download�v���N���b�N
-�@3.�uDownload ZIP�v����t�@�C���ꎮ���_�E�����[�h
-�@4. ���[�J���̓K���ȏꏊ�i�f�X�N�g�b�v�Ȃǁj�ɉ�
-�@5. �u���E�U�iGoogle Chrome��IE�Ȃǁj��index.html���J��
+　1. https://github.com/sakuramochi84/ttpc を開く
+　2.「Clone or download」をクリック
+　3.「Download ZIP」からファイル一式をダウンロード
+　4. ローカルの適当な場所（デスクトップなど）に解凍
+　5. ブラウザ（Google ChromeやIEなど）でindex.htmlを開く
 --------------------------------------------------------
 
-�폜�̎d��
-�@�_�E�����[�h�����t�@�C�������ׂč폜����΂悢�ł��B
+削除の仕方
+　ダウンロードしたファイルをすべて削除すればよいです。
 
-2018/02/12 ���������
+2018/02/12 さくらもち
 

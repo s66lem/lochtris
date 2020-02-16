@@ -1,10 +1,10 @@
 /*----------------------------------------------------------------------------------------
-™š ƒIƒuƒWƒFƒNƒg: –â‘è š™
+â˜†â˜… ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ: å•é¡Œ â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function ProblemWarmingUp(id){
   switch(id){
     case  0:
-    // ‰Šúƒ}ƒgƒŠƒbƒNƒXBƒfƒbƒhƒ‰ƒCƒ“ˆÈã‚ÍŠÜ‚ß‚È‚¢
+    // åˆæœŸãƒãƒˆãƒªãƒƒã‚¯ã‚¹ã€‚ãƒ‡ãƒƒãƒ‰ãƒ©ã‚¤ãƒ³ä»¥ä¸Šã¯å«ã‚ãªã„
     this.initialBlocks = [[0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0],
@@ -25,18 +25,18 @@ function ProblemWarmingUp(id){
     [0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0]];
-    this.ingredients = [[],Z,T,S,J,O,L,I,I,O,J];  // g—p‰Â”\ƒ~ƒm æ“ª—v‘f‚Í‰Šúƒz[ƒ‹ƒhƒ~ƒm
-    this.caption = 'ƒeƒgƒŠƒX@‚»‚Ì‚P';
-    this.hint = 'Å‰‚Ì‚Vè‚Í Perfect Clear\n(ƒp[ƒtƒFƒNƒgEƒNƒŠƒA)‚ğ‘_‚¤\n‚½‚ß‚Ì@‘ã•\“I‚Èƒeƒ“ƒvƒŒ‚Å‚·B';
-    this.guides = [G(Z, 0, 6, 18), G(T, 3, 8, 17), G(S, 0, 7, 16), G(J, 0, 0, 18), G(O, 0, 0, 17), G(L, 2, 0, 15), G(I, 3, 2, 16), G(I, 0, 4, 15), G(O, 0, 3, 18), G(J, 2, 4, 17)];  // ƒKƒCƒh ì¬‚·‚éÛ‚Íİ’uƒ~ƒm‚Ìƒ_ƒ“ƒvî•ñ‚ğ—˜—pittt.js‚É‚Äconsole.log‚Éİ’uƒ~ƒm‚ğƒ_ƒ“ƒv‚µ‚Ä‚¢‚éj
-    this.useGuide = true;  // ƒKƒCƒhg—p(R‚ğ‰Ÿ‚³‚È‚­‚Ä‚àƒKƒCƒh‚ğ—˜—p‚·‚é‚Æ‚«true)
-    this.req = [];       // ƒmƒ‹ƒ}( REQuired features )
+    this.ingredients = [[],Z,T,S,J,O,L,I,I,O,J];  // ä½¿ç”¨å¯èƒ½ãƒŸãƒ å…ˆé ­è¦ç´ ã¯åˆæœŸãƒ›ãƒ¼ãƒ«ãƒ‰ãƒŸãƒ
+    this.caption = 'ãƒ†ãƒˆãƒªã‚¹ã€€ãã®ï¼‘';
+    this.hint = 'æœ€åˆã®ï¼—æ‰‹ã¯ Perfect ClearÂ¥n(ãƒ‘ãƒ¼ãƒ•ã‚§ã‚¯ãƒˆãƒ»ã‚¯ãƒªã‚¢)ã‚’ç‹™ã†Â¥nãŸã‚ã®ã€€ä»£è¡¨çš„ãªãƒ†ãƒ³ãƒ—ãƒ¬ã§ã™ã€‚';
+    this.guides = [G(Z, 0, 6, 18), G(T, 3, 8, 17), G(S, 0, 7, 16), G(J, 0, 0, 18), G(O, 0, 0, 17), G(L, 2, 0, 15), G(I, 3, 2, 16), G(I, 0, 4, 15), G(O, 0, 3, 18), G(J, 2, 4, 17)];  // ã‚¬ã‚¤ãƒ‰ ä½œæˆã™ã‚‹éš›ã¯è¨­ç½®ãƒŸãƒã®ãƒ€ãƒ³ãƒ—æƒ…å ±ã‚’åˆ©ç”¨ï¼ˆttt.jsã«ã¦console.logã«è¨­ç½®ãƒŸãƒã‚’ãƒ€ãƒ³ãƒ—ã—ã¦ã„ã‚‹ï¼‰
+    this.useGuide = true;  // ã‚¬ã‚¤ãƒ‰ä½¿ç”¨(Rã‚’æŠ¼ã•ãªãã¦ã‚‚ã‚¬ã‚¤ãƒ‰ã‚’åˆ©ç”¨ã™ã‚‹ã¨ãtrue)
+    this.req = [];       // ãƒãƒ«ãƒ( REQuired features )
     this.req.push(0);    //   [0]: Single
     this.req.push(0);    //   [1]: Double
     this.req.push(0);    //   [2]: Triple
     this.req.push(0);    //   [3]: Tetris
-    this.req.push(0);    //   [4]: T-Spin Mini ( 0 —ñ)
-    this.req.push(0);    //   [5]: T-Spin ( 0 —ñ)
+    this.req.push(0);    //   [4]: T-Spin Mini ( 0 åˆ—)
+    this.req.push(0);    //   [5]: T-Spin ( 0 åˆ—)
     this.req.push(0);    //   [6]: Mini T-Spin Single
     this.req.push(0);    //   [7]: T-Spin Single
     this.req.push(0);    //   [8]: T-Spin Double
@@ -47,7 +47,7 @@ function ProblemWarmingUp(id){
     break;
 
     default:
-    // ‰Šúƒ}ƒgƒŠƒbƒNƒXBƒfƒbƒhƒ‰ƒCƒ“ˆÈã‚ÍŠÜ‚ß‚È‚¢
+    // åˆæœŸãƒãƒˆãƒªãƒƒã‚¯ã‚¹ã€‚ãƒ‡ãƒƒãƒ‰ãƒ©ã‚¤ãƒ³ä»¥ä¸Šã¯å«ã‚ãªã„
     this.initialBlocks = [[0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0],
@@ -68,18 +68,18 @@ function ProblemWarmingUp(id){
     [1,1,1,1,1,1,1,1,1,0],
     [1,1,1,1,1,1,1,1,1,0],
     [1,1,1,1,1,1,1,1,1,0]];
-    this.ingredients = [[],I];  // g—p‰Â”\ƒ~ƒm æ“ª—v‘f‚Í‰Šúƒz[ƒ‹ƒhƒ~ƒm
-    this.caption = 'ƒeƒgƒŠƒX@‚»‚Ì‚P';
-    this.hint = 'Å‰‚Í@TETRiS (‚S—ñÁ‚µ)‚ğ\n‚Ğ‚½‚·‚çŒˆ‚ß‚é‚¾‚¯B‚Ü‚¸‚Í\n‚±‚±‚Å@ƒEƒH[ƒ~ƒ“ƒOƒAƒbƒvI';
-    this.guides = [];    // ƒKƒCƒh ì¬‚·‚éÛ‚Íİ’uƒ~ƒm‚Ìƒ_ƒ“ƒvî•ñ‚ğ—˜—pittt.js‚É‚Äconsole.log‚Éİ’uƒ~ƒm‚ğƒ_ƒ“ƒv‚µ‚Ä‚¢‚éj
-    this.useGuide = true;  // ƒKƒCƒhg—p(R‚ğ‰Ÿ‚³‚È‚­‚Ä‚àƒKƒCƒh‚ğ—˜—p‚·‚é‚Æ‚«true)
-    this.req = [];       // ƒmƒ‹ƒ}( REQuired features )
+    this.ingredients = [[],I];  // ä½¿ç”¨å¯èƒ½ãƒŸãƒ å…ˆé ­è¦ç´ ã¯åˆæœŸãƒ›ãƒ¼ãƒ«ãƒ‰ãƒŸãƒ
+    this.caption = 'ãƒ†ãƒˆãƒªã‚¹ã€€ãã®ï¼‘';
+    this.hint = 'æœ€åˆã¯ã€€TETRiS (ï¼”åˆ—æ¶ˆã—)ã‚’Â¥nã²ãŸã™ã‚‰æ±ºã‚ã‚‹ã ã‘ã€‚ã¾ãšã¯Â¥nã“ã“ã§ã€€ã‚¦ã‚©ãƒ¼ãƒŸãƒ³ã‚°ã‚¢ãƒƒãƒ—ï¼';
+    this.guides = [];    // ã‚¬ã‚¤ãƒ‰ ä½œæˆã™ã‚‹éš›ã¯è¨­ç½®ãƒŸãƒã®ãƒ€ãƒ³ãƒ—æƒ…å ±ã‚’åˆ©ç”¨ï¼ˆttt.jsã«ã¦console.logã«è¨­ç½®ãƒŸãƒã‚’ãƒ€ãƒ³ãƒ—ã—ã¦ã„ã‚‹ï¼‰
+    this.useGuide = true;  // ã‚¬ã‚¤ãƒ‰ä½¿ç”¨(Rã‚’æŠ¼ã•ãªãã¦ã‚‚ã‚¬ã‚¤ãƒ‰ã‚’åˆ©ç”¨ã™ã‚‹ã¨ãtrue)
+    this.req = [];       // ãƒãƒ«ãƒ( REQuired features )
     this.req.push(0);    //   [0]: Single
     this.req.push(0);    //   [1]: Double
     this.req.push(0);    //   [2]: Triple
     this.req.push(1);    //   [3]: Tetris
-    this.req.push(0);    //   [4]: T-Spin Mini ( 0 —ñ)
-    this.req.push(0);    //   [5]: T-Spin ( 0 —ñ)
+    this.req.push(0);    //   [4]: T-Spin Mini ( 0 åˆ—)
+    this.req.push(0);    //   [5]: T-Spin ( 0 åˆ—)
     this.req.push(0);    //   [6]: Mini T-Spin Single
     this.req.push(0);    //   [7]: T-Spin Single
     this.req.push(0);    //   [8]: T-Spin Double
@@ -98,11 +98,11 @@ function Problem840(id){
   this.id = id;
   this.initialBlocks = INITIAL_PC_BLOCKS;
   this.caption = 'No.'+ id;
-  this.hint = 'Perfect Clear ‚ğ”­“®‚µ‚Ä‚­‚¾‚³‚¢B';
+  this.hint = 'Perfect Clear ã‚’ç™ºå‹•ã—ã¦ãã ã•ã„ã€‚';
   this.useGuide = false;
   this.req = [0,0,0,0,0,0,0,0,0,0,1,0,0];
 
-  /* ‚±‚±‚Ìcase•¶‚Í uƒeƒgƒŠƒX_ƒpƒtƒFƒeƒ“ƒvƒŒ¬Œ÷—¦.xlsxv‚Ìuƒeƒ“ƒvƒŒ‰ü_ŒvZ—pvƒV[ƒg DB—ñ‚©‚çƒRƒs[‚·‚é‚±‚Æ */
+  /* ã“ã“ã®caseæ–‡ã¯ ã€Œãƒ†ãƒˆãƒªã‚¹_ãƒ‘ãƒ•ã‚§ãƒ†ãƒ³ãƒ—ãƒ¬æˆåŠŸç‡.xlsxã€ã®ã€Œãƒ†ãƒ³ãƒ—ãƒ¬æ”¹_è¨ˆç®—ç”¨ã€ã‚·ãƒ¼ãƒˆ DBåˆ—ã‹ã‚‰ã‚³ãƒ”ãƒ¼ã™ã‚‹ã“ã¨ */
   switch(id){
     case   1:    this.ingredients = [[],I,I,J,L,O];    this.guides = GUIDES_ILO;    break;
     case   3:    this.ingredients = [[],I,I,J,L,T];    this.guides = GUIDES_IJT;    break;
@@ -817,7 +817,7 @@ function Problem840(id){
     case 840:    this.ingredients = [[],I,Z,T,S,O];    this.guides = GUIDES_TZS;    break;
 
     default:
-    // ‰Šúƒ}ƒgƒŠƒbƒNƒXBƒfƒbƒhƒ‰ƒCƒ“ˆÈã‚ÍŠÜ‚ß‚È‚¢
+    // åˆæœŸãƒãƒˆãƒªãƒƒã‚¯ã‚¹ã€‚ãƒ‡ãƒƒãƒ‰ãƒ©ã‚¤ãƒ³ä»¥ä¸Šã¯å«ã‚ãªã„
     this.initialBlocks = [[0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0],
@@ -838,18 +838,18 @@ function Problem840(id){
     [1,1,1,1,1,1,1,1,1,0],
     [1,1,1,1,1,1,1,1,1,0],
     [1,1,1,1,1,1,1,1,1,0]];
-    this.ingredients = [[],I];  // g—p‰Â”\ƒ~ƒm æ“ª—v‘f‚Í‰Šúƒz[ƒ‹ƒhƒ~ƒm
-    this.caption = 'ƒeƒgƒŠƒX@‚»‚Ì‚P';
-    this.hint = 'Å‰‚Í@TETRiS (‚S—ñÁ‚µ)‚ğ\n‚Ğ‚½‚·‚çŒˆ‚ß‚é‚¾‚¯B‚Ü‚¸‚Í\n‚±‚±‚Å@ƒEƒH[ƒ~ƒ“ƒOƒAƒbƒvI';
-    this.guides = [];    // ƒKƒCƒh ì¬‚·‚éÛ‚Íİ’uƒ~ƒm‚Ìƒ_ƒ“ƒvî•ñ‚ğ—˜—pittt.js‚É‚Äconsole.log‚Éİ’uƒ~ƒm‚ğƒ_ƒ“ƒv‚µ‚Ä‚¢‚éj
-    this.useGuide = true;  // ƒKƒCƒhg—p(R‚ğ‰Ÿ‚³‚È‚­‚Ä‚àƒKƒCƒh‚ğ—˜—p‚·‚é‚Æ‚«true)
-    this.req = [];       // ƒmƒ‹ƒ}( REQuired features )
+    this.ingredients = [[],I];  // ä½¿ç”¨å¯èƒ½ãƒŸãƒ å…ˆé ­è¦ç´ ã¯åˆæœŸãƒ›ãƒ¼ãƒ«ãƒ‰ãƒŸãƒ
+    this.caption = 'ãƒ†ãƒˆãƒªã‚¹ã€€ãã®ï¼‘';
+    this.hint = 'æœ€åˆã¯ã€€TETRiS (ï¼”åˆ—æ¶ˆã—)ã‚’Â¥nã²ãŸã™ã‚‰æ±ºã‚ã‚‹ã ã‘ã€‚ã¾ãšã¯Â¥nã“ã“ã§ã€€ã‚¦ã‚©ãƒ¼ãƒŸãƒ³ã‚°ã‚¢ãƒƒãƒ—ï¼';
+    this.guides = [];    // ã‚¬ã‚¤ãƒ‰ ä½œæˆã™ã‚‹éš›ã¯è¨­ç½®ãƒŸãƒã®ãƒ€ãƒ³ãƒ—æƒ…å ±ã‚’åˆ©ç”¨ï¼ˆttt.jsã«ã¦console.logã«è¨­ç½®ãƒŸãƒã‚’ãƒ€ãƒ³ãƒ—ã—ã¦ã„ã‚‹ï¼‰
+    this.useGuide = true;  // ã‚¬ã‚¤ãƒ‰ä½¿ç”¨(Rã‚’æŠ¼ã•ãªãã¦ã‚‚ã‚¬ã‚¤ãƒ‰ã‚’åˆ©ç”¨ã™ã‚‹ã¨ãtrue)
+    this.req = [];       // ãƒãƒ«ãƒ( REQuired features )
     this.req.push(0);    //   [0]: Single
     this.req.push(0);    //   [1]: Double
     this.req.push(0);    //   [2]: Triple
     this.req.push(1);    //   [3]: Tetris
-    this.req.push(0);    //   [4]: T-Spin Mini ( 0 —ñ)
-    this.req.push(0);    //   [5]: T-Spin ( 0 —ñ)
+    this.req.push(0);    //   [4]: T-Spin Mini ( 0 åˆ—)
+    this.req.push(0);    //   [5]: T-Spin ( 0 åˆ—)
     this.req.push(0);    //   [6]: Mini T-Spin Single
     this.req.push(0);    //   [7]: T-Spin Single
     this.req.push(0);    //   [8]: T-Spin Double
@@ -867,12 +867,12 @@ function ProblemWithGuidance(id){
   this.id = id;
   this.initialBlocks = INITIAL_PC_BLOCKS;
   this.caption = 'No.'+ id;
-  this.hint = 'Šî–{ƒpƒ^[ƒ“@[ƒKƒCƒh‚ ‚è] \nPerfect Clear ‚ğ”­“®‚µ‚Ä‚­‚¾‚³‚¢B';
+  this.hint = 'åŸºæœ¬ãƒ‘ã‚¿ãƒ¼ãƒ³ã€€[ã‚¬ã‚¤ãƒ‰ã‚ã‚Š] Â¥nPerfect Clear ã‚’ç™ºå‹•ã—ã¦ãã ã•ã„ã€‚';
   this.useGuide = true;
   this.req = [0,0,0,0,0,0,0,0,0,0,1,0,0];
 
   switch(id){
-    /* I c’u‚« iƒKƒCƒh‚ ‚èj*/
+    /* I ç¸¦ç½®ã ï¼ˆã‚¬ã‚¤ãƒ‰ã‚ã‚Šï¼‰*/
     case  1:    this.ingredients = [[],I,I,J,T];        this.guides = GUIDES_IJT;   break;
     case  2:    this.ingredients = [[],I,I,O,J];        this.guides = GUIDES_IOJ;   break;
     case  3:    this.ingredients = [[],I,I,S,J];        this.guides = GUIDES_ISJ;   break;
@@ -888,7 +888,7 @@ function ProblemWithGuidance(id){
     case 13:    this.ingredients = [[],I,O,J,T];        this.guides = GUIDES_OJT;   break;
     case 14:    this.ingredients = [[],I,T,J,S];        this.guides = GUIDES_TJS;   break;
 
-    /* ‰è I ƒ~ƒm‚P’i–ÚiƒKƒCƒh‚ ‚èj */
+    /* åˆæ‰‹ I ãƒŸãƒï¼‘æ®µç›®ï¼ˆã‚¬ã‚¤ãƒ‰ã‚ã‚Šï¼‰ */
     case 15:    this.ingredients = [[],I,T,O,J];        this.guides = GUIDES_TOJ;   break;
     case 16:    this.ingredients = [[],I,T,L,O];        this.guides = GUIDES_TLO;   break;
     case 17:    this.ingredients = [[],I,S,T,O];        this.guides = GUIDES_STO;   break;
@@ -896,26 +896,26 @@ function ProblemWithGuidance(id){
     case 19:    this.ingredients = [[],I,S,O,J];        this.guides = GUIDES_SOJ;   break;
     case 20:    this.ingredients = [[],I,T,S,I];        this.guides = GUIDES_TSI;   break;
 
-    /* ‘S•”Q‚©‚¹iƒKƒCƒh‚ ‚èj */
+    /* å…¨éƒ¨å¯ã‹ã›ï¼ˆã‚¬ã‚¤ãƒ‰ã‚ã‚Šï¼‰ */
     case 21:    this.ingredients = [[],I,L,Z,T];        this.guides = GUIDES_LZT;   break;
     case 22:    this.ingredients = [[],I,L,S,T];        this.guides = GUIDES_LST;   break;
     case 23:    this.ingredients = [[],I,J,Z,T];        this.guides = GUIDES_JZT;   break;
     case 24:    this.ingredients = [[],I,J,S,T];        this.guides = GUIDES_JST2;   break;
 
-    /* I I L OiƒKƒCƒh‚ ‚èj */
+    /* I I L Oï¼ˆã‚¬ã‚¤ãƒ‰ã‚ã‚Šï¼‰ */
     case 25:    this.ingredients = [[],I,I,L,O];        this.guides = GUIDES_ILO;   break;
     case 26:    this.ingredients = [[],I,L,I,O];        this.guides = GUIDES_LIO;   break;
 
-    /* ‰è I ƒ~ƒm3’i–ÚiƒKƒCƒh‚ ‚èj */
+    /* åˆæ‰‹ I ãƒŸãƒ3æ®µç›®ï¼ˆã‚¬ã‚¤ãƒ‰ã‚ã‚Šï¼‰ */
     case 27:    this.ingredients = [[],I,L,O,S];        this.guides = GUIDES_LOS;   break;
     case 28:    this.ingredients = [[],I,L,I,Z];        this.guides = GUIDES_LIZ;   break;
     case 29:    this.ingredients = [[],I,O,J,S];        this.guides = GUIDES_OJS;   break;
 
-    /* LSIO iƒKƒCƒh‚ ‚èj*/
+    /* LSIO ï¼ˆã‚¬ã‚¤ãƒ‰ã‚ã‚Šï¼‰*/
     case 30:    this.ingredients = [[],L,S,I,O];        this.guides = GUIDES_LSIO;   break;
 
     default:
-    // ‰Šúƒ}ƒgƒŠƒbƒNƒXBƒfƒbƒhƒ‰ƒCƒ“ˆÈã‚ÍŠÜ‚ß‚È‚¢
+    // åˆæœŸãƒãƒˆãƒªãƒƒã‚¯ã‚¹ã€‚ãƒ‡ãƒƒãƒ‰ãƒ©ã‚¤ãƒ³ä»¥ä¸Šã¯å«ã‚ãªã„
     this.initialBlocks = [[0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0],
@@ -936,18 +936,18 @@ function ProblemWithGuidance(id){
     [1,1,1,1,1,1,1,1,1,0],
     [1,1,1,1,1,1,1,1,1,0],
     [1,1,1,1,1,1,1,1,1,0]];
-    this.ingredients = [[],I];  // g—p‰Â”\ƒ~ƒm æ“ª—v‘f‚Í‰Šúƒz[ƒ‹ƒhƒ~ƒm
-    this.caption = 'ƒeƒgƒŠƒX@‚»‚Ì‚P';
-    this.hint = 'Å‰‚Í@TETRiS (‚S—ñÁ‚µ)‚ğ\n‚Ğ‚½‚·‚çŒˆ‚ß‚é‚¾‚¯B‚Ü‚¸‚Í\n‚±‚±‚Å@ƒEƒH[ƒ~ƒ“ƒOƒAƒbƒvI';
-    this.guides = [];    // ƒKƒCƒh ì¬‚·‚éÛ‚Íİ’uƒ~ƒm‚Ìƒ_ƒ“ƒvî•ñ‚ğ—˜—pittt.js‚É‚Äconsole.log‚Éİ’uƒ~ƒm‚ğƒ_ƒ“ƒv‚µ‚Ä‚¢‚éj
-    this.useGuide = true;  // ƒKƒCƒhg—p(R‚ğ‰Ÿ‚³‚È‚­‚Ä‚àƒKƒCƒh‚ğ—˜—p‚·‚é‚Æ‚«true)
-    this.req = [];       // ƒmƒ‹ƒ}( REQuired features )
+    this.ingredients = [[],I];  // ä½¿ç”¨å¯èƒ½ãƒŸãƒ å…ˆé ­è¦ç´ ã¯åˆæœŸãƒ›ãƒ¼ãƒ«ãƒ‰ãƒŸãƒ
+    this.caption = 'ãƒ†ãƒˆãƒªã‚¹ã€€ãã®ï¼‘';
+    this.hint = 'æœ€åˆã¯ã€€TETRiS (ï¼”åˆ—æ¶ˆã—)ã‚’Â¥nã²ãŸã™ã‚‰æ±ºã‚ã‚‹ã ã‘ã€‚ã¾ãšã¯Â¥nã“ã“ã§ã€€ã‚¦ã‚©ãƒ¼ãƒŸãƒ³ã‚°ã‚¢ãƒƒãƒ—ï¼';
+    this.guides = [];    // ã‚¬ã‚¤ãƒ‰ ä½œæˆã™ã‚‹éš›ã¯è¨­ç½®ãƒŸãƒã®ãƒ€ãƒ³ãƒ—æƒ…å ±ã‚’åˆ©ç”¨ï¼ˆttt.jsã«ã¦console.logã«è¨­ç½®ãƒŸãƒã‚’ãƒ€ãƒ³ãƒ—ã—ã¦ã„ã‚‹ï¼‰
+    this.useGuide = true;  // ã‚¬ã‚¤ãƒ‰ä½¿ç”¨(Rã‚’æŠ¼ã•ãªãã¦ã‚‚ã‚¬ã‚¤ãƒ‰ã‚’åˆ©ç”¨ã™ã‚‹ã¨ãtrue)
+    this.req = [];       // ãƒãƒ«ãƒ( REQuired features )
     this.req.push(0);    //   [0]: Single
     this.req.push(0);    //   [1]: Double
     this.req.push(0);    //   [2]: Triple
     this.req.push(1);    //   [3]: Tetris
-    this.req.push(0);    //   [4]: T-Spin Mini ( 0 —ñ)
-    this.req.push(0);    //   [5]: T-Spin ( 0 —ñ)
+    this.req.push(0);    //   [4]: T-Spin Mini ( 0 åˆ—)
+    this.req.push(0);    //   [5]: T-Spin ( 0 åˆ—)
     this.req.push(0);    //   [6]: Mini T-Spin Single
     this.req.push(0);    //   [7]: T-Spin Single
     this.req.push(0);    //   [8]: T-Spin Double
@@ -965,7 +965,7 @@ function ProblemOtherwise(id){
   this.id = id;
   this.initialBlocks = INITIAL_PC_BLOCKS;
   this.caption = 'No.'+ id;
-  this.hint = 'Perfect Clear ‚ğ”­“®‚µ‚Ä‚­‚¾‚³‚¢B';
+  this.hint = 'Perfect Clear ã‚’ç™ºå‹•ã—ã¦ãã ã•ã„ã€‚';
   this.useGuide = true;
   this.req = [0,0,0,0,0,0,0,0,0,0,1,0,0];
 
@@ -999,7 +999,7 @@ function ProblemOtherwise(id){
     case   27:    this.ingredients = [[],I,T,J,S];    this.guides = [G(I, 3, 2, 16),G(T, 2, 4, 16),G(J, 1, 3, 17),G(S, 2, 5, 17)];    break;
 
     default:
-    // ‰Šúƒ}ƒgƒŠƒbƒNƒXBƒfƒbƒhƒ‰ƒCƒ“ˆÈã‚ÍŠÜ‚ß‚È‚¢
+    // åˆæœŸãƒãƒˆãƒªãƒƒã‚¯ã‚¹ã€‚ãƒ‡ãƒƒãƒ‰ãƒ©ã‚¤ãƒ³ä»¥ä¸Šã¯å«ã‚ãªã„
     this.initialBlocks = [[0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0],
@@ -1020,18 +1020,18 @@ function ProblemOtherwise(id){
     [1,1,1,1,1,1,1,1,1,0],
     [1,1,1,1,1,1,1,1,1,0],
     [1,1,1,1,1,1,1,1,1,0]];
-    this.ingredients = [[],I];  // g—p‰Â”\ƒ~ƒm æ“ª—v‘f‚Í‰Šúƒz[ƒ‹ƒhƒ~ƒm
-    this.caption = 'ƒeƒgƒŠƒX@‚»‚Ì‚P';
-    this.hint = 'Å‰‚Í@TETRiS (‚S—ñÁ‚µ)‚ğ\n‚Ğ‚½‚·‚çŒˆ‚ß‚é‚¾‚¯B‚Ü‚¸‚Í\n‚±‚±‚Å@ƒEƒH[ƒ~ƒ“ƒOƒAƒbƒvI';
-    this.guides = [];    // ƒKƒCƒh ì¬‚·‚éÛ‚Íİ’uƒ~ƒm‚Ìƒ_ƒ“ƒvî•ñ‚ğ—˜—pittt.js‚É‚Äconsole.log‚Éİ’uƒ~ƒm‚ğƒ_ƒ“ƒv‚µ‚Ä‚¢‚éj
-    this.useGuide = true;  // ƒKƒCƒhg—p(R‚ğ‰Ÿ‚³‚È‚­‚Ä‚àƒKƒCƒh‚ğ—˜—p‚·‚é‚Æ‚«true)
-    this.req = [];       // ƒmƒ‹ƒ}( REQuired features )
+    this.ingredients = [[],I];  // ä½¿ç”¨å¯èƒ½ãƒŸãƒ å…ˆé ­è¦ç´ ã¯åˆæœŸãƒ›ãƒ¼ãƒ«ãƒ‰ãƒŸãƒ
+    this.caption = 'ãƒ†ãƒˆãƒªã‚¹ã€€ãã®ï¼‘';
+    this.hint = 'æœ€åˆã¯ã€€TETRiS (ï¼”åˆ—æ¶ˆã—)ã‚’Â¥nã²ãŸã™ã‚‰æ±ºã‚ã‚‹ã ã‘ã€‚ã¾ãšã¯Â¥nã“ã“ã§ã€€ã‚¦ã‚©ãƒ¼ãƒŸãƒ³ã‚°ã‚¢ãƒƒãƒ—ï¼';
+    this.guides = [];    // ã‚¬ã‚¤ãƒ‰ ä½œæˆã™ã‚‹éš›ã¯è¨­ç½®ãƒŸãƒã®ãƒ€ãƒ³ãƒ—æƒ…å ±ã‚’åˆ©ç”¨ï¼ˆttt.jsã«ã¦console.logã«è¨­ç½®ãƒŸãƒã‚’ãƒ€ãƒ³ãƒ—ã—ã¦ã„ã‚‹ï¼‰
+    this.useGuide = true;  // ã‚¬ã‚¤ãƒ‰ä½¿ç”¨(Rã‚’æŠ¼ã•ãªãã¦ã‚‚ã‚¬ã‚¤ãƒ‰ã‚’åˆ©ç”¨ã™ã‚‹ã¨ãtrue)
+    this.req = [];       // ãƒãƒ«ãƒ( REQuired features )
     this.req.push(0);    //   [0]: Single
     this.req.push(0);    //   [1]: Double
     this.req.push(0);    //   [2]: Triple
     this.req.push(1);    //   [3]: Tetris
-    this.req.push(0);    //   [4]: T-Spin Mini ( 0 —ñ)
-    this.req.push(0);    //   [5]: T-Spin ( 0 —ñ)
+    this.req.push(0);    //   [4]: T-Spin Mini ( 0 åˆ—)
+    this.req.push(0);    //   [5]: T-Spin ( 0 åˆ—)
     this.req.push(0);    //   [6]: Mini T-Spin Single
     this.req.push(0);    //   [7]: T-Spin Single
     this.req.push(0);    //   [8]: T-Spin Double
@@ -1048,11 +1048,11 @@ function Problem840_Mirror(id){
   this.id = id;
   this.initialBlocks = INITIAL_PC_BLOCKS_MIRROR;
   this.caption = 'No.'+ id;
-  this.hint = 'Perfect Clear ‚ğ”­“®‚µ‚Ä‚­‚¾‚³‚¢B';
+  this.hint = 'Perfect Clear ã‚’ç™ºå‹•ã—ã¦ãã ã•ã„ã€‚';
   this.useGuide = false;
   this.req = [0,0,0,0,0,0,0,0,0,0,1,0,0];
 
-  /* ‚±‚±‚Ìcase•¶‚Í uƒeƒgƒŠƒX_ƒpƒtƒFƒeƒ“ƒvƒŒ¬Œ÷—¦.xlsxv‚Ìuƒeƒ“ƒvƒŒ‰ü_ƒ~ƒ‰[_ŒvZ—pvƒV[ƒg DB—ñ‚©‚çƒRƒs[‚·‚é‚±‚Æ */
+  /* ã“ã“ã®caseæ–‡ã¯ ã€Œãƒ†ãƒˆãƒªã‚¹_ãƒ‘ãƒ•ã‚§ãƒ†ãƒ³ãƒ—ãƒ¬æˆåŠŸç‡.xlsxã€ã®ã€Œãƒ†ãƒ³ãƒ—ãƒ¬æ”¹_ãƒŸãƒ©ãƒ¼_è¨ˆç®—ç”¨ã€ã‚·ãƒ¼ãƒˆ DBåˆ—ã‹ã‚‰ã‚³ãƒ”ãƒ¼ã™ã‚‹ã“ã¨ */
   switch(id){
     case   1:    this.ingredients = [[],I,I,J,L,O];    this.guides = GUIDES_MIRROR_IJO;    break;
     case   2:    this.ingredients = [[],I,I,J,L,S];    this.guides = GUIDES_MIRROR_JIS;    break;
@@ -1767,7 +1767,7 @@ function Problem840_Mirror(id){
     case 840:    this.ingredients = [[],I,Z,T,S,O];    this.guides = GUIDES_MIRROR_TSZ;    break;
 
     default:
-    // ‰Šúƒ}ƒgƒŠƒbƒNƒXBƒfƒbƒhƒ‰ƒCƒ“ˆÈã‚ÍŠÜ‚ß‚È‚¢
+    // åˆæœŸãƒãƒˆãƒªãƒƒã‚¯ã‚¹ã€‚ãƒ‡ãƒƒãƒ‰ãƒ©ã‚¤ãƒ³ä»¥ä¸Šã¯å«ã‚ãªã„
     this.initialBlocks = [[0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0],
@@ -1788,18 +1788,18 @@ function Problem840_Mirror(id){
     [1,1,1,1,1,1,1,1,1,0],
     [1,1,1,1,1,1,1,1,1,0],
     [1,1,1,1,1,1,1,1,1,0]];
-    this.ingredients = [[],I];  // g—p‰Â”\ƒ~ƒm æ“ª—v‘f‚Í‰Šúƒz[ƒ‹ƒhƒ~ƒm
-    this.caption = 'ƒeƒgƒŠƒX@‚»‚Ì‚P';
-    this.hint = 'Å‰‚Í@TETRiS (‚S—ñÁ‚µ)‚ğ\n‚Ğ‚½‚·‚çŒˆ‚ß‚é‚¾‚¯B‚Ü‚¸‚Í\n‚±‚±‚Å@ƒEƒH[ƒ~ƒ“ƒOƒAƒbƒvI';
-    this.guides = [];    // ƒKƒCƒh ì¬‚·‚éÛ‚Íİ’uƒ~ƒm‚Ìƒ_ƒ“ƒvî•ñ‚ğ—˜—pittt.js‚É‚Äconsole.log‚Éİ’uƒ~ƒm‚ğƒ_ƒ“ƒv‚µ‚Ä‚¢‚éj
-    this.useGuide = true;  // ƒKƒCƒhg—p(R‚ğ‰Ÿ‚³‚È‚­‚Ä‚àƒKƒCƒh‚ğ—˜—p‚·‚é‚Æ‚«true)
-    this.req = [];       // ƒmƒ‹ƒ}( REQuired features )
+    this.ingredients = [[],I];  // ä½¿ç”¨å¯èƒ½ãƒŸãƒ å…ˆé ­è¦ç´ ã¯åˆæœŸãƒ›ãƒ¼ãƒ«ãƒ‰ãƒŸãƒ
+    this.caption = 'ãƒ†ãƒˆãƒªã‚¹ã€€ãã®ï¼‘';
+    this.hint = 'æœ€åˆã¯ã€€TETRiS (ï¼”åˆ—æ¶ˆã—)ã‚’Â¥nã²ãŸã™ã‚‰æ±ºã‚ã‚‹ã ã‘ã€‚ã¾ãšã¯Â¥nã“ã“ã§ã€€ã‚¦ã‚©ãƒ¼ãƒŸãƒ³ã‚°ã‚¢ãƒƒãƒ—ï¼';
+    this.guides = [];    // ã‚¬ã‚¤ãƒ‰ ä½œæˆã™ã‚‹éš›ã¯è¨­ç½®ãƒŸãƒã®ãƒ€ãƒ³ãƒ—æƒ…å ±ã‚’åˆ©ç”¨ï¼ˆttt.jsã«ã¦console.logã«è¨­ç½®ãƒŸãƒã‚’ãƒ€ãƒ³ãƒ—ã—ã¦ã„ã‚‹ï¼‰
+    this.useGuide = true;  // ã‚¬ã‚¤ãƒ‰ä½¿ç”¨(Rã‚’æŠ¼ã•ãªãã¦ã‚‚ã‚¬ã‚¤ãƒ‰ã‚’åˆ©ç”¨ã™ã‚‹ã¨ãtrue)
+    this.req = [];       // ãƒãƒ«ãƒ( REQuired features )
     this.req.push(0);    //   [0]: Single
     this.req.push(0);    //   [1]: Double
     this.req.push(0);    //   [2]: Triple
     this.req.push(1);    //   [3]: Tetris
-    this.req.push(0);    //   [4]: T-Spin Mini ( 0 —ñ)
-    this.req.push(0);    //   [5]: T-Spin ( 0 —ñ)
+    this.req.push(0);    //   [4]: T-Spin Mini ( 0 åˆ—)
+    this.req.push(0);    //   [5]: T-Spin ( 0 åˆ—)
     this.req.push(0);    //   [6]: Mini T-Spin Single
     this.req.push(0);    //   [7]: T-Spin Single
     this.req.push(0);    //   [8]: T-Spin Double

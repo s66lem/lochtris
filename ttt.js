@@ -1,54 +1,54 @@
 /*========================================================================================
-  ¡ ttt.js ¡ 
+ â–¡â–  ttt.js â– â–¡
 ========================================================================================*/
 /*----------------------------------------------------------------------------------------
- ™š ƒOƒ[ƒoƒ‹•Ï”ˆê—— š™
+ â˜†â˜… ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•°ä¸€è¦§ â˜…â˜†
 ----------------------------------------------------------------------------------------*/
-var gButton;          // ‰Ÿ‚³‚ê‚½ƒ{ƒ^ƒ“‚Ì–¼‘OBƒtƒŒ[ƒ€I—¹‚É‰Šú‰»(‹ó•¶š—ñ‘ã“ü)‚³‚ê‚é
-var gLyrSections;     // ƒZƒNƒVƒ‡ƒ“‘I‘ğƒŒƒCƒ„[( LaYeR )
-var gLyrPerform;      // ƒQ[ƒ€ƒŒƒCƒ„[
-var gLyrPreferences;  // İ’èƒŒƒCƒ„[
-var gScene;           // ƒV[ƒ“–¼
-var gPrevScene;       // ‘O‚ÌƒtƒŒ[ƒ€‚Å‚ÌƒV[ƒ“–¼( PREVious SCENE )
+var gButton;          // æŠ¼ã•ã‚ŒãŸãƒœã‚¿ãƒ³ã®åå‰ã€‚ãƒ•ãƒ¬ãƒ¼ãƒ çµ‚äº†æ™‚ã«åˆæœŸåŒ–(ç©ºæ–‡å­—åˆ—ä»£å…¥)ã•ã‚Œã‚‹
+var gLyrSections;     // ã‚»ã‚¯ã‚·ãƒ§ãƒ³é¸æŠãƒ¬ã‚¤ãƒ¤ãƒ¼( LaYeR )
+var gLyrPerform;      // ã‚²ãƒ¼ãƒ ãƒ¬ã‚¤ãƒ¤ãƒ¼
+var gLyrPreferences;  // è¨­å®šãƒ¬ã‚¤ãƒ¤ãƒ¼
+var gScene;           // ã‚·ãƒ¼ãƒ³å
+var gPrevScene;       // å‰ã®ãƒ•ãƒ¬ãƒ¼ãƒ ã§ã®ã‚·ãƒ¼ãƒ³å( PREVious SCENE )
 /*
-œ ƒV[ƒ“\‘¢
- select_sections Ì preferences
-   «ª
+â— ã‚·ãƒ¼ãƒ³æ§‹é€ 
+ select_sections â‡” preferences
+   â†“â†‘
  perform
 */
-var gKeys;            // ƒL[‚Ì–¼‘O
+var gKeys;            // ã‚­ãƒ¼ã®åå‰
 var gSelectForms = ['key_left', 'key_right', 'key_softdrop', 'key_harddrop',
-                    'key_rot_right', 'key_rot_left' , 'key_hold' , 'key_guide'];  // ƒL[‘I‘ğƒ{ƒbƒNƒX‚Ì–¼‘O
+                    'key_rot_right', 'key_rot_left' , 'key_hold' , 'key_guide'];  // ã‚­ãƒ¼é¸æŠãƒœãƒƒã‚¯ã‚¹ã®åå‰
 /*
- ƒL[‚ğ’Ç‰Á‚·‚éÛ‚É‚Í LoadData() ‚¨‚æ‚Ñ SavePreferences() ‚Ö‚Ì’Ç‰ÁA‚Ü‚½ Key**() (ƒL[–¼‚Ì
- æ“¾ƒƒ\ƒbƒh)‚¨‚æ‚Ñİ’èƒZƒŒƒNƒgƒ{ƒbƒNƒX‚Ì’Ç‰Á‚ğ–Y‚ê‚È‚¢‚Å‚­‚¾‚³‚¢B
+ ã‚­ãƒ¼ã‚’è¿½åŠ ã™ã‚‹éš›ã«ã¯ LoadData() ãŠã‚ˆã³ SavePreferences() ã¸ã®è¿½åŠ ã€ã¾ãŸ Key**() (ã‚­ãƒ¼åã®
+ å–å¾—ãƒ¡ã‚½ãƒƒãƒ‰)ãŠã‚ˆã³è¨­å®šã‚»ãƒ¬ã‚¯ãƒˆãƒœãƒƒã‚¯ã‚¹ã®è¿½åŠ ã‚’å¿˜ã‚Œãªã„ã§ãã ã•ã„ã€‚
 */
 
-var gCurSectionId;    // ‘I‘ğ’†( CURrent )‚ÌƒZƒNƒVƒ‡ƒ“ ID
-var gCurProblemId;    // ‘I‘ğ’†‚Ì–â‘è ID
-var gCurProblem;      // ‘I‘ğ’†‚Ì–â‘èƒIƒuƒWƒFƒNƒg
-var gCurProblemReq;   // –â‘èƒmƒ‹ƒ}
-var gQueue;           // ƒlƒNƒXƒg—ñ
+var gCurSectionId;    // é¸æŠä¸­( CURrent )ã®ã‚»ã‚¯ã‚·ãƒ§ãƒ³ ID
+var gCurProblemId;    // é¸æŠä¸­ã®å•é¡Œ ID
+var gCurProblem;      // é¸æŠä¸­ã®å•é¡Œã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+var gCurProblemReq;   // å•é¡Œãƒãƒ«ãƒ
+var gQueue;           // ãƒã‚¯ã‚¹ãƒˆåˆ—
 var gCurMino;
 var gCurHold;
-var gCurUseGuideFlg   // ƒKƒCƒh‚ğ—˜—p‚·‚é‚©‚Ç‚¤‚©
+var gCurUseGuideFlg   // ã‚¬ã‚¤ãƒ‰ã‚’åˆ©ç”¨ã™ã‚‹ã‹ã©ã†ã‹
 var gCurX;
 var gCurY;
 var gCurDir;
 var gNdCount;         // ( Natural Drop COUNT )
 var gDfCount;         // ( Display Features COUNT )
-var gCurGuide;        // Œ»İ‚ÌƒKƒCƒh
-var gGuidesQueue;     // ƒKƒCƒh”z—ñ
+var gCurGuide;        // ç¾åœ¨ã®ã‚¬ã‚¤ãƒ‰
+var gGuidesQueue;     // ã‚¬ã‚¤ãƒ‰é…åˆ—
 
-var gLineClearCount;  // ƒ‰ƒCƒ“Á‹‰‰o‚ÌƒJƒEƒ“ƒg
-var gTSpinType;       // 0= T ƒXƒsƒ“‚È‚µ, 1= T ƒXƒsƒ“Eƒ~ƒj, 2=T ƒXƒsƒ“
-var gRens;            // Œp‘±’†‚Ì REN ”
-var gIsReadyToB2b;    // Ÿ‚ª BACK to BACK ‚É‚È‚è‚¤‚é?
+var gLineClearCount;  // ãƒ©ã‚¤ãƒ³æ¶ˆå»æ¼”å‡ºã®ã‚«ã‚¦ãƒ³ãƒˆ
+var gTSpinType;       // 0= T ã‚¹ãƒ”ãƒ³ãªã—, 1= T ã‚¹ãƒ”ãƒ³ãƒ»ãƒŸãƒ‹, 2=T ã‚¹ãƒ”ãƒ³
+var gRens;            // ç¶™ç¶šä¸­ã® REN æ•°
+var gIsReadyToB2b;    // æ¬¡ãŒ BACK to BACK ã«ãªã‚Šã†ã‚‹?
 
 /*----------------------------------------------------------------------------------------
- ™š Še–â‘è‚Ö‚ÌƒAƒNƒZƒXİ’è š™
+ â˜†â˜… å„å•é¡Œã¸ã®ã‚¢ã‚¯ã‚»ã‚¹è¨­å®š â˜…â˜†
 
- –â‘èƒf[ƒ^‚Í problem.js “™‚É‹LÚ‚³‚ê‚Ä‚¢‚Ü‚·B
+ å•é¡Œãƒ‡ãƒ¼ã‚¿ã¯ problem.js ç­‰ã«è¨˜è¼‰ã•ã‚Œã¦ã„ã¾ã™ã€‚
 ----------------------------------------------------------------------------------------*/
 var gProblems = getProblems();
 var gCurProgmeIdList = [];
@@ -58,9 +58,9 @@ for(var i = 0; i < SECTION_NUM; i++){
 }
 
 /*----------------------------------------------------------------------------------------
- ™š ‰Šú‰» š™
+ â˜†â˜… åˆæœŸåŒ– â˜…â˜†
 
- ‹N“®‚É 1 “x‚¾‚¯ŒÄ‚Ño‚³‚ê‚Ü‚·BŒo‰ßƒtƒŒ[ƒ€”‚Í 0 ‚Æ‚µ‚Äˆµ‚í‚ê‚Ü‚·B
+ èµ·å‹•æ™‚ã« 1 åº¦ã ã‘å‘¼ã³å‡ºã•ã‚Œã¾ã™ã€‚çµŒéãƒ•ãƒ¬ãƒ¼ãƒ æ•°ã¯ 0 ã¨ã—ã¦æ‰±ã‚ã‚Œã¾ã™ã€‚
 ----------------------------------------------------------------------------------------*/
 function Setup(){
   SetupLayers();
@@ -70,9 +70,9 @@ function Setup(){
   LoadData();
 }
 /*----------------------------------------------------------------------------------------
- ™š ƒŒƒCƒ„[‰Šú‰» š™
+ â˜†â˜… ãƒ¬ã‚¤ãƒ¤ãƒ¼åˆæœŸåŒ– â˜…â˜†
 
- ƒŒƒCƒ„[‚ÌƒTƒCƒY“™‚Í css ƒtƒ@ƒCƒ‹‚ÅA“à—e‚Í HTML ã‚Å’è‹`‚µ‚Ä‚¢‚Ü‚·B
+ ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ã‚µã‚¤ã‚ºç­‰ã¯ css ãƒ•ã‚¡ã‚¤ãƒ«ã§ã€å†…å®¹ã¯ HTML ä¸Šã§å®šç¾©ã—ã¦ã„ã¾ã™ã€‚
 ----------------------------------------------------------------------------------------*/
 function SetupLayers(){
   gLyrSections = new Layer('list_sections');
@@ -80,12 +80,12 @@ function SetupLayers(){
   gLyrPreferences = new Layer('preferences');
 }
 /*----------------------------------------------------------------------------------------
- ™š “Ç š™
+ â˜†â˜… èª­è¾¼ â˜…â˜†
 
- ƒNƒbƒL[‚©‚çİ’è‚Æi’»‚ğ“Ç‚İ‚İ‚Ü‚·B
+ ã‚¯ãƒƒã‚­ãƒ¼ã‹ã‚‰è¨­å®šã¨é€²æ—ã‚’èª­ã¿è¾¼ã¿ã¾ã™ã€‚
 ----------------------------------------------------------------------------------------*/
 function LoadData(){
-  // ƒL[İ’è‚Ì“Ç
+  // ã‚­ãƒ¼è¨­å®šã®èª­è¾¼
   gKeys = [];
   gKeys.push(Load('MoveLeft', DEFAULT_KEY_MOVE_LEFT));
   gKeys.push(Load('MoveRight', DEFAULT_KEY_MOVE_RIGHT));
@@ -95,29 +95,29 @@ function LoadData(){
   gKeys.push(Load('RotateLeft', DEFAULT_KEY_ROTATE_LEFT));
   gKeys.push(Load('Hold', DEFAULT_KEY_HOLD));
   gKeys.push(Load('Guide', DEFAULT_KEY_GUIDE));
-  // i’»‚Ì“Ç
+  // é€²æ—ã®èª­è¾¼
   for(var i = 0; i < SECTION_NUM; i++){
     gProblemsCleared[i] = (Load('Prg' + i, '0') == '1');
   }
 }
 /*----------------------------------------------------------------------------------------
- ™š ƒtƒŒ[ƒ€“àˆ— š™
+ â˜†â˜… ãƒ•ãƒ¬ãƒ¼ãƒ å†…å‡¦ç† â˜…â˜†
 
- 1 ƒtƒŒ[ƒ€‚É 1 ‰ñŒÄ‚Ño‚³‚ê‚éˆ—‚Å‚·BƒtƒŒ[ƒ€ŠÇ—‚Í jsmod.js ‚Ås‚Á‚Ä‚¢‚Ü‚·B
+ 1 ãƒ•ãƒ¬ãƒ¼ãƒ ã« 1 å›å‘¼ã³å‡ºã•ã‚Œã‚‹å‡¦ç†ã§ã™ã€‚ãƒ•ãƒ¬ãƒ¼ãƒ ç®¡ç†ã¯ jsmod.js ã§è¡Œã£ã¦ã„ã¾ã™ã€‚
 ----------------------------------------------------------------------------------------*/
 function Main(){
-  // ƒV[ƒ“‚ª•Ï‚í‚Á‚Ä‚¢‚ê‚ÎØ‚è‘Ö‚¦
+  // ã‚·ãƒ¼ãƒ³ãŒå¤‰ã‚ã£ã¦ã„ã‚Œã°åˆ‡ã‚Šæ›¿ãˆ
   if(gPrevScene != gScene){
     TerminateScene(gPrevScene);
     SetupScene(gScene);
-    //u‘O‚ÌƒV[ƒ“v‚ÌXV
+    //ã€Œå‰ã®ã‚·ãƒ¼ãƒ³ã€ã®æ›´æ–°
     gPrevScene = gScene;
   }
   PerformScene(gScene);
   gButton = '';
 }
 /*----------------------------------------------------------------------------------------
- ™š ƒV[ƒ“ŠJn š™
+ â˜†â˜… ã‚·ãƒ¼ãƒ³é–‹å§‹ â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function SetupScene(scene){
   switch(scene){
@@ -132,34 +132,34 @@ function SetupScene(scene){
     PrepareProblem();
     Refresh();
     gLyrPerform.Show();
-    window.scroll(0, 0);    // ˆê”Ôã‚ÖƒXƒNƒ[ƒ‹
+    window.scroll(0, 0);    // ä¸€ç•ªä¸Šã¸ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«
     break;
   case 'perform_falling':
     break;
   case 'perform_failed':
     Refresh();
-    Say('perform_hint', '‰½‚©ƒL[‚ğ‰Ÿ‚·‚Æ\n‚â‚è’¼‚¹‚Ü‚·');
-    Say('perform_caption', '¸”sc');
+    Say('perform_hint', 'ä½•ã‹ã‚­ãƒ¼ã‚’æŠ¼ã™ã¨Â¥nã‚„ã‚Šç›´ã›ã¾ã™');
+    Say('perform_caption', 'å¤±æ•—â€¦');
     break;
   case 'perform_cleared':
     Refresh();
     gCurUseGuideFlg = false;
     var curProblemId = gCurProgmeIdList[gCurProblemId];
-    Say('perform_caption', 'ƒNƒŠƒAI');
+    Say('perform_caption', 'ã‚¯ãƒªã‚¢ï¼');
     break;
   case 'perform_guide':
     Refresh();
     gCurUseGuideFlg = true;
-    Say('perform_hint', '‰½‚©ƒL[‚ğ‰Ÿ‚·‚Æ\nŠJn‚µ‚Ü‚·');
-    Say('perform_caption', 'ƒKƒCƒhƒ‚[ƒh');
+    Say('perform_hint', 'ä½•ã‹ã‚­ãƒ¼ã‚’æŠ¼ã™ã¨Â¥né–‹å§‹ã—ã¾ã™');
+    Say('perform_caption', 'ã‚¬ã‚¤ãƒ‰ãƒ¢ãƒ¼ãƒ‰');
     break;
   case 'preferences':
-    // ƒL[İ’è‚Ì•\¦”½‰f
+    // ã‚­ãƒ¼è¨­å®šã®è¡¨ç¤ºåæ˜ 
     for(var i = 0; i < gKeys.length; i++){
       document.getElementById(gSelectForms[i]).value = gKeys[i];
     }
     gLyrPreferences.Show();
-    window.scroll(0, 0);    // ˆê”Ôã‚ÖƒXƒNƒ[ƒ‹
+    window.scroll(0, 0);    // ä¸€ç•ªä¸Šã¸ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«
     break;
   default:
     gScene = 'select_section';
@@ -167,7 +167,7 @@ function SetupScene(scene){
   }
 }
 /*----------------------------------------------------------------------------------------
- ™š ƒV[ƒ“I—¹ š™
+ â˜†â˜… ã‚·ãƒ¼ãƒ³çµ‚äº† â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function TerminateScene(scene){
   switch(scene){
@@ -195,7 +195,7 @@ function TerminateScene(scene){
   }
 }
 /*----------------------------------------------------------------------------------------
- ™š ƒV[ƒ“ˆ— š™
+ â˜†â˜… ã‚·ãƒ¼ãƒ³å‡¦ç† â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function PerformScene(scene){
   switch(scene){
@@ -226,23 +226,23 @@ function PerformScene(scene){
   }
 }
 /*----------------------------------------------------------------------------------------
- ™š –â‘è€”õ š™
+ â˜†â˜… å•é¡Œæº–å‚™ â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function PrepareProblem(){
 
   var curProblemId = gCurProgmeIdList[gCurProblemId];
   gCurProblem = gProblems[curProblemId];
 
-  // ƒmƒ‹ƒ}”z—ñ‚ğƒfƒB[ƒvƒRƒs[
+  // ãƒãƒ«ãƒé…åˆ—ã‚’ãƒ‡ã‚£ãƒ¼ãƒ—ã‚³ãƒ”ãƒ¼
   gCurProblemReq = [];
   for(var i = 0; i < gCurProblem.req.length; i++){
     gCurProblemReq.push(gCurProblem.req[i]);
   }
 
-  // î•ñ•\¦
+  // æƒ…å ±è¡¨ç¤º
   DisplayCaption();
   RefreshHint();
-  // ƒ}ƒgƒŠƒbƒNƒX€”õ
+  // ãƒãƒˆãƒªãƒƒã‚¯ã‚¹æº–å‚™
   for(var i = 0; i < DEADLINE_HEIGHT; i++){
     for(var j = 0; j < MATRIX_WIDTH; j++){
       gMatrix[i][j] = 0;
@@ -253,7 +253,7 @@ function PrepareProblem(){
       gMatrix[i][j] = gCurProblem.initialBlocks[i - DEADLINE_HEIGHT][j];
     }
   }
-  // ƒlƒNƒXƒg€”õ
+  // ãƒã‚¯ã‚¹ãƒˆæº–å‚™
   gQueue = [];
   gGuidesQueue = [];
   gCurHold = gCurProblem.ingredients[0][0];
@@ -263,14 +263,14 @@ function PrepareProblem(){
   for(var i = 0; i < gCurProblem.guides.length; i++){
     gGuidesQueue.push(gCurProblem.guides[i]);
   }
-  // Šeíƒtƒ‰ƒO‰Šú‰»
+  // å„ç¨®ãƒ•ãƒ©ã‚°åˆæœŸåŒ–
   gLineClearCount = -1;
   gTSpinType = 0;
   gRens = -1;
   gIsReadyToB2b = false;
 }
 /*----------------------------------------------------------------------------------------
- ™š –â‘èƒ^ƒCƒgƒ‹•\¦ š™
+ â˜†â˜… å•é¡Œã‚¿ã‚¤ãƒˆãƒ«è¡¨ç¤º â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function DisplayCaption(){
   var curProblemId = gCurProgmeIdList[gCurProblemId];
@@ -280,9 +280,9 @@ function DisplayCaption(){
   Say("perform_caption", caption);
 }
 /*----------------------------------------------------------------------------------------
- ™š ƒlƒNƒXƒg‚ğ‘—‚é š™
+ â˜†â˜… ãƒã‚¯ã‚¹ãƒˆã‚’é€ã‚‹ â˜…â˜†
 
- ƒlƒNƒXƒg‚ª‘¶İ‚µ‚½‚©‚ğ•Ô‚µ‚Ü‚·B
+ ãƒã‚¯ã‚¹ãƒˆãŒå­˜åœ¨ã—ãŸã‹ã‚’è¿”ã—ã¾ã™ã€‚
 ----------------------------------------------------------------------------------------*/
 function Dequeue(){
   if(gQueue.length == 0 && !gCurHold) return false;
@@ -303,23 +303,23 @@ function Dequeue(){
   return true;
 }
 /*----------------------------------------------------------------------------------------
- ™š ƒqƒ“ƒg•\¦‚ğ”½‰f š™
+ â˜†â˜… ãƒ’ãƒ³ãƒˆè¡¨ç¤ºã‚’åæ˜  â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function RefreshHint(){
   var hint = gCurProblem.hint;
   if(gCurGuide && (gCurProblem.useGuide || gCurUseGuideFlg)){
-    hint += '\n(ƒKƒCƒh’Ê‚è‚É@’u‚¢‚Ä‚­‚¾‚³‚¢)';
+    hint += 'Â¥n(ã‚¬ã‚¤ãƒ‰é€šã‚Šã«ã€€ç½®ã„ã¦ãã ã•ã„)';
   }
   Say('perform_hint', hint);
 }
 /*----------------------------------------------------------------------------------------
- ™š ƒZƒNƒVƒ‡ƒ“–¼‚Ì‹LÚ š™
+ â˜†â˜… ã‚»ã‚¯ã‚·ãƒ§ãƒ³åã®è¨˜è¼‰ â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function RefreshSectionTitle(){
   Say('section_title', SectionTitle(gCurSectionId));
 }
 /*----------------------------------------------------------------------------------------
- ™š ƒNƒŠƒAó‹µ‚ğƒ{ƒ^ƒ“‚É”½‰f š™
+ â˜†â˜… ã‚¯ãƒªã‚¢çŠ¶æ³ã‚’ãƒœã‚¿ãƒ³ã«åæ˜  â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function RefreshProblemButtons(){
   for(var i = 0; i < SECTION_NUM; i++){
@@ -328,7 +328,7 @@ function RefreshProblemButtons(){
   }
 }
 /*----------------------------------------------------------------------------------------
- ™š ƒV[ƒ“: ƒZƒNƒVƒ‡ƒ“‘I‘ğ š™
+ â˜†â˜… ã‚·ãƒ¼ãƒ³: ã‚»ã‚¯ã‚·ãƒ§ãƒ³é¸æŠ â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function SceneSelectSection(){
   switch(gButton){
@@ -341,81 +341,81 @@ function SceneSelectSection(){
     gCurProblemId = 0;
 
     switch(gButton){
-    case 'section1':  /* ƒeƒ“ƒvƒŒ‚ğ‘g‚ñ‚Å‚İ‚æ‚¤ */
+    case 'section1':  /* ãƒ†ãƒ³ãƒ—ãƒ¬ã‚’çµ„ã‚“ã§ã¿ã‚ˆã† */
       gCurProgmeIdList = getProblemIdList(WARMING_UP);
       break;
-    case 'section2':  /* I c’u‚« iƒKƒCƒh‚ ‚èj*/
+    case 'section2':  /* I ç¸¦ç½®ã ï¼ˆã‚¬ã‚¤ãƒ‰ã‚ã‚Šï¼‰*/
       gCurProgmeIdList = getProblemIdList(GUIDANCE_VERTICAL);
       break;
-    case 'section3':  /* I c’u‚« ƒ‰ƒ“ƒ_ƒ€ 30–â */
+    case 'section3':  /* I ç¸¦ç½®ã ãƒ©ãƒ³ãƒ€ãƒ  30å• */
       gCurProgmeIdList = (shuffle(getProblemIdList(PROB840_VERTICAL))).slice(0,20);
       break;
-    case 'section4':  /* ‰è I ƒ~ƒm‚P’i–ÚiƒKƒCƒh‚ ‚èj */
+    case 'section4':  /* åˆæ‰‹ I ãƒŸãƒï¼‘æ®µç›®ï¼ˆã‚¬ã‚¤ãƒ‰ã‚ã‚Šï¼‰ */
       gCurProgmeIdList = getProblemIdList(GUIDANCE_HORIZONTAL_1);
       break;
-    case 'section5':  /* ‰è I ƒ~ƒm‚P’i–Ú */
+    case 'section5':  /* åˆæ‰‹ I ãƒŸãƒï¼‘æ®µç›® */
       gCurProgmeIdList = (shuffle(getProblemIdList(PROB840_HORIZONTAL_1))).slice(0,20);
       break;
-    case 'section6':  /* ‘S•”Q‚©‚¹iƒKƒCƒh‚ ‚èj */
+    case 'section6':  /* å…¨éƒ¨å¯ã‹ã›ï¼ˆã‚¬ã‚¤ãƒ‰ã‚ã‚Šï¼‰ */
       gCurProgmeIdList = getProblemIdList(GUIDANCE_HORIZONTAL_LAYDOWN);
       break;
-    case 'section7':  /* ‘S•”Q‚©‚¹ */
+    case 'section7':  /* å…¨éƒ¨å¯ã‹ã› */
       gCurProgmeIdList = (shuffle(getProblemIdList(PROB840_HORIZONTAL_LAYDOWN))).slice(0,20);
       break;
-    case 'section8':  /* I I L OiƒKƒCƒh‚ ‚èj */
+    case 'section8':  /* I I L Oï¼ˆã‚¬ã‚¤ãƒ‰ã‚ã‚Šï¼‰ */
       gCurProgmeIdList = getProblemIdList(GUIDANCE_HORIZONTAL_IILO);
       break;
     case 'section9':  /* I I L O */
       gCurProgmeIdList = (shuffle(getProblemIdList(PROB840_HORIZONTAL_IILO))).slice(0,10);
       break;
-    case 'section10':  /* ‰è I ƒ~ƒm3’i–ÚiƒKƒCƒh‚ ‚èj */
+    case 'section10':  /* åˆæ‰‹ I ãƒŸãƒ3æ®µç›®ï¼ˆã‚¬ã‚¤ãƒ‰ã‚ã‚Šï¼‰ */
       gCurProgmeIdList = getProblemIdList(GUIDANCE_HORIZONTAL_3);
       break;
-    case 'section11':  /* ‰è I ƒ~ƒm3’i–Ú */
+    case 'section11':  /* åˆæ‰‹ I ãƒŸãƒ3æ®µç›® */
       gCurProgmeIdList = (shuffle(getProblemIdList(PROB840_HORIZONTAL_3))).slice(0,20);
       break;
-    case 'section12':  /* ’†ŠÔƒeƒXƒg 20–â */
+    case 'section12':  /* ä¸­é–“ãƒ†ã‚¹ãƒˆ 20å• */
       var array1 = shuffle(getProblemIdList(PROB840_HORIZONTAL_1));
       var array2 = shuffle(getProblemIdList(PROB840_HORIZONTAL_LAYDOWN));
       var array3 = shuffle(getProblemIdList(PROB840_HORIZONTAL_IILO));
       var array4 = shuffle(getProblemIdList(PROB840_HORIZONTAL_3));
       gCurProgmeIdList = (shuffle(((array1.concat(array2)).concat(array3)).concat(array4))).slice(0,20);
       break;
-    case 'section13':  /* LSIO (ƒKƒCƒh‚ ‚è)*/
+    case 'section13':  /* LSIO (ã‚¬ã‚¤ãƒ‰ã‚ã‚Š)*/
       gCurProgmeIdList = getProblemIdList(GUIDANCE_LSIO);
       break;
     case 'section14':  /* LSIO  */
       gCurProgmeIdList = shuffle(getProblemIdList(PROB840_LSIO));
       break;
-    case 'section15':  /* Šú––ƒeƒXƒg 30–â */
+    case 'section15':  /* æœŸæœ«ãƒ†ã‚¹ãƒˆ 30å• */
       gCurProgmeIdList = (shuffle(getProblemIdList(PROB840))).slice(0,30);
       break;
-    case 'section16':  /* ‘²‹ÆƒeƒXƒg */
+    case 'section16':  /* å’æ¥­ãƒ†ã‚¹ãƒˆ */
       var array1 = (shuffle(getProblemIdList(PROB840))).slice(0,50);
       var array2 = (shuffle(getProblemIdList(PROB840_MIRROR))).slice(0,50);
       gCurProgmeIdList = shuffle(array1.concat(array2));
       break;
-    case 'section17':  /* ‚»‚Ì‚Ù‚©‚ÌÁ‚µ•û */
+    case 'section17':  /* ãã®ã»ã‹ã®æ¶ˆã—æ–¹ */
       gCurProgmeIdList = getProblemIdList(GUIDANCE_OTHER_WISE);
       break;
-    case 'section18':  /* I c’u‚« ƒ‰ƒ“ƒ_ƒ€ 514–â */
+    case 'section18':  /* I ç¸¦ç½®ã ãƒ©ãƒ³ãƒ€ãƒ  514å• */
       gCurProgmeIdList = shuffle(getProblemIdList(PROB840_VERTICAL));
       break;
-    case 'section19':  /* I ‰¡’u‚« ƒ‰ƒ“ƒ_ƒ€ 196–â */
+    case 'section19':  /* I æ¨ªç½®ã ãƒ©ãƒ³ãƒ€ãƒ  196å• */
       var array1 = shuffle(getProblemIdList(PROB840_HORIZONTAL_1));
       var array2 = shuffle(getProblemIdList(PROB840_HORIZONTAL_LAYDOWN));
       var array3 = shuffle(getProblemIdList(PROB840_HORIZONTAL_IILO));
       var array4 = shuffle(getProblemIdList(PROB840_HORIZONTAL_3));
       gCurProgmeIdList = shuffle(((array1.concat(array2)).concat(array3)).concat(array4));
       break;
-    case 'section20':  /* ‘S711–â */
+    case 'section20':  /* å…¨711å• */
       gCurProgmeIdList = shuffle(getProblemIdList(PROB840));
       break;
-    case 'section21':  /* ‘S–âƒ~ƒ‰[ */
+    case 'section21':  /* å…¨å•ãƒŸãƒ©ãƒ¼ */
       gCurProgmeIdList = shuffle(getProblemIdList(PROB840_MIRROR));
       break;
     default:
-      gCurProgmeIdList = [];/* ‚±‚±‚É“ü‚é‚ÆA‰æ–Ê‚ª”’F‚É‚È‚Á‚Ä—‚¿‚é‚æ‚¤‚ÉŒ©‚¦‚é‚Í‚¸ */
+      gCurProgmeIdList = [];/* ã“ã“ã«å…¥ã‚‹ã¨ã€ç”»é¢ãŒç™½è‰²ã«ãªã£ã¦è½ã¡ã‚‹ã‚ˆã†ã«è¦‹ãˆã‚‹ã¯ãš */
       break;
     }
 
@@ -424,7 +424,7 @@ function SceneSelectSection(){
 }
 
 /*----------------------------------------------------------------------------------------
- ™š ƒV[ƒ“: ƒŒƒbƒXƒ“ŠJn š™
+ â˜†â˜… ã‚·ãƒ¼ãƒ³: ãƒ¬ãƒƒã‚¹ãƒ³é–‹å§‹ â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function ScenePerform(){
   switch(gButton){
@@ -435,7 +435,7 @@ function ScenePerform(){
   if(IsPressed()) gScene = 'perform_falling';
 }
 /*----------------------------------------------------------------------------------------
- ™š ƒV[ƒ“: ƒŒƒbƒXƒ“’† š™
+ â˜†â˜… ã‚·ãƒ¼ãƒ³: ãƒ¬ãƒƒã‚¹ãƒ³ä¸­ â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function ScenePerformFalling(){
   switch(gButton){
@@ -443,13 +443,13 @@ function ScenePerformFalling(){
     gScene = 'select_section';
     return;
   }
-  // ‹Z–¼•\¦’†
+  // æŠ€åè¡¨ç¤ºä¸­
   if(gDfCount > 0){
     gDfCount--;
-    // ƒJƒEƒ“ƒgI—¹‚Å•\¦‚ğ–ß‚·
+    // ã‚«ã‚¦ãƒ³ãƒˆçµ‚äº†ã§è¡¨ç¤ºã‚’æˆ»ã™
     if(gDfCount == 0) DisplayCaption();
   }
-  // ƒ‰ƒCƒ“Á‹’†
+  // ãƒ©ã‚¤ãƒ³æ¶ˆå»ä¸­
   if(gLineClearCount > 0){
     gLineClearCount--;
     if(gLineClearCount == 0){
@@ -457,26 +457,26 @@ function ScenePerformFalling(){
       caption += gCurProblem.caption;
       RemoveReservedLines()
     }
-    // ‘¼‚Ì‘€ì‹Ö~
+    // ä»–ã®æ“ä½œç¦æ­¢
     return;
   }
-  // ƒ~ƒm‚ğ‘€ì’†‚Å‚È‚¢ê‡
+  // ãƒŸãƒã‚’æ“ä½œä¸­ã§ãªã„å ´åˆ
   if(!gCurMino){
-    // ƒNƒŠƒAŠm”F
+    // ã‚¯ãƒªã‚¢ç¢ºèª
     if(ReqIsCleared()) gScene = 'perform_cleared';
-    // ƒlƒNƒXƒg‚ğ‘—‚éBƒlƒNƒXƒg‚ª‚È‚¯‚ê‚Î¸”s
+    // ãƒã‚¯ã‚¹ãƒˆã‚’é€ã‚‹ã€‚ãƒã‚¯ã‚¹ãƒˆãŒãªã‘ã‚Œã°å¤±æ•—
     else if(!Dequeue()){
       gCurMino = null;
       gScene = 'perform_failed';
     }
-    // ƒƒbƒNƒAƒEƒg”»’è
+    // ãƒ­ãƒƒã‚¯ã‚¢ã‚¦ãƒˆåˆ¤å®š
     if(AppearsToLockout()){
       Lockout();
       return;
     }
-  // ƒ~ƒm‚ğ‘€ì’†‚Ìê‡
+  // ãƒŸãƒã‚’æ“ä½œä¸­ã®å ´åˆ
   }else{
-    // ƒL[“ü—Í‚Å•ªŠò
+    // ã‚­ãƒ¼å…¥åŠ›ã§åˆ†å²
     if(InputsHorizontalMove(true)){
       if(PlaceTest(gCurDir, gCurMino, gCurX + 1, gCurY)){
         gCurX++;
@@ -497,8 +497,8 @@ function ScenePerformFalling(){
       gScene = 'perform_guide';
     }
     if(IsPressed(KeyH())) Hold();
-    if(IsPressed(KeyHD())) HardDrop();  // ƒn[ƒhƒhƒƒbƒv“ü—Í‚ÍÅŒã‚É”»’è‚·‚é‚±‚Æ
-    // —‰º/’…’nˆ—
+    if(IsPressed(KeyHD())) HardDrop();  // ãƒãƒ¼ãƒ‰ãƒ‰ãƒ­ãƒƒãƒ—å…¥åŠ›ã¯æœ€å¾Œã«åˆ¤å®šã™ã‚‹ã“ã¨
+    // è½ä¸‹/ç€åœ°å‡¦ç†
     if(--gNdCount <= 0){
       gNdCount = NATURAL_DROP_SPAN;
       if(!IsLanding()){
@@ -506,11 +506,11 @@ function ScenePerformFalling(){
         gTSpinType = 0;
         gLandingCount = NATURAL_DROP_SPAN;
       }else{
-        // ƒKƒCƒh”z—ñƒ_ƒ“ƒv
+        // ã‚¬ã‚¤ãƒ‰é…åˆ—ãƒ€ãƒ³ãƒ—
         if(DUMP_GUIDE_DATA){
           console.log("G(%s, %d, %d, %d)", gCurMino, gCurDir, gCurX, gCurY-3);
         }
-        // ’…’n
+        // ç€åœ°
         Land();
       }
     }
@@ -519,10 +519,10 @@ function ScenePerformFalling(){
   Refresh();
 }
 /*----------------------------------------------------------------------------------------
- ™š ‰¡ˆÚ“®‚ğ—^‚¦‚é? š™
+ â˜†â˜… æ¨ªç§»å‹•ã‚’ä¸ãˆã‚‹? â˜…â˜†
 
- ‰¡ˆÚ“®ƒL[‚ğ‰Ÿ‚µ‚Á‚Ï‚È‚µ‚É‚µ‚½‚Æ‚«A‰¡ˆÚ“®‚ğ—^‚¦‚éuŠÔ‚©‚ğ”»’f‚µ‚Ä•Ô‚µ‚Ü‚·B‰Ÿ‚µn‚ß‚½u
- ŠÔ‚â‹K’è‚ÌƒŠƒs[ƒgŠÔŠu‚Å true ‚ğ•Ô‚µ‚Ü‚·B
+ æ¨ªç§»å‹•ã‚­ãƒ¼ã‚’æŠ¼ã—ã£ã±ãªã—ã«ã—ãŸã¨ãã€æ¨ªç§»å‹•ã‚’ä¸ãˆã‚‹ç¬é–“ã‹ã‚’åˆ¤æ–­ã—ã¦è¿”ã—ã¾ã™ã€‚æŠ¼ã—å§‹ã‚ãŸç¬
+ é–“ã‚„è¦å®šã®ãƒªãƒ”ãƒ¼ãƒˆé–“éš”ã§ true ã‚’è¿”ã—ã¾ã™ã€‚
 ----------------------------------------------------------------------------------------*/
 function InputsHorizontalMove(toRight){
   keyName = toRight ? KeyR() : KeyL();
@@ -530,9 +530,9 @@ function InputsHorizontalMove(toRight){
   return (PressedDuration(keyName) - HORIZONTAL_CHARGE_DURATION) % HORIZONTAL_REPEAT_SPAN == 0;
 }
 /*----------------------------------------------------------------------------------------
- ™š ƒ\ƒtƒgƒhƒƒbƒvÀs? š™
+ â˜†â˜… ã‚½ãƒ•ãƒˆãƒ‰ãƒ­ãƒƒãƒ—å®Ÿè¡Œ? â˜…â˜†
 
- ‰Ÿ‚µ‚½uŠÔ‚ÆAˆÈ~ƒ\ƒtƒgƒhƒƒbƒvŠÔŠu‚ªŒo‰ß‚·‚é“x‚É true ‚ğ•Ô‚µ‚Ü‚·B
+ æŠ¼ã—ãŸç¬é–“ã¨ã€ä»¥é™ã‚½ãƒ•ãƒˆãƒ‰ãƒ­ãƒƒãƒ—é–“éš”ãŒçµŒéã™ã‚‹åº¦ã« true ã‚’è¿”ã—ã¾ã™ã€‚
 ----------------------------------------------------------------------------------------*/
 function InputsSoftDrop(){
   if(IsPressed(KeySD())) return true;
@@ -540,12 +540,12 @@ function InputsSoftDrop(){
   return PressedDuration(KeySD()) % SOFT_DROP_SPAN == 0;
 }
 /*----------------------------------------------------------------------------------------
- ™š ‘µ‚Á‚½ƒ‰ƒCƒ“‚ª‚ ‚ê‚ÎÁ‹—\–ñ‚·‚é š™
+ â˜†â˜… æƒã£ãŸãƒ©ã‚¤ãƒ³ãŒã‚ã‚Œã°æ¶ˆå»äºˆç´„ã™ã‚‹ â˜…â˜†
 
- ’B¬‚µ‚½‹Z ID ‚ğ”z—ñ‚É‚µ‚Ä•Ô‚µ‚Ü‚·B
+ é”æˆã—ãŸæŠ€ ID ã‚’é…åˆ—ã«ã—ã¦è¿”ã—ã¾ã™ã€‚
 ----------------------------------------------------------------------------------------*/
 function EraseLine(){
-  // ‘µ‚Á‚½ƒ‰ƒCƒ“‚ÌŒŸ¸
+  // æƒã£ãŸãƒ©ã‚¤ãƒ³ã®æ¤œæŸ»
   var eraseLines = [];
   var lineErases;
   for(var i = 0; i < MATRIX_HEIGHT; i++){
@@ -558,15 +558,15 @@ function EraseLine(){
     }
     if(lineErases){
       eraseLines.push(i);
-      // ƒ‰ƒCƒ“íœ—\–ñ
+      // ãƒ©ã‚¤ãƒ³å‰Šé™¤äºˆç´„
       ReserveCutLine(i);
     }
   }
   var numEls = eraseLines.length;
-  // REN ”ŠÇ—
+  // REN æ•°ç®¡ç†
   if(numEls == 0) gRens = -1;
   else gRens++;
-  // ’B¬‚µ‚½‹Z ID ‚Ì”z—ñ‚ğì¬
+  // é”æˆã—ãŸæŠ€ ID ã®é…åˆ—ã‚’ä½œæˆ
   var features = [];
   switch(numEls){
   case 0:
@@ -582,14 +582,14 @@ function EraseLine(){
     if(gIsReadyToB2b && (numEls >= 4 || gTSpinType > 0)) features.push(11);
     if(IsEmptyMatrix()) features.push(10);
   }
-  // B2B ƒtƒ‰ƒOŠÇ—
+  // B2B ãƒ•ãƒ©ã‚°ç®¡ç†
   if(numEls >= 1) gIsReadyToB2b = (numEls >= 4 || (gTSpinType > 0 && numEls >= 1));
 
   return features;
 }
 
 /*----------------------------------------------------------------------------------------
- ™š ƒ}ƒgƒŠƒbƒNƒX‚Í‹ó? š™
+ â˜†â˜… ãƒãƒˆãƒªãƒƒã‚¯ã‚¹ã¯ç©º? â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function IsEmptyMatrix(){
   for(var i = 0; i < MATRIX_HEIGHT; i++){
@@ -600,9 +600,9 @@ function IsEmptyMatrix(){
   return true;
 }
 /*----------------------------------------------------------------------------------------
- ™š ƒ‰ƒCƒ“Á‹—\–ñ š™
+ â˜†â˜… ãƒ©ã‚¤ãƒ³æ¶ˆå»äºˆç´„ â˜…â˜†
 
- <line>s–Ú‚É‚ ‚éƒuƒƒbƒN‚ğíœ—\–ñ‚µ‚Ü‚·B‚±‚ê‚ç‚Í RemoveReservedLines() ‚Åíœ‚³‚ê‚Ü‚·B
+ <line>è¡Œç›®ã«ã‚ã‚‹ãƒ–ãƒ­ãƒƒã‚¯ã‚’å‰Šé™¤äºˆç´„ã—ã¾ã™ã€‚ã“ã‚Œã‚‰ã¯ RemoveReservedLines() ã§å‰Šé™¤ã•ã‚Œã¾ã™ã€‚
 ----------------------------------------------------------------------------------------*/
 function ReserveCutLine(line){
   for(var i = 0; i < MATRIX_WIDTH; i++){
@@ -611,9 +611,9 @@ function ReserveCutLine(line){
   gLineClearCount = LINE_CLEAR_DURATION;
 }
 /*----------------------------------------------------------------------------------------
- ™š Á‹—\–ñÏ‚Ìƒ‰ƒCƒ“Á‹ š™
+ â˜†â˜… æ¶ˆå»äºˆç´„æ¸ˆã®ãƒ©ã‚¤ãƒ³æ¶ˆå» â˜…â˜†
 
- Á‹—\–ñÏ‚ÌƒuƒƒbƒN‚ğÁ‹‚µA‚Å‚«‚½‹óŠÔ‚ğã‚©‚ç‹l‚ß‚Ü‚·B
+ æ¶ˆå»äºˆç´„æ¸ˆã®ãƒ–ãƒ­ãƒƒã‚¯ã‚’æ¶ˆå»ã—ã€ã§ããŸç©ºé–“ã‚’ä¸Šã‹ã‚‰è©°ã‚ã¾ã™ã€‚
 ----------------------------------------------------------------------------------------*/
 function RemoveReservedLines(){
   for(var i = 0; i < MATRIX_HEIGHT; i++){
@@ -628,14 +628,14 @@ function RemoveReservedLines(){
   }
 }
 /*----------------------------------------------------------------------------------------
- ™š ‹Z–¼æ“¾ š™
+ â˜†â˜… æŠ€åå–å¾— â˜…â˜†
 
- •¡”‚Ì‹Z‚ğ’B¬‚µ‚½ê‡A‚Ü‚Æ‚ß‚Ä 1 ‚Â‚Ì•¶š—ñ‚É‚µ‚Ä•Ô‚µ‚Ü‚·B
+ è¤‡æ•°ã®æŠ€ã‚’é”æˆã—ãŸå ´åˆã€ã¾ã¨ã‚ã¦ 1 ã¤ã®æ–‡å­—åˆ—ã«ã—ã¦è¿”ã—ã¾ã™ã€‚
 ----------------------------------------------------------------------------------------*/
 function FeatureName(features){
-  var result = "™ ";
+  var result = "â˜† ";
   for(var i = 0; i < features.length; i++){
-    if(i > 0) result += "@";
+    if(i > 0) result += "ã€€";
     switch(features[i]){
     case  0: result += "SINGLE"; break;
     case  1: result += "DOUBLE"; break;
@@ -652,20 +652,20 @@ function FeatureName(features){
     default: result += (features[i] - 100) + " REN"; break;  // 100 + n: n REN
     }
   }
-  result += " ™";
+  result += " â˜†";
   return result;
 }
 /*----------------------------------------------------------------------------------------
- ™š Ú’n’†? š™
+ â˜†â˜… æ¥åœ°ä¸­? â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function IsLanding(){
   return !PlaceTest(gCurDir, gCurMino, gCurX, gCurY + 1);
 }
 /*----------------------------------------------------------------------------------------
- ™š ’…’n š™
+ â˜†â˜… ç€åœ° â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function Land(){
-  // ƒtƒB[ƒ‹ƒh‚É”½‰f
+  // ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰ã«åæ˜ 
   for(var i = 0; i < 4; i++){
     for(var j = 0; j < 4; j++){
       if(IsValidPos(j + gCurX, i + gCurY)){
@@ -675,7 +675,7 @@ function Land(){
       }
     }
   }
-  // Œµ–§‚ÈƒKƒCƒh‚È‚ç]‚í‚È‚¢‚Æ¸”s‚É
+  // å³å¯†ãªã‚¬ã‚¤ãƒ‰ãªã‚‰å¾“ã‚ãªã„ã¨å¤±æ•—ã«
   if(gCurGuide){
     if((gCurProblem.useGuide || gCurUseGuideFlg) && GuideBlocksPos().join() != CurMinoBlocksPos().join()){
       gScene = 'perform_failed';
@@ -683,29 +683,29 @@ function Land(){
       return;
     }
   }
-  // ƒƒbƒNƒAƒEƒg”»’è
+  // ãƒ­ãƒƒã‚¯ã‚¢ã‚¦ãƒˆåˆ¤å®š
   if(LandsToLockout()){
     Lockout();
     return;
   }
-  // ‹Z‚ª”­“®‚µ‚Ä‚¢‚ê‚Î•\¦‚¨‚æ‚Ñˆ—
+  // æŠ€ãŒç™ºå‹•ã—ã¦ã„ã‚Œã°è¡¨ç¤ºãŠã‚ˆã³å‡¦ç†
   var features = EraseLine();
   if(features.length > 0){
-    // •\¦ŠÇ—
+    // è¡¨ç¤ºç®¡ç†
     Say('perform_caption', FeatureName(features));
     gDfCount = DISPLAY_FEATURES_DURATION;
-    // ƒmƒ‹ƒ}‚Ö”½‰f
+    // ãƒãƒ«ãƒã¸åæ˜ 
     RemoveReq(features);
-    // ƒ‰ƒCƒ“‚ª‘µ‚Á‚Ä‚¢‚ê‚Îƒ‰ƒCƒ“Á‹
+    // ãƒ©ã‚¤ãƒ³ãŒæƒã£ã¦ã„ã‚Œã°ãƒ©ã‚¤ãƒ³æ¶ˆå»
     if(IsErased(features)) gLineClearCount = LINE_CLEAR_DURATION;
   }
-  // ƒAƒNƒeƒBƒuƒ~ƒm‰ğœ
+  // ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ãƒŸãƒè§£é™¤
   gCurMino = null;
 }
 /*----------------------------------------------------------------------------------------
- š™ ’…’n‚µ‚½Œ‹‰ÊAƒƒbƒNƒAƒEƒg? ™š
+ â˜…â˜† ç€åœ°ã—ãŸçµæœã€ãƒ­ãƒƒã‚¯ã‚¢ã‚¦ãƒˆ? â˜†â˜…
 
- ƒ~ƒm‚Ì‘SƒuƒƒbƒN‚ªƒfƒbƒhƒ‰ƒCƒ“‚æ‚èã‚É‚È‚Á‚½ê‡‚Í true ‚ğ•Ô‚µ‚Ü‚·B
+ ãƒŸãƒã®å…¨ãƒ–ãƒ­ãƒƒã‚¯ãŒãƒ‡ãƒƒãƒ‰ãƒ©ã‚¤ãƒ³ã‚ˆã‚Šä¸Šã«ãªã£ãŸå ´åˆã¯ true ã‚’è¿”ã—ã¾ã™ã€‚
 ----------------------------------------------------------------------------------------*/
 function LandsToLockout(){
   var minoPos = MinoToBlockPositions(gCurDir, gCurMino, gCurX, gCurY);
@@ -715,23 +715,23 @@ function LandsToLockout(){
   return true;
 }
 /*----------------------------------------------------------------------------------------
- š™ ƒ~ƒm‚ªoŒ»‚µ‚½Œ‹‰ÊAƒƒbƒNƒAƒEƒg? ™š
+ â˜…â˜† ãƒŸãƒãŒå‡ºç¾ã—ãŸçµæœã€ãƒ­ãƒƒã‚¯ã‚¢ã‚¦ãƒˆ? â˜†â˜…
 
- ƒ~ƒm‚ÌƒuƒƒbƒN‚ÆŠù‘¶‚ÌƒuƒƒbƒN‚ÌˆÊ’u‚ª 1 ‚Â‚Å‚àd•¡‚µ‚½‚ç true ‚ğ•Ô‚µ‚Ü‚·B
+ ãƒŸãƒã®ãƒ–ãƒ­ãƒƒã‚¯ã¨æ—¢å­˜ã®ãƒ–ãƒ­ãƒƒã‚¯ã®ä½ç½®ãŒ 1 ã¤ã§ã‚‚é‡è¤‡ã—ãŸã‚‰ true ã‚’è¿”ã—ã¾ã™ã€‚
 ----------------------------------------------------------------------------------------*/
 function AppearsToLockout(){
   if(!gCurMino) return;
   return !PlaceTest(INITIAL_DIR, gCurMino, INITIAL_X, INITIAL_Y);
 }
 /*----------------------------------------------------------------------------------------
- š™ ƒƒbƒNƒAƒEƒgˆ— ™š
+ â˜…â˜† ãƒ­ãƒƒã‚¯ã‚¢ã‚¦ãƒˆæ™‚å‡¦ç† â˜†â˜…
 ----------------------------------------------------------------------------------------*/
 function Lockout(){
   gScene = 'perform_failed';
   gCurMino = null;
 }
 /*----------------------------------------------------------------------------------------
- ™š ƒ‰ƒCƒ“‚ğÁ‚µ‚½? š™
+ â˜†â˜… ãƒ©ã‚¤ãƒ³ã‚’æ¶ˆã—ãŸ? â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function IsErased(features){
   for(var i = 0; i < features.length; i++){
@@ -752,7 +752,7 @@ function IsErased(features){
   return false;
 }
 /*----------------------------------------------------------------------------------------
- ™š ƒKƒCƒh‚ÌƒuƒƒbƒN‚ª‚ ‚éÀ•W‚Ìˆê——‚ğæ“¾ š™
+ â˜†â˜… ã‚¬ã‚¤ãƒ‰ã®ãƒ–ãƒ­ãƒƒã‚¯ãŒã‚ã‚‹åº§æ¨™ã®ä¸€è¦§ã‚’å–å¾— â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function GuideBlocksPos(){
   var g = gCurGuide;
@@ -760,15 +760,15 @@ function GuideBlocksPos(){
   return MinoToBlockPositions(g.dir, g.mino, g.x, g.y + DEADLINE_HEIGHT);
 }
 /*----------------------------------------------------------------------------------------
- ™š ‘€ì’†‚Ìƒ~ƒm‚ÌƒuƒƒbƒN‚ª‚ ‚éÀ•W‚Ìˆê——‚ğæ“¾ š™
+ â˜†â˜… æ“ä½œä¸­ã®ãƒŸãƒã®ãƒ–ãƒ­ãƒƒã‚¯ãŒã‚ã‚‹åº§æ¨™ã®ä¸€è¦§ã‚’å–å¾— â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function CurMinoBlocksPos(){
   return MinoToBlockPositions(gCurDir, gCurMino, gCurX, gCurY);
 }
 /*----------------------------------------------------------------------------------------
- ™š w’èˆÊ’u‚Éƒ~ƒm‚ğ’u‚¢‚½‚Æ‚«‚ÌƒuƒƒbƒN‚ÌÀ•W‚Ìˆê——‚ğæ“¾ š™
+ â˜†â˜… æŒ‡å®šä½ç½®ã«ãƒŸãƒã‚’ç½®ã„ãŸã¨ãã®ãƒ–ãƒ­ãƒƒã‚¯ã®åº§æ¨™ã®ä¸€è¦§ã‚’å–å¾— â˜…â˜†
 
- ‘å‚«‚³ 2 ‚Ì”z—ñ [ x À•W, y À•W] ‚Ìˆê——‚ğ‚³‚ç‚É”z—ñ‚É‚µ‚Ä•Ô‚µ‚Ü‚·(–Àã 2 ŸŒ³”z—ñ)B
+ å¤§ãã• 2 ã®é…åˆ— [ x åº§æ¨™, y åº§æ¨™] ã®ä¸€è¦§ã‚’ã•ã‚‰ã«é…åˆ—ã«ã—ã¦è¿”ã—ã¾ã™(äº‹å®Ÿä¸Š 2 æ¬¡å…ƒé…åˆ—)ã€‚
 ----------------------------------------------------------------------------------------*/
 function MinoToBlockPositions(dir, mino, x, y){
   var result = [];
@@ -780,18 +780,18 @@ function MinoToBlockPositions(dir, mino, x, y){
   return result;
 }
 /*----------------------------------------------------------------------------------------
- ™š ƒn[ƒhƒhƒƒbƒv‚ğ‚·‚é‚Æ Y ‚ª‚Ç‚ê‚¾‚¯‘‰Á( DIFFerence of Y )‚·‚é‚©‚ğæ“¾ š™
+ â˜†â˜… ãƒãƒ¼ãƒ‰ãƒ‰ãƒ­ãƒƒãƒ—ã‚’ã™ã‚‹ã¨ Y ãŒã©ã‚Œã ã‘å¢—åŠ ( DIFFerence of Y )ã™ã‚‹ã‹ã‚’å–å¾— â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function HarddropDiffY(){
   var i = 0;
   while(PlaceTest(gCurDir, gCurMino, gCurX, gCurY + i)){
     i++;
   }
-  // ’Ê‰ß•s”\‚É‚È‚é’¼‘O‚Ì“_‚Ü‚Å‚Ì‘‰Á—Ê‚ğ•Ô‚·
+  // é€šéä¸èƒ½ã«ãªã‚‹ç›´å‰ã®ç‚¹ã¾ã§ã®å¢—åŠ é‡ã‚’è¿”ã™
   return i - 1;
 }
 /*----------------------------------------------------------------------------------------
- ™š ƒn[ƒhƒhƒƒbƒv š™
+ â˜†â˜… ãƒãƒ¼ãƒ‰ãƒ‰ãƒ­ãƒƒãƒ— â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function HardDrop(){
   var dY = HarddropDiffY();
@@ -801,7 +801,7 @@ function HardDrop(){
   gLandingCount = 0;
 }
 /*----------------------------------------------------------------------------------------
- ™š ƒ\ƒtƒgƒhƒƒbƒv š™
+ â˜†â˜… ã‚½ãƒ•ãƒˆãƒ‰ãƒ­ãƒƒãƒ— â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function SoftDrop(){
   if(!IsLanding()){
@@ -811,7 +811,7 @@ function SoftDrop(){
   }
 }
 /*----------------------------------------------------------------------------------------
- ™š ƒz[ƒ‹ƒh š™
+ â˜†â˜… ãƒ›ãƒ¼ãƒ«ãƒ‰ â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function Hold(){
   if(gQueue.length == 0 && !gCurHold) return;
@@ -833,14 +833,14 @@ function Hold(){
 
 }
 /*----------------------------------------------------------------------------------------
- ™š ’B¬‚µ‚½‹Z‚É‰‚¶‚Äƒmƒ‹ƒ}( REQuired features )‚ğŒ¸‚ç‚· š™
+ â˜†â˜… é”æˆã—ãŸæŠ€ã«å¿œã˜ã¦ãƒãƒ«ãƒ( REQuired features )ã‚’æ¸›ã‚‰ã™ â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function RemoveReq(features){
   var index;
   for(var i = 0; i < features.length; i++){
     index = (features[i] > 100) ? 12 : features[i];
     gCurProblemReq[index]--;
-    // T ƒXƒsƒ“‚È‚ç’Êí‚ÌÁ‚µ•û‚Ìƒmƒ‹ƒ}‚àŒ¸‚ç‚·B‚½‚Æ‚¦‚Î TST ‚È‚çƒgƒŠƒvƒ‹‚Ìƒmƒ‹ƒ}‚àŒ¸‚ç‚·
+    // T ã‚¹ãƒ”ãƒ³ãªã‚‰é€šå¸¸ã®æ¶ˆã—æ–¹ã®ãƒãƒ«ãƒã‚‚æ¸›ã‚‰ã™ã€‚ãŸã¨ãˆã° TST ãªã‚‰ãƒˆãƒªãƒ—ãƒ«ã®ãƒãƒ«ãƒã‚‚æ¸›ã‚‰ã™
     switch(index){
     case 6:
     case 7:
@@ -856,7 +856,7 @@ function RemoveReq(features){
   }
 }
 /*----------------------------------------------------------------------------------------
- ™š ƒmƒ‹ƒ}ƒNƒŠƒA? š™
+ â˜†â˜… ãƒãƒ«ãƒã‚¯ãƒªã‚¢? â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function ReqIsCleared(){
   for(var i = 0; i < gCurProblemReq.length; i++){
@@ -865,7 +865,7 @@ function ReqIsCleared(){
   return true;
 }
 /*----------------------------------------------------------------------------------------
- ™š w’èÀ•W‚Éƒ~ƒm‚ğ’u‚¯‚é? š™
+ â˜†â˜… æŒ‡å®šåº§æ¨™ã«ãƒŸãƒã‚’ç½®ã‘ã‚‹? â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function PlaceTest(dir, mino, x, y){
   var block;
@@ -875,7 +875,7 @@ function PlaceTest(dir, mino, x, y){
         block = gBlocks[gMatrix[y + i][x + j]];
         if(mino.shape[dir][i][j] == 1 && !block.passable) return false;
       }else{
-        // –³Œø‚ÈêŠ‚Åƒfƒbƒhƒ‰ƒCƒ“‚æ‚èãˆÈŠO‚È‚ç’u‚¯‚È‚¢
+        // ç„¡åŠ¹ãªå ´æ‰€ã§ãƒ‡ãƒƒãƒ‰ãƒ©ã‚¤ãƒ³ã‚ˆã‚Šä¸Šä»¥å¤–ãªã‚‰ç½®ã‘ãªã„
         if(mino.shape[dir][i][j] == 1 &&
                 (x + j < 0 || MATRIX_WIDTH <= x + j || MATRIX_HEIGHT <= y + i)){
           return false;
@@ -886,16 +886,16 @@ function PlaceTest(dir, mino, x, y){
   return true;
 }
 /*----------------------------------------------------------------------------------------
- ™š w’èÀ•W‚Í”z—ñ‚Ì”ÍˆÍ“à? š™
+ â˜†â˜… æŒ‡å®šåº§æ¨™ã¯é…åˆ—ã®ç¯„å›²å†…? â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function IsValidPos(x, y){
   return (0 <= x && x < MATRIX_WIDTH && 0 <= y && y < MATRIX_HEIGHT);
 }
 /*----------------------------------------------------------------------------------------
- ™š ‰æ–Êã‚Éƒ~ƒm‚ğ•`‰æ š™
+ â˜†â˜… ç”»é¢ä¸Šã«ãƒŸãƒã‚’æç”» â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function DisplayMino(dir, mino, x, y, blockId){
-  var block;  // 0=‹ó‚«, 1=‚ ‚è
+  var block;  // 0=ç©ºã, 1=ã‚ã‚Š
 
   for(var i = 0; i < 4; i++){
     for(var j = 0; j < 4; j++){
@@ -904,10 +904,10 @@ function DisplayMino(dir, mino, x, y, blockId){
   }
 }
 /*----------------------------------------------------------------------------------------
- ™š ƒuƒƒbƒN‚Ì•`‰æ š™
+ â˜†â˜… ãƒ–ãƒ­ãƒƒã‚¯ã®æç”» â˜…â˜†
 
- ƒ}ƒgƒŠƒbƒNƒXã‚ÌÀ•W(<x>, <y>)‚É ID ‚ª<blockId>‚ÌƒuƒƒbƒN‚ğ•`‰æ‚µ‚Ü‚·B <ignoresZero>‚É
- true ‚ğw’è‚·‚é‚ÆAID ‚ª 0 ‚ÌƒuƒƒbƒN‚ğ•`‰æ‚µ‚Ü‚¹‚ñ(“§–¾‚Æ‚µ‚Äˆµ‚¤)B
+ ãƒãƒˆãƒªãƒƒã‚¯ã‚¹ä¸Šã®åº§æ¨™(<x>, <y>)ã« ID ãŒ<blockId>ã®ãƒ–ãƒ­ãƒƒã‚¯ã‚’æç”»ã—ã¾ã™ã€‚ <ignoresZero>ã«
+ true ã‚’æŒ‡å®šã™ã‚‹ã¨ã€ID ãŒ 0 ã®ãƒ–ãƒ­ãƒƒã‚¯ã‚’æç”»ã—ã¾ã›ã‚“(é€æ˜ã¨ã—ã¦æ‰±ã†)ã€‚
 ----------------------------------------------------------------------------------------*/
 function DisplayBlock(x, y, blockId, ignoresZero){
   if(ignoresZero && blockId == 0) return;
@@ -916,7 +916,7 @@ function DisplayBlock(x, y, blockId, ignoresZero){
   }
 }
 /*----------------------------------------------------------------------------------------
- ™š ’Ês‰Â? š™
+ â˜†â˜… é€šè¡Œå¯? â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function IsPassable(x, y){
   if(x < 0 || MATRIX_WIDTH <= x || MATRIX_HEIGHT <= y) return false;
@@ -924,34 +924,34 @@ function IsPassable(x, y){
   return gBlocks[gMatrix[y][x]].passable;
 }
 /*----------------------------------------------------------------------------------------
- ™š •\¦‹æˆæ“à? š™
+ â˜†â˜… è¡¨ç¤ºåŒºåŸŸå†…? â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function CanDisplayPos(x, y){
   return (0 <= x && x < MATRIX_WIDTH && DEADLINE_HEIGHT <= y && y < MATRIX_HEIGHT);
 }
 /*----------------------------------------------------------------------------------------
- ™š ‰E‰ñ“] š™
+ â˜†â˜… å³å›è»¢ â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function RotateRight(){
   Rotate(true);
 }
 /*----------------------------------------------------------------------------------------
- ™š ¶‰ñ“] š™
+ â˜†â˜… å·¦å›è»¢ â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function RotateLeft(){
   Rotate(false);
 }
 /*----------------------------------------------------------------------------------------
- ™š ‰ñ“] š™
+ â˜†â˜… å›è»¢ â˜…â˜†
 
- <toRight>‚ª true ‚È‚ç‰E‰ñ“]Afalse ‚È‚ç¶‰ñ“]‚ğ‚µ‚Ü‚·B
+ <toRight>ãŒ true ãªã‚‰å³å›è»¢ã€false ãªã‚‰å·¦å›è»¢ã‚’ã—ã¾ã™ã€‚
 ----------------------------------------------------------------------------------------*/
 function Rotate(toRight){
   var newDir = (gCurDir + (toRight ? 1 : 3)) % 4;
   var rotRule = gCurMino.rotationRule;
   var newX, newY;
   var rotateRuleId;
-  // ‰ñ“]ƒ‹[ƒ‹‚ÌƒeƒXƒgB¬Œ÷‚µ‚½‚ç”½‰f
+  // å›è»¢ãƒ«ãƒ¼ãƒ«ã®ãƒ†ã‚¹ãƒˆã€‚æˆåŠŸã—ãŸã‚‰åæ˜ 
   var canRotate = false;
   for(var i = 0; i < ROTATE_RULES; i++){
     newX = gCurX + rotRule.dx[toRight ? 0 : 1][gCurDir][i];
@@ -971,28 +971,28 @@ function Rotate(toRight){
   }
 }
 /*----------------------------------------------------------------------------------------
- š™ T-SPIN ¬—§”»’è ™š
+ â˜…â˜† T-SPIN æˆç«‹åˆ¤å®š â˜†â˜…
 
- T-SPIN •s¬—§‚È‚ç 0AT-SPIN MINI ‚È‚ç 1AT-SPIN ‚È‚ç 2 ‚ğ•Ô‚µ‚Ü‚·B
+ T-SPIN ä¸æˆç«‹ãªã‚‰ 0ã€T-SPIN MINI ãªã‚‰ 1ã€T-SPIN ãªã‚‰ 2 ã‚’è¿”ã—ã¾ã™ã€‚
 //----------------------------------------------------------------------------------------
- ‰ñ“]ˆ—‚Ì’†‚Åæ“¾‚µ‚Ä‚­‚¾‚³‚¢B
- Ÿ‚ÌğŒ‚ğ–‚½‚·‚Æ T-SPIN ‚É‚È‚è‚Ü‚·B
- E T ƒ~ƒm‚Å‚ ‚é‚±‚Æ
- EÅŒã‚É¬Œ÷‚µ‚½‘€ì‚ª‰ñ“]‚Å‚ ‚é(‚±‚ÌŠÖ”‚ğŒÄ‚Ño‚·‘O’ñ)
- E“Ê•”‚ÌüˆÍ 4 ƒuƒƒbƒN( ¦ ‚Æ ~ ‚Ì•”•ª)‚Ì‚¤‚¿ 3 ‰ÓŠˆÈã‚ÉƒuƒƒbƒN‚ª‚ ‚é
+ å›è»¢å‡¦ç†ã®ä¸­ã§å–å¾—ã—ã¦ãã ã•ã„ã€‚
+ æ¬¡ã®æ¡ä»¶ã‚’æº€ãŸã™ã¨ T-SPIN ã«ãªã‚Šã¾ã™ã€‚
+ ãƒ» T ãƒŸãƒã§ã‚ã‚‹ã“ã¨
+ ãƒ»æœ€å¾Œã«æˆåŠŸã—ãŸæ“ä½œãŒå›è»¢ã§ã‚ã‚‹(ã“ã®é–¢æ•°ã‚’å‘¼ã³å‡ºã™å‰æ)
+ ãƒ»å‡¸éƒ¨ã®å‘¨å›² 4 ãƒ–ãƒ­ãƒƒã‚¯( â€» ã¨ Ã— ã®éƒ¨åˆ†)ã®ã†ã¡ 3 ç®‡æ‰€ä»¥ä¸Šã«ãƒ–ãƒ­ãƒƒã‚¯ãŒã‚ã‚‹
 
- ‚³‚ç‚ÉŸ‚ÌğŒ‚Ì‚Ç‚¿‚ç‚©‚ğ–‚½‚·‚Æ T-SPIN ‚ÉA–‚½‚³‚È‚¢‚Æ T-SPIN MINI ‚É‚È‚è‚Ü‚·B
- E“Ê•”‚Ì—¼—×( ¦ ‚Ì•”•ª)‚Ì 2 ‰ÓŠ‚Æ‚àƒuƒƒbƒN‚ª‚ ‚é
- E’¼‘O‚Ì‰ñ“]‚ª‘æ 5 Œó•â( TST •—‚Ì‰ñ“]Au T-SPIN FIN v“™)‚Å‚ ‚é
+ ã•ã‚‰ã«æ¬¡ã®æ¡ä»¶ã®ã©ã¡ã‚‰ã‹ã‚’æº€ãŸã™ã¨ T-SPIN ã«ã€æº€ãŸã•ãªã„ã¨ T-SPIN MINI ã«ãªã‚Šã¾ã™ã€‚
+ ãƒ»å‡¸éƒ¨ã®ä¸¡éš£( â€» ã®éƒ¨åˆ†)ã® 2 ç®‡æ‰€ã¨ã‚‚ãƒ–ãƒ­ãƒƒã‚¯ãŒã‚ã‚‹
+ ãƒ»ç›´å‰ã®å›è»¢ãŒç¬¬ 5 å€™è£œ( TST é¢¨ã®å›è»¢ã€ã€Œ T-SPIN FIN ã€ç­‰)ã§ã‚ã‚‹
 
- ¦¡¦@~¡¦@~@~@¦¡~
- ¡¡¡@@¡¡@¡¡¡@¡¡
- ~@~@~¡¦@¦¡¦@¦¡~
+ â€»â– â€»ã€€Ã—â– â€»ã€€Ã—ã€€Ã—ã€€â€»â– Ã—
+ â– â– â– ã€€ã€€â– â– ã€€â– â– â– ã€€â– â– 
+ Ã—ã€€Ã—ã€€Ã—â– â€»ã€€â€»â– â€»ã€€â€»â– Ã—
 
- ‰ñ“]ˆÈŠO‚Ì‘€ì‚ª¬Œ÷‚µ‚½‚Æ‚«‚Í T-SPIN ƒtƒ‰ƒO gTSpinType ‚ğ 0 ‚É‚µ‚Ä‚­‚¾‚³‚¢B
+ å›è»¢ä»¥å¤–ã®æ“ä½œãŒæˆåŠŸã—ãŸã¨ãã¯ T-SPIN ãƒ•ãƒ©ã‚° gTSpinType ã‚’ 0 ã«ã—ã¦ãã ã•ã„ã€‚
 //----------------------------------------------------------------------------------------
- ×‚©‚¢ğŒ‚Íƒ\ƒtƒg‚É‚æ‚Á‚ÄˆÙ‚È‚é‚æ‚¤‚Å‚·B‚Æ‚è‚ ‚¦‚¸A•ÇR‚è‚âŠŠ‚è‚İ‚Ì T-SPIN ‚ª MINI
- ‚Æ”»’è‚³‚ê‚Ä‚¢‚ê‚Î—Ç‚¢‚Æv‚í‚ê‚Ü‚·B
+ ç´°ã‹ã„æ¡ä»¶ã¯ã‚½ãƒ•ãƒˆã«ã‚ˆã£ã¦ç•°ãªã‚‹ã‚ˆã†ã§ã™ã€‚ã¨ã‚Šã‚ãˆãšã€å£è¹´ã‚Šã‚„æ»‘ã‚Šè¾¼ã¿ã® T-SPIN ãŒ MINI
+ ã¨åˆ¤å®šã•ã‚Œã¦ã„ã‚Œã°è‰¯ã„ã¨æ€ã‚ã‚Œã¾ã™ã€‚
 ----------------------------------------------------------------------------------------*/
 function SetTSpinType(rotateRuleId){
   if(gCurMino != T) return 0;
@@ -1000,7 +1000,7 @@ function SetTSpinType(rotateRuleId){
   var tsCnt = 0;
   var tssCnt = 0;
   var isBlock = false;
-  // TS ğŒ‚¨‚æ‚Ñ TSS ğŒ‚Ì‰½‰ÓŠ‚É’Ês•s‰ÂƒuƒƒbƒN‚ª‚ ‚é‚©
+  // TS æ¡ä»¶ãŠã‚ˆã³ TSS æ¡ä»¶ã®ä½•ç®‡æ‰€ã«é€šè¡Œä¸å¯ãƒ–ãƒ­ãƒƒã‚¯ãŒã‚ã‚‹ã‹
   for(var i = 0; i < T.shape[gCurDir].length; i++){
     for(var j = 0; j < T.shape[gCurDir][i].length; j++){
       if(IsValidPos(j + gCurX, i + gCurY)){
@@ -1014,7 +1014,7 @@ function SetTSpinType(rotateRuleId){
       }
     }
   }
-  // TSS ‚© TSM ‚©‚Ì”»’è
+  // TSS ã‹ TSM ã‹ã®åˆ¤å®š
   if(tsCnt >= 3){
     gTSpinType = (tssCnt >= 2 || rotateRuleId == 4) ? 2 : 1;
   }else{
@@ -1022,7 +1022,7 @@ function SetTSpinType(rotateRuleId){
   }
 }
 /*----------------------------------------------------------------------------------------
- ™š •\¦‚ğ”½‰f š™
+ â˜†â˜… è¡¨ç¤ºã‚’åæ˜  â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function Refresh(){
   RefreshMatrix();
@@ -1030,7 +1030,7 @@ function Refresh(){
   RefreshHold();
 }
 /*----------------------------------------------------------------------------------------
- ™š ƒ}ƒgƒŠƒbƒNƒX”½‰f š™
+ â˜†â˜… ãƒãƒˆãƒªãƒƒã‚¯ã‚¹åæ˜  â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function RefreshMatrix(){
   RefreshPlacedMino();
@@ -1038,7 +1038,7 @@ function RefreshMatrix(){
   RefreshActiveMino();
 }
 /*----------------------------------------------------------------------------------------
- ™š İ’uÏƒuƒƒbƒN”½‰f š™
+ â˜†â˜… è¨­ç½®æ¸ˆãƒ–ãƒ­ãƒƒã‚¯åæ˜  â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function RefreshPlacedMino(){
   for(var i = DEADLINE_HEIGHT; i < MATRIX_HEIGHT; i++){
@@ -1048,18 +1048,18 @@ function RefreshPlacedMino(){
   }
 }
 /*----------------------------------------------------------------------------------------
- ™š —‰º’†ƒ~ƒm”½‰f š™
+ â˜†â˜… è½ä¸‹ä¸­ãƒŸãƒåæ˜  â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function RefreshActiveMino(){
   if(gCurMino) DisplayMino(gCurDir, gCurMino, gCurX, gCurY, gCurMino.activeBlockId);
 }
 /*----------------------------------------------------------------------------------------
- ™š ƒS[ƒXƒgƒ~ƒm‚ÆƒKƒCƒhƒ~ƒm”½‰f š™
+ â˜†â˜… ã‚´ãƒ¼ã‚¹ãƒˆãƒŸãƒã¨ã‚¬ã‚¤ãƒ‰ãƒŸãƒåæ˜  â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function RefreshGhostAndGuide(){
   if(!gCurMino) return;
   var ghostBlks = MinoToBlockPositions(gCurDir, gCurMino, gCurX, gCurY + HarddropDiffY());
-  // ƒS[ƒXƒgƒ~ƒm‚Ì•`‰æ
+  // ã‚´ãƒ¼ã‚¹ãƒˆãƒŸãƒã®æç”»
   for(var i = 0; i < ghostBlks.length; i++){
     DisplayBlock(ghostBlks[i][0], ghostBlks[i][1], gCurMino.ghostBlockId, true);
   }
@@ -1067,7 +1067,7 @@ function RefreshGhostAndGuide(){
   var g = gCurGuide;
   if(!g) return;
   var guideBlks = MinoToBlockPositions(g.dir, g.mino, g.x, g.y + DEADLINE_HEIGHT);
-  // ‹¤’Ê•”•ª‚Ì’Tõ
+  // å…±é€šéƒ¨åˆ†ã®æ¢ç´¢
   var ghostGuideBlks = [];
   for(var i = 0; i < ghostBlks.length; i++){
     for(var j = 0; j < guideBlks.length; j++){
@@ -1077,22 +1077,22 @@ function RefreshGhostAndGuide(){
     }
   }
 
-  // ƒKƒCƒhƒ~ƒm‚Ì•`‰æ
+  // ã‚¬ã‚¤ãƒ‰ãƒŸãƒã®æç”»
   if(gCurProblem.useGuide || gCurUseGuideFlg){
     for(var i = 0; i < guideBlks.length; i++){
       DisplayBlock(guideBlks[i][0], guideBlks[i][1], g.mino.guideBlockId, true);
     }
 
-    // ‹¤’Ê•”•ª‚Ì•`‰æ
+    // å…±é€šéƒ¨åˆ†ã®æç”»
     for(var i = 0; i < ghostGuideBlks.length; i++){
       DisplayBlock(ghostGuideBlks[i][0], ghostGuideBlks[i][1], String(g.mino.ghostGuideBlockId) + String(gCurMino.id), true);
     }
   }
 }
 /*----------------------------------------------------------------------------------------
- ™š ƒlƒNƒXƒg”½‰f š™
+ â˜†â˜… ãƒã‚¯ã‚¹ãƒˆåæ˜  â˜…â˜†
 
- ‹ó—“( 0 )‚©ˆÚ“®’†‚ÌƒuƒƒbƒN( 11 ` 17 )‚Ì‰æ‘œ‚ğ•\¦‚µ‚Ü‚·B1 ƒ}ƒX‰º‚É‚¸‚ç‚µ‚Ü‚·B
+ ç©ºæ¬„( 0 )ã‹ç§»å‹•ä¸­ã®ãƒ–ãƒ­ãƒƒã‚¯( 11 ã€œ 17 )ã®ç”»åƒã‚’è¡¨ç¤ºã—ã¾ã™ã€‚1 ãƒã‚¹ä¸‹ã«ãšã‚‰ã—ã¾ã™ã€‚
 ----------------------------------------------------------------------------------------*/
 function RefreshQueue(){
   var mino;
@@ -1108,7 +1108,7 @@ function RefreshQueue(){
     }
     i++;
   }
-  // ‹ó—“
+  // ç©ºæ¬„
   while(i < NEXT_MINOS){
     for(var j = 0; j < 4; j++){
       for(var k = 0; k < 4; k++){
@@ -1119,9 +1119,9 @@ function RefreshQueue(){
   }
 }
 /*----------------------------------------------------------------------------------------
- ™š ƒz[ƒ‹ƒh”½‰f š™
+ â˜†â˜… ãƒ›ãƒ¼ãƒ«ãƒ‰åæ˜  â˜…â˜†
 
- ‹ó—“( 0 )‚©ˆÚ“®’†‚ÌƒuƒƒbƒN( 11 ` 17 )‚Ì‰æ‘œ‚ğ•\¦‚µ‚Ü‚·B1 ƒ}ƒX‰º‚É‚¸‚ç‚µ‚Ü‚·B
+ ç©ºæ¬„( 0 )ã‹ç§»å‹•ä¸­ã®ãƒ–ãƒ­ãƒƒã‚¯( 11 ã€œ 17 )ã®ç”»åƒã‚’è¡¨ç¤ºã—ã¾ã™ã€‚1 ãƒã‚¹ä¸‹ã«ãšã‚‰ã—ã¾ã™ã€‚
 ----------------------------------------------------------------------------------------*/
 function RefreshHold(){
   var mino;
@@ -1135,7 +1135,7 @@ function RefreshHold(){
       }
     }
   }else{
-    // ‹ó—“
+    // ç©ºæ¬„
     for(var j = 0; j < 4; j++){
       for(var k = 0; k < 4; k++){
         SetImage("h" + j + "_" + k, gBlocks[0].cache.src);
@@ -1145,7 +1145,7 @@ function RefreshHold(){
 
 }
 /*----------------------------------------------------------------------------------------
- ™š ƒV[ƒ“: ƒŒƒbƒXƒ“¸”s š™
+ â˜†â˜… ã‚·ãƒ¼ãƒ³: ãƒ¬ãƒƒã‚¹ãƒ³å¤±æ•— â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function ScenePerformFailed(){
   switch(gButton){
@@ -1156,7 +1156,7 @@ function ScenePerformFailed(){
   if(IsPressed()) gScene = 'perform';
 }
 /*----------------------------------------------------------------------------------------
- ™š ƒV[ƒ“: ƒKƒCƒhƒ‚[ƒh š™
+ â˜†â˜… ã‚·ãƒ¼ãƒ³: ã‚¬ã‚¤ãƒ‰ãƒ¢ãƒ¼ãƒ‰ â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function ScenePerformGuideMode(){
   switch(gButton){
@@ -1167,7 +1167,7 @@ function ScenePerformGuideMode(){
   if(IsPressed()) gScene = 'perform';
 }
 /*----------------------------------------------------------------------------------------
- ™š ƒV[ƒ“: ƒNƒŠƒA š™
+ â˜†â˜… ã‚·ãƒ¼ãƒ³: ã‚¯ãƒªã‚¢ â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function ScenePerformCleared(){
   switch(gButton){
@@ -1178,9 +1178,9 @@ function ScenePerformCleared(){
   if(IsPressed()) AfterClear();
 }
 /*----------------------------------------------------------------------------------------
- ™š ƒNƒŠƒAŒã‚ÌƒL[‘€ì š™
+ â˜†â˜… ã‚¯ãƒªã‚¢å¾Œã®ã‚­ãƒ¼æ“ä½œ â˜…â˜†
 
- u–â‘è10v‚È‚ç‚ÎƒZƒNƒVƒ‡ƒ“ˆê——‚ÖA‚»‚êˆÈŠO‚È‚çŸ‚Ì–â‘è‚Éi‚İ‚Ü‚·B
+ ã€Œå•é¡Œ10ã€ãªã‚‰ã°ã‚»ã‚¯ã‚·ãƒ§ãƒ³ä¸€è¦§ã¸ã€ãã‚Œä»¥å¤–ãªã‚‰æ¬¡ã®å•é¡Œã«é€²ã¿ã¾ã™ã€‚
 ----------------------------------------------------------------------------------------*/
 function AfterClear(){
   if(gCurProblemId >= gCurProgmeIdList.length - 1){
@@ -1194,7 +1194,7 @@ function AfterClear(){
   }
 }
 /*----------------------------------------------------------------------------------------
- ™š ŠeƒL[–¼‚Ìæ“¾ š™
+ â˜†â˜… å„ã‚­ãƒ¼åã®å–å¾— â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function KeyL() {return gKeys[0]; }  // move Left
 function KeyR() {return gKeys[1]; }  // move Right
@@ -1205,7 +1205,7 @@ function KeyRL(){return gKeys[5]; }  // Rotate Left
 function KeyH() {return gKeys[6]; }  // Hold
 function KeyG() {return gKeys[7]; }  // Guide
 /*----------------------------------------------------------------------------------------
- ™š ƒV[ƒ“: İ’è š™
+ â˜†â˜… ã‚·ãƒ¼ãƒ³: è¨­å®š â˜…â˜†
 ----------------------------------------------------------------------------------------*/
 function ScenePreferences(){
   switch(gButton){
@@ -1218,21 +1218,21 @@ function ScenePreferences(){
   }
 }
 /*----------------------------------------------------------------------------------------
- ™š İ’è‚Ì•Û‘¶ š™
+ â˜†â˜… è¨­å®šã®ä¿å­˜ â˜…â˜†
 
- •Û‘¶‚ª¬Œ÷‚µ‚½‚©‚Ç‚¤‚©‚ğ•Ô‚µ‚Ü‚·B
+ ä¿å­˜ãŒæˆåŠŸã—ãŸã‹ã©ã†ã‹ã‚’è¿”ã—ã¾ã™ã€‚
 ----------------------------------------------------------------------------------------*/
 function SavePreferences(){
-  // d•¡•s‰Â
+  // é‡è¤‡ä¸å¯
   if(KeyDuplicates()){
-    alert("ƒL[‚ªd•¡‚µ‚Ä‚¢‚Ü‚·B");
+    alert("ã‚­ãƒ¼ãŒé‡è¤‡ã—ã¦ã„ã¾ã™ã€‚");
     return false;
   }
-  // İ’è”½‰f
+  // è¨­å®šåæ˜ 
   for(var i = 0; i < gKeys.length; i++){
     gKeys[i] = document.getElementById(gSelectForms[i]).value;
   }
-  // ƒNƒbƒL[‚É•Û‘¶
+  // ã‚¯ãƒƒã‚­ãƒ¼ã«ä¿å­˜
   Save('MoveLeft', gKeys[0]);
   Save('MoveRight', gKeys[1]);
   Save('SoftDrop', gKeys[2]);
@@ -1244,9 +1244,9 @@ function SavePreferences(){
   return true;
 }
 /*----------------------------------------------------------------------------------------
- ™š ƒL[‚ªd•¡? š™
+ â˜†â˜… ã‚­ãƒ¼ãŒé‡è¤‡? â˜…â˜†
 
- ŠeƒZƒŒƒNƒgƒ{ƒbƒNƒX‚ğŠm”F‚µ‚ÄAd•¡‚ª‚ ‚é‚©‚Ç‚¤‚©‚ğ”»’è‚µ‚Ä•Ô‚µ‚Ü‚·B
+ å„ã‚»ãƒ¬ã‚¯ãƒˆãƒœãƒƒã‚¯ã‚¹ã‚’ç¢ºèªã—ã¦ã€é‡è¤‡ãŒã‚ã‚‹ã‹ã©ã†ã‹ã‚’åˆ¤å®šã—ã¦è¿”ã—ã¾ã™ã€‚
 ----------------------------------------------------------------------------------------*/
 function KeyDuplicates(){
   var target1, target2;

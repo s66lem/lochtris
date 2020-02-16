@@ -1,21 +1,21 @@
-/* Šî–{İ’è */
+/* åŸºæœ¬è¨­å®š */
 body, input, select{
-  font-family: "ƒƒCƒŠƒI", "‚l‚r ƒSƒVƒbƒN", monospace;
+  font-family: "ãƒ¡ã‚¤ãƒªã‚ª", "ï¼­ï¼³ ã‚´ã‚·ãƒƒã‚¯", monospace;
   font-size: 16px;
 }
 
 #list_sections input{
-  font-family: "ƒƒCƒŠƒI", "‚l‚r ƒSƒVƒbƒN", monospace;
+  font-family: "ãƒ¡ã‚¤ãƒªã‚ª", "ï¼­ï¼³ ã‚´ã‚·ãƒƒã‚¯", monospace;
   font-size: 12px;
   height: 24px;
 }
 
 textarea{
-  font-family: "ƒƒCƒŠƒI", "‚l‚r ƒSƒVƒbƒN", monospace;
+  font-family: "ãƒ¡ã‚¤ãƒªã‚ª", "ï¼­ï¼³ ã‚´ã‚·ãƒƒã‚¯", monospace;
   font-size: 14px;
 }
 
-/* ƒŒƒCƒ„[ */
+/* ãƒ¬ã‚¤ãƒ¤ãƒ¼ */
 .layer{
   visibility: hidden;
   position: absolute;
@@ -24,11 +24,11 @@ textarea{
   border: 1px #cccccc solid;
   padding: 8px 12px;
 }
-/* ’†‰›‘µ‚¦ */
+/* ä¸­å¤®æƒãˆ */
 .center{
   text-align: center;
 }
-/* ¬‚³‚¢•¶š */
+/* å°ã•ã„æ–‡å­— */
 .small{
   font-size: 12px;
 }
@@ -36,7 +36,7 @@ textarea{
 #title{
   font-size: 24px;
   font-weight: bold;
-  font-family: "ƒƒCƒŠƒI", "‚l‚r ƒSƒVƒbƒN", monospace;
+  font-family: "ãƒ¡ã‚¤ãƒªã‚ª", "ï¼­ï¼³ ã‚´ã‚·ãƒƒã‚¯", monospace;
 }
 #list_sections{
   background-color: #eef4ff;
