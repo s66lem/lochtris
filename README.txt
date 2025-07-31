@@ -1,3 +1,6 @@
+just a little side-project, don't mind me, still a WIP
+
+
 内容
 　テトリスの開幕パーフェクトクリアの練習ができます。
 
