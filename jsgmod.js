@@ -1,39 +1,39 @@
 /*========================================================================================
- □■ jsgmod.js (JavaScript Game MODule) ■□
+□■ jsgmod.js (JavaScript Game MODule) ■□
  
- フレーム管理やキー入力等を支援するモジュールです。
+This module supports frame management, key input, etc.
 ==========================================================================================
 /*----------------------------------------------------------------------------------------
- ☆★ 定数一覧 ★☆
+☆★ Constant list ★☆
 ----------------------------------------------------------------------------------------*/
-var FPS = 30;            // Frames Per Second; 1 秒間のフレーム数
-var LOOP_INTERVAL = 17;  // <ミリ秒> メインループ起動間隔。(1000 / <FPS>) より小さくする
-var KEY_CHARGE_DURATION = 7;  // <フレーム> キーリピート開始までのフレーム数
-var KEY_REPEAT_SPAN = 2;      // <フレーム> 次のキーリピートまでのフレーム数
+var FPS = 30; //Frames Per Second; Frames per second
+var LOOP_INTERVAL = 17; //<milliseconds> Main loop startup interval. (1000 /<FPS>) to be smaller
+var KEY_CHARGE_DURATION = 7; //<frame> Number of frames until key repeat starts
+var KEY_REPEAT_SPAN = 2; //<frame> Number of frames up to the next key repeat
 /*
-● キーリピート
- キーを押し続けるとキーが連続で入力されることを「キーリピート」といいます。たとえば
- KEY_CHARGE_DURATION = 20, KEY_REPEAT_SPAN = 4 とすれば、キーを押し始めたフレームと、そこ
- から数えて 20, 24, 28, 32, … フレームの間押し続けたときに入力を送る( IsInputting が true
- を返す)ようになります。
+● Key repeat
+When a key is pressed and held down, the keys are input continuously is called "key repeat." for example
+If KEY_CHARGE_DURATION = 20, KEY_REPEAT_SPAN = 4, then the frame where you started pressing the key and the
+Counting from 20, 24, 28, 32, … Send input when pressed for a frame (IsInputting is true
+) returns
 */
 /*----------------------------------------------------------------------------------------
- ☆★ 使い方 ★☆
+☆★ How to use ★☆
 
- Javascript でフレーム制御を行うモジュールです。本モジュールの読み込み元に Setup() (起動時
- の 1 回だけ処理される初期化処理)と Main() (毎フレーム実行される処理)を定義してください。
- また、body タグの onLoad イベントから Execute() を呼び出してください。
+This is a module that controls frames using Javascript. Setup() (at startup) to load this module
+Define the initialization process that is processed only once () and Main() (process executed every frame).
+Also, call Execute() from the onLoad event of the body tag.
 
-◎ HTML ファイルのソースの例
- <html>
-  <head>
-   <script type="text/javascript" src="jsgmod.js"></script>
-   <script type="text/javascript" src="my_sccript.js"></script>
-  </head>
-  <body onLoad="Execute()">
-   本文
-  </body>
- </html>
+◎ Example of HTML file source
+<html>
+<head>
+<script type="text/javascript" src="jsgmod.js"></script>
+<script type="text/javascript" src="my_sccript.js"></script>
+</head>
+<body onLoad="Execute()">
+This article
+</body>
+</html>
 
 ------------------------------------------------------------------------------------------
 ● キー制御

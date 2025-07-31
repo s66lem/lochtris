@@ -1,10 +1,10 @@
-/*----------------------------------------------------------------------------------------
-☆★ オブジェクト: 問題 ★☆
-----------------------------------------------------------------------------------------*/
+/*------------------------
+☆★ Object: Problem ★☆
+-----*/
 function ProblemWarmingUp(id){
   switch(id){
-    case  0:
-    // 初期マトリックス。デッドライン以上は含めない
+    case 0:
+    //Initial matrix. Do not include more than deadlines
     this.initialBlocks = [[0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0],
@@ -25,29 +25,29 @@ function ProblemWarmingUp(id){
     [0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0]];
-    this.ingredients = [[],Z,T,S,J,O,L,I,I,O,J];  // 使用可能ミノ 先頭要素は初期ホールドミノ
-    this.caption = 'テトリス　その１';
-    this.hint = '最初の７手は Perfect Clear¥n(パーフェクト・クリア)を狙う¥nための　代表的なテンプレです。';
-    this.guides = [G(Z, 0, 6, 18), G(T, 3, 8, 17), G(S, 0, 7, 16), G(J, 0, 0, 18), G(O, 0, 0, 17), G(L, 2, 0, 15), G(I, 3, 2, 16), G(I, 0, 4, 15), G(O, 0, 3, 18), G(J, 2, 4, 17)];  // ガイド 作成する際は設置ミノのダンプ情報を利用（ttt.jsにてconsole.logに設置ミノをダンプしている）
-    this.useGuide = true;  // ガイド使用(Rを押さなくてもガイドを利用するときtrue)
-    this.req = [];       // ノルマ( REQuired features )
-    this.req.push(0);    //   [0]: Single
-    this.req.push(0);    //   [1]: Double
-    this.req.push(0);    //   [2]: Triple
-    this.req.push(0);    //   [3]: Tetris
-    this.req.push(0);    //   [4]: T-Spin Mini ( 0 列)
-    this.req.push(0);    //   [5]: T-Spin ( 0 列)
-    this.req.push(0);    //   [6]: Mini T-Spin Single
-    this.req.push(0);    //   [7]: T-Spin Single
-    this.req.push(0);    //   [8]: T-Spin Double
-    this.req.push(0);    //   [9]: T-Spin Triple
-    this.req.push(1);    //   [10]: Perfect Clear
-    this.req.push(0);    //   [11]: Back-to-Back
-    this.req.push(0);    //   [12]: vREN (Combo)
+    this.ingredients = [[],Z,T,S,J,O,L,I,I,O,J]; //Available mino The first element is the initial hold mino
+    this.caption = 'Tetris Part 1';
+    this.hint = 'The first 7 moves are a typical template for ¥n, which aims for Perfect Clear\n. ';
+    this.guides = [G(Z, 0, 6, 18), G(T, 3, 8, 17), G(S, 0, 7, 16), G(J, 0, 0, 18), G(O, 0, 0, 17), G(L, 2, 0, 15), G(I, 3, 2, 16), G(I, 0, 4, 15), G(O, 0, 3, 18), G(J, 2, 4, 17)]; //Guide When creating a guide, use the dump information of the installation mino (the installation mino is dumped in console.log using ttt.js)
+    this.useGuide = true; //Use guide (true when using guides without pressing R)
+this.req = [];       //ノルマ( REQuired features )
+    this.req.push(0);    //  [0]: Single
+    this.req.push(0);    //  [1]: Double
+    this.req.push(0);    //  [2]: Triple
+    this.req.push(0);    //  [3]: Tetris
+    this.req.push(0);    //  [4]: T-Spin Mini ( 0 列)
+    this.req.push(0);    //  [5]: T-Spin ( 0 列)
+    this.req.push(0);    //  [6]: Mini T-Spin Single
+    this.req.push(0);    //  [7]: T-Spin Single
+    this.req.push(0);    //  [8]: T-Spin Double
+this.req.push(0);    //  [9]: T-Spin Triple
+    this.req.push(1);    //  [10]: Perfect Clear
+    this.req.push(0);    //  [11]: Back-to-Back
+    this.req.push(0);    //  [12]: vREN (Combo)
     break;
 
     default:
-    // 初期マトリックス。デッドライン以上は含めない
+    //Initial matrix. Do not include more than deadlines
     this.initialBlocks = [[0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0],
@@ -68,25 +68,25 @@ function ProblemWarmingUp(id){
     [1,1,1,1,1,1,1,1,1,0],
     [1,1,1,1,1,1,1,1,1,0],
     [1,1,1,1,1,1,1,1,1,0]];
-    this.ingredients = [[],I];  // 使用可能ミノ 先頭要素は初期ホールドミノ
-    this.caption = 'テトリス　その１';
-    this.hint = '最初は　TETRiS (４列消し)を¥nひたすら決めるだけ。まずは¥nここで　ウォーミングアップ！';
-    this.guides = [];    // ガイド 作成する際は設置ミノのダンプ情報を利用（ttt.jsにてconsole.logに設置ミノをダンプしている）
-    this.useGuide = true;  // ガイド使用(Rを押さなくてもガイドを利用するときtrue)
-    this.req = [];       // ノルマ( REQuired features )
-    this.req.push(0);    //   [0]: Single
-    this.req.push(0);    //   [1]: Double
-    this.req.push(0);    //   [2]: Triple
-    this.req.push(1);    //   [3]: Tetris
-    this.req.push(0);    //   [4]: T-Spin Mini ( 0 列)
-    this.req.push(0);    //   [5]: T-Spin ( 0 列)
-    this.req.push(0);    //   [6]: Mini T-Spin Single
-    this.req.push(0);    //   [7]: T-Spin Single
-    this.req.push(0);    //   [8]: T-Spin Double
-    this.req.push(0);    //   [9]: T-Spin Triple
-    this.req.push(0);    //   [10]: Perfect Clear
-    this.req.push(0);    //   [11]: Back-to-Back
-    this.req.push(0);    //   [12]: vREN (Combo)
+    this.ingredients = [[],I]; //Available mino The first element is the initial hold mino
+    this.caption = 'Tetris Part 1';
+    this.hint = 'Just count to 4! (Make a Tetris)';
+    this.guides = []; //Guide When creating a guide, use the dump information of the installation mino (the installation mino is dumped in console.log using ttt.js)
+    this.useGuide = true; //Use guide (true when using guides without pressing R)
+    this.req = []; //Quota ( REQuireed features )
+    this.req.push(0); //[0]: Single
+    this.req.push(0); //[1]: Double
+    this.req.push(0); //[2]: Triple
+this.req.push(1);    //  [3]: Tetris
+    this.req.push(0);    //  [4]: T-Spin Mini ( 0 列)
+    this.req.push(0);    //  [5]: T-Spin ( 0 列)
+    this.req.push(0);    //  [6]: Mini T-Spin Single
+    this.req.push(0);    //  [7]: T-Spin Single
+    this.req.push(0);    //  [8]: T-Spin Double
+    this.req.push(0);    //  [9]: T-Spin Triple
+    this.req.push(0);    //  [10]: Perfect Clear
+    this.req.push(0);    //  [11]: Back-to-Back
+this.req.push(0);    //  [12]: vREN (Combo)
     break;
 
   }
@@ -98,11 +98,11 @@ function Problem840(id){
   this.id = id;
   this.initialBlocks = INITIAL_PC_BLOCKS;
   this.caption = 'No.'+ id;
-  this.hint = 'Perfect Clear を発動してください。';
+  this.hint = 'PC this bad boy.';
   this.useGuide = false;
   this.req = [0,0,0,0,0,0,0,0,0,0,1,0,0];
 
-  /* ここのcase文は 「テトリス_パフェテンプレ成功率.xlsx」の「テンプレ改_計算用」シート DB列からコピーすること */
+  /* Copy the case statements here from column DB of the "Template Revised_Calculation" sheet in "Tetris_Perfect_Clear_Template_Success_Rate.xlsx" */
   switch(id){
     case   1:    this.ingredients = [[],I,I,J,L,O];    this.guides = GUIDES_ILO;    break;
     case   3:    this.ingredients = [[],I,I,J,L,T];    this.guides = GUIDES_IJT;    break;
@@ -839,8 +839,8 @@ function Problem840(id){
     [1,1,1,1,1,1,1,1,1,0],
     [1,1,1,1,1,1,1,1,1,0]];
     this.ingredients = [[],I];  // 使用可能ミノ 先頭要素は初期ホールドミノ
-    this.caption = 'テトリス　その１';
-    this.hint = '最初は　TETRiS (４列消し)を¥nひたすら決めるだけ。まずは¥nここで　ウォーミングアップ！';
+    this.caption = 'Tetris Part 1';
+    this.hint = 'At first, \nI just decided on TETRiS (4 rows removed).\n First, warm up here!';
     this.guides = [];    // ガイド 作成する際は設置ミノのダンプ情報を利用（ttt.jsにてconsole.logに設置ミノをダンプしている）
     this.useGuide = true;  // ガイド使用(Rを押さなくてもガイドを利用するときtrue)
     this.req = [];       // ノルマ( REQuired features )
@@ -867,7 +867,7 @@ function ProblemWithGuidance(id){
   this.id = id;
   this.initialBlocks = INITIAL_PC_BLOCKS;
   this.caption = 'No.'+ id;
-  this.hint = '基本パターン　[ガイドあり] ¥nPerfect Clear を発動してください。';
+  this.hint = 'Basic pattern [With guide] /n Please PC this bad boy. ';
   this.useGuide = true;
   this.req = [0,0,0,0,0,0,0,0,0,0,1,0,0];
 
@@ -965,7 +965,7 @@ function ProblemOtherwise(id){
   this.id = id;
   this.initialBlocks = INITIAL_PC_BLOCKS;
   this.caption = 'No.'+ id;
-  this.hint = 'Perfect Clear を発動してください。';
+  this.hint = 'Please PC this bad boy. ';
   this.useGuide = true;
   this.req = [0,0,0,0,0,0,0,0,0,0,1,0,0];
 
@@ -1048,11 +1048,11 @@ function Problem840_Mirror(id){
   this.id = id;
   this.initialBlocks = INITIAL_PC_BLOCKS_MIRROR;
   this.caption = 'No.'+ id;
-  this.hint = 'Perfect Clear を発動してください。';
+  this.hint = 'Please PC this bad boy.';
   this.useGuide = false;
   this.req = [0,0,0,0,0,0,0,0,0,0,1,0,0];
 
-  /* ここのcase文は 「テトリス_パフェテンプレ成功率.xlsx」の「テンプレ改_ミラー_計算用」シート DB列からコピーすること */
+  /*The case statement here is "Tetris_Parfait Template Success Rate.xlsx" sheet "For Template Revised_Mirror_Calculation" */
   switch(id){
     case   1:    this.ingredients = [[],I,I,J,L,O];    this.guides = GUIDES_MIRROR_IJO;    break;
     case   2:    this.ingredients = [[],I,I,J,L,S];    this.guides = GUIDES_MIRROR_JIS;    break;

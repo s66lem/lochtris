@@ -1,18 +1,18 @@
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <title>テトパフェチャレンジ84</title>
-  <!-- 外部 css 読込 -->
+  <title>Tetris PCO Trainer 84</title>
+  <!--Load external css -->
   <link href="ttt.css" rel="stylesheet" type="text/css">
-  <!-- 詳細動作については各 js ファイルをご参照ください -->
+  <!--Please refer to each js file for detailed operation -->
   <script type="text/javascript" src="jsgmod.js"></script>
   <script type="text/javascript" src="data.js"></script>
   <script type="text/javascript" src="problemData.js"></script>
   <script type="text/javascript" src="problem.js"></script>
-  <script type="text/javascript" src="ttt.js"></script>
+<script type="text/javascript" src="ttt.js"></script>
   <!--
-  ■メモ
-  ・(特になし)
+  ■Note
+  ・(Nothing in particular)
 -->
 </head>
 <body onLoad="Execute()">
@@ -20,140 +20,134 @@
 
     <div id="list_sections" class="layer">
       <p id="title">
-        TETRIS Perfect Clear Challenge<br>
-        テトリス　パフェチャレンジ
+        TETRIS PCO Trainer
       </p>
 
       <p>
-        対戦テトリスのテンプレ「開幕パーフェクトクリア」を極めたい！<br>
-        という方向けの講座です。<br>
-        840通りのツモの内、パーフェクトクリアが可能な711通りのツモを<br>
-        実際に<b>自分で動かしながら練習する</b>ことができます。<br>
+        <b><i>Originally created by sakuramochi84, Forked by s6lem. </i></b>
+        <br>
+        This course is for those who want to master PCO, or the Perfect Clear Opener <br>
+        Of the 840 possible bags, 711 of those can be perfect cleared. <br>
       </p>
       <p>
-        <b>答えが分からない場合は"R"を押してください。</b>ガイドが現れます。<br>
-        本講座で紹介するパターンとパフェ成功率の関係は<a href="TetrisPerfectClear.xlsx">ここ</a>を参照してください。
+        <b>If you don't know the answer, press "R". And the guide will appear. <br>
+        For the relationship between the patterns introduced in this course and the success rate of pc's, please refer to <a href="TetrisPerfectClear.xlsx">here</a>.
       </p>
 
       <p>
-        <input type="button" value="キー設定" onClick="gButton='preferences'">
+<input type="button" value="key settings" onClick="gButton='preferences'">
       </p>
       <p>
-        ・キー設定は Cookie でセーブされます。<br>
-        ・ミノの動きが速くなりすぎたらリロードしてみてください。<br>
-        ・ミノの動きがカクつくようでしたらリロードしてみてください。<br>
+        -Key settings will be saved using cookies. <br>
+        ・If the minos moves too quickly, try reloading. <br>
+        ・If mino movements seem stuttery, try reloading. <br>
       </p>
       <!
-      --セクションを編集した場合は data.js の SectionTitle にも反映してください-->
+      --If you edit a section, please also reflect it in the SectionTitle in data.js-->
       <p>
-        はじめに<br>
-        <input type="button" value="1  テンプレを組んでみよう[ガイドあり]" onClick="gButton='section1'">
+        Introduction<br>
+        <input type="button" value="[1] Creating the Template (w/ Guide)" onClick="gButton='section1'">
         <img src="img/clear.png" class="clear" id="clear0"><br>
       </p>
-
       <p>
-        Iミノ縦置き 61％<br>
-        <input type="button" value="2  「Iミノ縦置き」 14パターン [ガイドあり]" onClick="gButton='section2'">
+       Vertical I-Mino Placement 61%<br>
+        <input type="button" value="[2] Vertical I-Mino, 14 patterns (w/ Guide)" onClick="gButton='section2'">
         <img src="img/clear.png" class="clear" id="clear1"><br>
-        <input type="button" value="3  「Iミノ縦置き」 20問" onClick="gButton='section3'">
+        <input type="button" value="[3] Vertical I-Mino, 20q" onClick="gButton='section3'">
         <img src="img/clear.png" class="clear" id="clear2"><br>
       </p>
 
       <p>
-        Iミノ横置き 84％<br>
-        <input type="button" value="4  「初手 I ミノ１段目型」 6パターン [ガイドあり]" onClick="gButton='section4'">
+        Horizontal I-Mino Placement 84%
+        <input type="button" value="[4] I-Mino 1st Layer, 6 patterns (w/ Guide)" onClick="gButton='section4'">
         <img src="img/clear.png" class="clear" id="clear3"><br>
 
-        <input type="button" value="5  「初手 I ミノ１段目型」 20問" onClick="gButton='section5'">
+        <input type="button" value="[5] I-Mino 1st Layer, 20q" onClick="gButton='section5'">
         <img src="img/clear.png" class="clear" id="clear4"><br>
 
-        <input type="button" value="6  「全部寝かせ型」 4パターン [ガイドあり]" onClick="gButton='section6'">
+        <input type="button" value="[6] I-Mino 3rd Layer, Flat Placement, 4 patterns (w/ Guide)" onClick="gButton='section6'">
         <img src="img/clear.png" class="clear" id="clear5"><br>
 
-        <input type="button" value="7  「全部寝かせ型」 20問" onClick="gButton='section7'">
+        <input type="button" value="[7] I-Mino 3rd Layer, Flat Placement, 20q" onClick="gButton='section7'">
         <img src="img/clear.png" class="clear" id="clear6"><br>
 
-        <input type="button" value="8  「IILO型」 2パターン [ガイドあり]" onClick="gButton='section8'">
+        <input type="button" value="[8] IILO, 2 patterns (w/ Guide)" onClick="gButton='section8'">
         <img src="img/clear.png" class="clear" id="clear7"><br>
 
-        <input type="button" value="9  「IILO型」 10問" onClick="gButton='section9'">
+        <input type="button" value="[9] IILO, 10q" onClick="gButton='section9'">
         <img src="img/clear.png" class="clear" id="clear8"><br>
 
-        <input type="button" value="10 「初手Iミノ3段目型」 3パターン [ガイドあり]" onClick="gButton='section10'">
-        <img src="img/clear.png" class="clear" id="clear9"><br>
-
-        <input type="button" value="11 「初手Iミノ3段目型」 20問" onClick="gButton='section11'">
-        <img src="img/clear.png" class="clear" id="clear10"><br>
+        <input type="button" value="[10] 3rd Layer I-Mino, 3 patterns (w/ Guide)" onClick="gButton='section10'">
+        <img src="IMG/Clear.png" class="Clear" ID="Clear9"><br>
+        <input type="button" value="[11] 3rd Layer I-Mino, 20q" onclick="gButton='section11'">
+        <img src="IMG/Clear.png" class="Clear" ID="Clear10"><br>
 
       </p>
 
       <p>
-        Iミノ横置きのまとめ<br>
-        <input type="button" value="12  中間テスト 20問" onClick="gButton='section12'">
+        Summary of I-mino horizontal placement<br>
+        <input type="button" value="[12] Midterm Test 20q" onClick="gButton='section12'">
         <img src="img/clear.png" class="clear" id="clear11"><br>
       </p>
 
       <p>
-        ここまで覚えられれば、パーフェクトクリアが可能なツモ711通りの内、<br>
-        710通りを覚えられたことになります。<br>
-        余力のある方は最後の1通りとなる「LSIO型」も学習してみてください。<br>
+        If you can remember this much, 
+        you will have memorized 710 of the 711 possible combinations for a perfect clear, <br>
+          If you have the energy, try learning the last combination, "LSIO types." <br>
       </p>
-
       <p>
-        LSIO型 84.6％<br>
-        <input type="button" value="13 「LSIO型」 全1パターン [ガイドあり]" onClick="gButton='section13'">
+        LSIO type [84.6%]<br>
+        <input type="button" value="[13] LSIO type 1 pattern (w/ Guide)" onClick="gButton='section13'">
         <img src="img/clear.png" class="clear" id="clear12"><br>
 
-        <input type="button" value="14 「LSIO型」 12問" onClick="gButton='section14'">
+        <input type="button" value="[14] LSIO type 12q" onClick="gButton='section14'">
         <img src="img/clear.png" class="clear" id="clear13"><br>
 
       </p>
 
       <p>
-        まとめ<br>
-        <input type="button" value="15 期末テスト 30問" onClick="gButton='section15'">
-        <img src="img/clear.png" class="clear" id="clear14"><br>
+        Summary<br>
+        <input type="button" value="[15] Final Exam, 30q" onClick="gButton='section15'">
+<img src="img/clear.png" class="clear" id="clear14"><br>
 
-        <input type="button" value="16 卒業テスト（ミラー問題を含む） 100問" onClick="gButton='section16'">
+        <input type="button" value="[16] Graduation test (+mirror q's) 100q" onClick="gButton='section16'">
         <img src="img/clear.png" class="clear" id="clear15"><br>
-
       </p>
       <p>
-        おまけ<br>
-        <input type="button" value="17 そのほかの消し方" onClick="gButton='section17'">
+        Bonus<br>
+        <input type="button" value="[17] Skimming Patterns" onClick="gButton='section17'">
         <img src="img/clear.png" class="clear" id="clear16"><br>
 
-        <input type="button" value="18 「Iミノ縦置き」 全514問" onClick="gButton='section18'">
+        <input type="button" value="[18] Vertical I-Mino, 514q" onClick="gButton='section18'">
         <img src="img/clear.png" class="clear" id="clear17"><br>
 
-        <input type="button" value="19 「Iミノ横置き」 全196問" onClick="gButton='section19'">
+        <input type="button" value="[19] Horizontal I-Mino, 196q" onClick="gButton='section19'">
         <img src="img/clear.png" class="clear" id="clear18"><br>
+        <input type="button" value="[20] All 711q" onclick="Gbutton='Section20'">
+        <img src="IMG/Clear.png" class="Clear" ID="Clear19"><br>
 
-        <input type="button" value="20 全711問" onClick="gButton='section20'">
-        <img src="img/clear.png" class="clear" id="clear19"><br>
-
-        <input type="button" value="21 全711問ミラー" onClick="gButton='section21'">
-        <img src="img/clear.png" class="clear" id="clear20"><br>
+        <input type="button" value="[21] 711q mirror (Not Checked)" onclick="Gbutton='Section21'">
+        <img src="IMG/Clear.png" class="Clear" ID="Clear20"><br>
       </p>
 
       <p>
-        ■作成者<br>
-        <a href="https://form1ssl.fc2.com/form/?id=685fca71e208118a">chokotia</a><br>
+        ■Adult<br>
+        <a href="https://form1ssl.fc2.com/form/?id=685FCA71E208118a">chotia</a><br>
       </p>
       <p>
-        ■参考サイト<br>
-        <a href="http://taninkona.web.fc2.com/ttt/">テトリス トレーナー トレビアン</a><br>
-        <a href="https://docs.google.com/spreadsheets/d/1bVY3t_X96xRmUL0qdgB9tViSIGenu6RMKX4RW7qWg8Y/edit#gid=376091749">テトリス　パフェテンプレ成功率</a><br>
-        <a href="http://waka.nu/tetris/">喜竹屋本舗</a><br>
+        ■Reference sites and topics<br>
+<a href="http://taninkona.web.fc2.com/ttt/">Tetris Trainer Trevian</a><br>
+        <a href="https://docs.google.com/spreadsheets/d/1bVY3t_X96xRmUL0qdgB9tViSIGenu6RMKX4RW7qWg8Y/edit#gid=376091749">Tetris PC Template Success Rate</a><br>
+        <a href="http://waka.nu/tetris/">Kitakeya Honpo</a><br>
         <a href="http://harddrop.com/wiki/Main_Page">Hard Drop Wiki</a><br>
-        <a href="http://www46.atwiki.jp/tojkazuto/">テトリス攻略・大会情報集積所</a><br>
-        <a href="http://www59.atwiki.jp/tetple/pages/1.html">テトリステンプレ技まとめ</a><br>
+        <a href="http://www46.atwiki.jp/tojkazuto/">Tetris Strategy and Tournament Information Collection</a><br>
+<a href="http://www59.atwiki.jp/tetple/pages/1.html">Tetristemplate technique summary</a><br>
       </p>
       <p>
-      ■無料『テトリス』で遊んでみる！<br>
-      <a href="http://www.tetrisfriends.com/">Tetris Friends</a><br>
-      <a href="http://www.nicovideo.jp/watch/sm16847148">テトリスフレンズの始め方！(ニコニコ動画)</a><br>
-      <a href="http://www.geocities.jp/teto_kozo/">テトフレ小僧 (『Tetris Friends』の始め方＆遊び方解説)</a><br>
+      ■Play Tetris for free! <br>
+      <a href="http://www.tetr.io/">TETR.IO</a><br>
+      <a href="https://www.youtube.com/watch?v=Lf0y3dZXXbk">9 Beginner Tips for TETR.IO! (sec)</a><br>
+      <a href="https://youtube.com/playlist?list=PLYU_jykh138wCGC-omwpyqHxkVeJAiUWD&si=av2YPlND9prTeZBd">Complete Guide to TETR.IO (KezDaBez)</a><br>
       </p>
     </div>
     <div id="list_problems" class="layer">
@@ -279,7 +273,7 @@
         </td>
         <td style="padding-left: 16px">
           <p>
-            <input type="button" value="問題選択に戻る" onClick="gButton='back'" style="width: 160px; height: 30px;"><br>
+            <input type="button" value="Main Menu" onClick="gButton='back'" style="width: 160px; height: 30px;"><br>
             <textarea type="text" id="perform_hint" style="width: 288px; height: 96px;"></textarea>
           </p>
           <p class="small">
@@ -344,7 +338,7 @@
 
       <div id="preferences" class="layer">
         <p>
-          左移動・・・・・・ <select id="key_left">
+          Move Left ・・・・・・ <select id="key_left">
             <option value="0">0</option><option value="1">1</option><option value="2">2</option>
             <option value="3">3</option><option value="4">4</option><option value="5">5</option>
             <option value="6">6</option><option value="7">7</option><option value="8">8</option>
@@ -376,7 +370,7 @@
             <option value="Left">←</option><option value="Right">→</option>
             <option value="Down">↓</option>
           </select><br>
-          右移動・・・・・・ <select id="key_right">
+          Move Right・・・・・・ <select id="key_right">
             <option value="0">0</option><option value="1">1</option><option value="2">2</option>
             <option value="3">3</option><option value="4">4</option><option value="5">5</option>
             <option value="6">6</option><option value="7">7</option><option value="8">8</option>
@@ -408,7 +402,7 @@
             <option value="Left">←</option><option value="Right">→</option>
             <option value="Down">↓</option>
           </select><br>
-          ソフトドロップ・・ <select id="key_softdrop">
+          Soft Drop ・・・・・・ <select id="key_softdrop">
             <option value="0">0</option><option value="1">1</option><option value="2">2</option>
             <option value="3">3</option><option value="4">4</option><option value="5">5</option>
             <option value="6">6</option><option value="7">7</option><option value="8">8</option>
@@ -440,7 +434,7 @@
             <option value="Left">←</option><option value="Right">→</option>
             <option value="Down">↓</option>
           </select><br>
-          ハードドロップ・・ <select id="key_harddrop">
+          Hard Drop ・・・・・・ <select id="key_harddrop">
             <option value="0">0</option><option value="1">1</option><option value="2">2</option>
             <option value="3">3</option><option value="4">4</option><option value="5">5</option>
             <option value="6">6</option><option value="7">7</option><option value="8">8</option>
@@ -472,7 +466,7 @@
             <option value="Left">←</option><option value="Right">→</option>
             <option value="Down">↓</option>
           </select><br>
-          右回転・・・・・・ <select id="key_rot_right">
+          Rotate CW ・・・・・・ <select id="key_rot_right">
             <option value="0">0</option><option value="1">1</option><option value="2">2</option>
             <option value="3">3</option><option value="4">4</option><option value="5">5</option>
             <option value="6">6</option><option value="7">7</option><option value="8">8</option>
@@ -504,7 +498,7 @@
             <option value="Left">←</option><option value="Right">→</option>
             <option value="Down">↓</option>
           </select><br>
-          左回転・・・・・・ <select id="key_rot_left">
+          Rotate CCW・・・・・・ <select id="key_rot_left">
             <option value="0">0</option><option value="1">1</option><option value="2">2</option>
             <option value="3">3</option><option value="4">4</option><option value="5">5</option>
             <option value="6">6</option><option value="7">7</option><option value="8">8</option>
@@ -536,7 +530,7 @@
             <option value="Left">←</option><option value="Right">→</option>
             <option value="Down">↓</option>
           </select><br>
-          ホールド・・・・・ <select id="key_hold">
+          Hold Mino ・・・・・・ <select id="key_hold">
             <option value="0">0</option><option value="1">1</option><option value="2">2</option>
             <option value="3">3</option><option value="4">4</option><option value="5">5</option>
             <option value="6">6</option><option value="7">7</option><option value="8">8</option>
@@ -568,7 +562,7 @@
             <option value="Left">←</option><option value="Right">→</option>
             <option value="Down">↓</option>
           </select><br>
-          ガイドの利用・・・ <select id="key_guide">
+          See Guide ・・・・・・ <select id="key_guide">
             <option value="0">0</option><option value="1">1</option><option value="2">2</option>
             <option value="3">3</option><option value="4">4</option><option value="5">5</option>
             <option value="6">6</option><option value="7">7</option><option value="8">8</option>
@@ -601,8 +595,8 @@
             <option value="Down">↓</option>
           </select><br>
         </p>
-        <input type="button" value="OK" onClick="gButton='ok'">
-        <input type="button" value="キャンセル" onClick="gButton='cancel'">
+        <input type="button" value="Apply" onClick="gButton='ok'">
+        <input type="button" value="Cancel" onClick="gButton='cancel'">
       </div>
 
     </form>

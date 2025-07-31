@@ -138,20 +138,20 @@ function SetupScene(scene){
     break;
   case 'perform_failed':
     Refresh();
-    Say('perform_hint', '何かキーを押すと¥nやり直せます');
-    Say('perform_caption', '失敗…');
+    Say('perform_hint', 'Press Any Key to Retry');
+    Say('perform_caption', 'Fail…');
     break;
   case 'perform_cleared':
     Refresh();
     gCurUseGuideFlg = false;
     var curProblemId = gCurProgmeIdList[gCurProblemId];
-    Say('perform_caption', 'クリア！');
+    Say('perform_caption', 'Clear!');
     break;
   case 'perform_guide':
     Refresh();
     gCurUseGuideFlg = true;
-    Say('perform_hint', '何かキーを押すと¥n開始します');
-    Say('perform_caption', 'ガイドモード');
+    Say('perform_hint', 'Press Any Key to Start');
+    Say('perform_caption', 'Guide Mode');
     break;
   case 'preferences':
     // キー設定の表示反映
@@ -308,7 +308,7 @@ function Dequeue(){
 function RefreshHint(){
   var hint = gCurProblem.hint;
   if(gCurGuide && (gCurProblem.useGuide || gCurUseGuideFlg)){
-    hint += '¥n(ガイド通りに　置いてください)';
+    hint += '\n (Please follow the guide)';
   }
   Say('perform_hint', hint);
 }
@@ -649,7 +649,7 @@ function FeatureName(features){
     case  9: result += "T-SPIN TRIPLE"; break;
     case 10: result += "PERFECT CLEAR"; break;
     case 11: result += "BACK to BACK"; break;
-    default: result += (features[i] - 100) + " REN"; break;  // 100 + n: n REN
+    default: result += (features[i] - 100 + 1) + "x Combo"; break;  // 100 + n: n REN
     }
   }
   result += " ☆";
@@ -1225,7 +1225,7 @@ function ScenePreferences(){
 function SavePreferences(){
   // 重複不可
   if(KeyDuplicates()){
-    alert("キーが重複しています。");
+    alert("Duplicate keys.");
     return false;
   }
   // 設定反映

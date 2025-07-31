@@ -23,10 +23,10 @@ var INITIAL_Y = DEADLINE_HEIGHT - 2;  // 出現時のミノの Y 座標
 var DEFAULT_KEY_MOVE_LEFT    = 'Left';
 var DEFAULT_KEY_MOVE_RIGHT   = 'Right';
 var DEFAULT_KEY_SOFTDROP     = 'Down';
-var DEFAULT_KEY_HARDDROP     = 'Up';
-var DEFAULT_KEY_ROTATE_RIGHT = 'X';
-var DEFAULT_KEY_ROTATE_LEFT  = 'Z';
-var DEFAULT_KEY_HOLD         = 'Shift';
+var DEFAULT_KEY_HARDDROP     = 'Space';
+var DEFAULT_KEY_ROTATE_RIGHT = 'Up';
+var DEFAULT_KEY_ROTATE_LEFT  = 'Ctrl';
+var DEFAULT_KEY_HOLD         = 'C';
 var DEFAULT_KEY_GUIDE        = 'R';
 
 var DUMP_GUIDE_DATA = true;            // ガイド配列ダンプ用
@@ -445,34 +445,33 @@ function G(mino, dir, x, y){
   return new Guide(mino, dir, x, y);
 }
 /*----------------------------------------------------------------------------------------
-☆★ セクション名の取得 ★☆
+☆★ Get section name ★☆
 
-<id>番目のセクション名を取得します。ここを編集した場合は、忘れずに index.html にも反映さ
-せてください。
+Gets the <id>th section name. If you edit this, don't forget to reflect it in index.html.
 ----------------------------------------------------------------------------------------*/
 function SectionTitle(id){
   switch(id){
-    case  0: return '1  テンプレを組んでみよう'; break;
-    case  1: return '2  「Iミノ縦置き」 14パターン'; break;
-    case  2: return '3  「Iミノ縦置き」'; break;
-    case  3: return '4  「初手 I ミノ１段目型」 6パターン'; break;
-    case  4: return '5  「初手 I ミノ１段目型」 20問'; break;
-    case  5: return '6  「全部寝かせ型」 4パターン'; break;
-    case  6: return '7  「全部寝かせ型」 20問'; break;
-    case  7: return '8  「IILO型」 2パターン'; break;
-    case  8: return '9  「IILO型」 10問'; break;
-    case  9: return '10 「初手Iミノ3段目型」 3パターン'; break;
-    case 10: return '11 「初手Iミノ3段目型」 20問'; break;
-    case 11: return '12 中間テスト 20問'; break;
-    case 12: return '13 「LSIO型」 全1パターン'; break;
-    case 13: return '14 「LSIO型」 12問'; break;
-    case 14: return '15 期末テスト 30問'; break;
-    case 15: return '16 卒業テスト（ミラー問題を含む） 100問'; break;
-    case 16: return '17 そのほかの消し方'; break;
-    case 17: return '18 「Iミノ縦置き」 全514問'; break;
-    case 18: return '19 「Iミノ横置き」 全196問'; break;
-    case 19: return '20 全711問'; break;
-    case 20: return '21 全711問ミラー(内容未チェック)'; break;
+    case  0: return '[1] Creating the Template (w/ Guide)'; break;
+    case  1: return '[2] Vertical I-Mino, 14 patterns (w/ Guide)'; break;
+    case  2: return '[3] Vertical I-Mino, 20q'; break;
+    case  3: return '[4] I-Mino 1st Layer, 6 patterns (w/ Guide)'; break;
+    case  4: return '[5] I-Mino 1st Layer, 20q'; break;
+    case  5: return '[6] I-Mino 3rd Layer, Flat Placement, 4 patterns (w/ Guide)'; break;
+    case  6: return '[7] I-Mino 3rd Layer, Flat Placement, 20q'; break;
+    case  7: return '[8] IILO, 2 patterns (w/ Guide)'; break;
+    case  8: return '[9] IILO, 10q'; break;
+    case  9: return '[10] 3rd Layer I-Mino, 3 patterns (w/ Guide)'; break;
+    case 10: return '[11] 3rd Layer I-Mino, 20q'; break;
+    case 11: return '[12] Midterm Test 20q'; break;
+    case 12: return '[13] LSIO type 1 pattern (w/ Guide)'; break;
+    case 13: return '[14] LSIO type 12q'; break;
+    case 14: return '[15] Final Exam, 30q'; break;
+    case 15: return '[16] Graduation test (+mirror q\'s) 100q'; break;
+    case 16: return '[17] Skimming Patterns'; break;
+    case 17: return '[18] Vertical I-Mino, 514q'; break;
+    case 18: return '[19] Horizontal I-Mino, 196q'; break;
+    case 19: return '[20] All 711q'; break;
+    case 20: return '[21] 711q mirror (Not Checked)'; break;
   }
-  return "？";
+  return "?";
 }
