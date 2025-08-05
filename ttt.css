@@ -19,7 +19,8 @@ textarea{
 .layer{
   visibility: hidden;
   position: absolute;
-  left: 8px; top: 80px;
+  left: 50%; top: 15px;
+  transform: translateX(-50%);
   width: 720px; height: 640px;
   border: 1px #cccccc solid;
   padding: 8px 12px;
@@ -37,23 +38,36 @@ text-align: center;
   font-size: 42px;
   font-weight: bold;
   font-family: "Sysfont";
+  padding-bottom: -10px;
 }
 #list_sections{
   background-color: #eef4ff;
   height: 1720px;
+  text-align: center;
 }
 #list_problems{
   background-color: #eef4ff;
+  text-align: center;
 }
 #perform{
   background-color: #eef4ff;
+  text-align: center;
 }
 #preferences{
   background-color: #eef4ff;
+  text-align: center;
 }
 
 .clear{
   display:none;
   width:17px;
   height:17px;
+}
+
+@font-face {
+  font-family: 'Sysfont';
+  src: url('sysfont.woff2') format('woff2'),
+  url('sysfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
 }
