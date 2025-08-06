@@ -22,35 +22,47 @@
       <p id="title" class="center">
         TETRIS PCO Trainer
       </p>
+      <p class="subtitle">
+          <b><i>Originally created by <a href=https://github.com/sakuramochi84>sakuramochi84</a>, Translated & Refreshed by s6lem. </i></b>
+      </p>
 
       <p>
-        <b><i>Originally created by sakuramochi84, Forked by s6lem. </i></b>
         <br>
-        This course is for those who want to master PCO, or the Perfect Clear Opener <br>
-        Of the 840 possible bags, 711 of those can be perfect cleared. <br>
+        <p id="header2">
+        Want to be a PCO master? You’ve come to the right place.
+        </p>
+        <p id="subheader">
+          711/840 bag combos are perfectly clearable.
+        </p>
       </p>
       <p>
-        <b>If you don't know the answer, press "R". And the guide will appear. <br>
-        For the relationship between the patterns introduced in this course and the success rate of pc's, please refer to <a href="TetrisPerfectClear.xlsx">here</a>.
+        
+          <p id="header2">
+          Can't figure out the solve? Press 'R' for the guide!
+          </p>
+          <p id="subheader">
+            For success rates per pattern, please refer to <a href="TetrisPerfectClear.xlsx">this</a>
+          </p>
       </p>
-
+      <hr style="height: 0px; border: none; margin: -5px;">
       <p>
 <input type="button" value="key settings" onClick="gButton='preferences'">
       </p>
-      <p>
-        -Key settings will be saved using cookies. <br>
-        ・If the minos moves too quickly, try reloading. <br>
-        ・If mino movements seem stuttery, try reloading. <br>
+      <p id="subheader">
+        <i>Minos stuttering/moving too quickly? Try reloading!</i>
       </p>
-      <!
-      --If you edit a section, please also reflect it in the SectionTitle in data.js-->
+      <!--If you edit a section, please also reflect it in the SectionTitle in data.js-->
       <p>
-        Introduction<br>
+        <p id="header">
+          Introduction
+        </p>
         <input type="button" value="[1] Creating the Template (w/ Guide)" onClick="gButton='section1'">
         <img src="img/clear.png" class="clear" id="clear0"><br>
       </p>
       <p>
-       Vertical I-Mino Placement 61%<br>
+        <p id="header">
+        Vertical I-Mino Placement [61%]
+        </p>
         <input type="button" value="[2] Vertical I-Mino, 14 patterns (w/ Guide)" onClick="gButton='section2'">
         <img src="img/clear.png" class="clear" id="clear1"><br>
         <input type="button" value="[3] Vertical I-Mino, 20q" onClick="gButton='section3'">
@@ -58,7 +70,9 @@
       </p>
 
       <p>
-        Horizontal I-Mino Placement 84%
+      <p id= "header">
+        Horizontal I-Mino Placement [84%]
+      </p>
         <input type="button" value="[4] I-Mino 1st Layer, 6 patterns (w/ Guide)" onClick="gButton='section4'">
         <img src="img/clear.png" class="clear" id="clear3"><br>
 
@@ -85,18 +99,22 @@
       </p>
 
       <p>
-        Summary of I-mino horizontal placement<br>
+        <p id="header"> 
+          Horizontal I-Mino Summary
+        </p>
         <input type="button" value="[12] Midterm Test 20q" onClick="gButton='section12'">
         <img src="img/clear.png" class="clear" id="clear11"><br>
       </p>
 
       <p>
-        If you can remember this much, 
-        you will have memorized 710 of the 711 possible combinations for a perfect clear, <br>
-          If you have the energy, try learning the last combination, "LSIO types." <br>
+        If you can remember this much, you’ll have memorized 710 of the 711 </br> possible
+combos for a perfect clear, <br>
+          If you have the energy, try learning the last combo, LSIO types. <br>
       </p>
       <p>
-        LSIO type [84.6%]<br>
+        <p id="header">
+        LSIO type [84.6%]
+        </p>
         <input type="button" value="[13] LSIO type 1 pattern (w/ Guide)" onClick="gButton='section13'">
         <img src="img/clear.png" class="clear" id="clear12"><br>
 
@@ -106,7 +124,10 @@
       </p>
 
       <p>
-        Summary<br>
+        <p id="header">
+          Summary
+        </p>
+
         <input type="button" value="[15] Final Exam, 30q" onClick="gButton='section15'">
 <img src="img/clear.png" class="clear" id="clear14"><br>
 
@@ -114,7 +135,9 @@
         <img src="img/clear.png" class="clear" id="clear15"><br>
       </p>
       <p>
-        Bonus<br>
+        <p id="header">
+          Bonus
+        </p>
         <input type="button" value="[17] Skimming Patterns" onClick="gButton='section17'">
         <img src="img/clear.png" class="clear" id="clear16"><br>
 
@@ -123,11 +146,11 @@
 
         <input type="button" value="[19] Horizontal I-Mino, 196q" onClick="gButton='section19'">
         <img src="img/clear.png" class="clear" id="clear18"><br>
-        <input type="button" value="[20] All 711q" onclick="Gbutton='Section20'">
-        <img src="IMG/Clear.png" class="Clear" ID="Clear19"><br>
+        <input type="button" value="[20] All 711q" onclick="gButton='section20'">
+        <img src="img/clear.png" class="clear" id="clear19"><br>
 
-        <input type="button" value="[21] 711q mirror (Not Checked)" onclick="Gbutton='Section21'">
-        <img src="IMG/Clear.png" class="Clear" ID="Clear20"><br>
+        <input type="button" value="[21] 711q mirror (Not Checked)" onclick="gButton='section21'">
+        <img src="img/clear.png" class="clear" id="clear20"><br>
       </p>
 
       <p>
@@ -273,8 +296,8 @@
         </td>
         <td style="padding-left: 16px">
           <p>
-            <input type="button" value="Main Menu" onClick="gButton='back'" style="width: 160px; height: 30px;"><br>
-            <textarea type="text" id="perform_hint" style="width: 288px; height: 96px;"></textarea>
+            <input type="button" value="Main Menu" onClick="gButton='back'" style="width: 160px; height: 30px; margin-bottom: 96px;"><br>
+            <textarea type="text" id="perform_hint" style="width: 288px; height: 96px; background-color: #2a2c3000; color: #ffffff00; border: none; resize: none; display: none;" ></textarea>
           </p>
           <p class="small">
             NEXT
@@ -331,9 +354,16 @@
               ><img src="img/b0.png" id="n4_3_2" width="12" height="12"><img src="img/b0.png" id="n4_3_3" width="12" height="12"><br>
             </p>
           </td>
+          
 
           <td style="width: 10%"></td>
         </table>
+        <!-- LOCK TIMER -->
+        <!-- LOCK TIMER -->
+        <!-- LOCK TIMER -->
+        <div id="lock_timer_container" style="width: 241.99px; height: 2px; background-color: #444; margin-top: 10px; margin-left: 66px;">
+        <div id="lock_timer_bar" style="width: 241.99px; height: 2px; background-color: #888;"></div>
+</div>
       </div>
 
       <div id="preferences" class="layer">

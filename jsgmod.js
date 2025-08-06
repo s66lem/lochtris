@@ -7,8 +7,11 @@ This module supports frame management, key input, etc.
 ☆★ Constant list ★☆
 ----------------------------------------------------------------------------------------*/
 var FPS = 30; //Frames Per Second; Frames per second
+
 var LOOP_INTERVAL = 17; //<milliseconds> Main loop startup interval. (1000 /<FPS>) to be smaller
+
 var KEY_CHARGE_DURATION = 7; //<frame> Number of frames until key repeat starts
+
 var KEY_REPEAT_SPAN = 2; //<frame> Number of frames up to the next key repeat
 /*
 ● Key repeat
@@ -36,126 +39,140 @@ This article
 </html>
 
 ------------------------------------------------------------------------------------------
-● キー制御
- PressedDuration(keyName)         キーが何フレーム押されているか
- IsPressed(keyName)               キーは入力開始状態?
- IsHolded(keyName)                キーが押されている?
- IsInputting(keyName)             キーは入力を与えている?
+● Key control
+ PressedDuration(keyName) How many frames is the key pressed?
+ Is the key input started?
+ Is the IsHolded(keyName) key pressed?
+ Is the IsInputting(keyName) key gives input?
 
-● スクリプト作成・デバッグ
- p(value, variableName)             コンソールに表示
- InitArg(variable, defaultValue)    定義済の値かデフォルト値を取得
+● Script creation and debugging
+ p(value, variableName) Display in console
+ InitArg(variable, defaultValue) Gets the defined value or default value
 
-● 表示
- Say(textBoxName, text)           テキストの表示
- SetImage(imageId, src)           画像の表示
+● Display
+ Say(textBoxName, text) Display text
+ SetImage(imageId, src) Display image
 
-● 時間
- EHour()                          経過時間の「時間」を取得
- EMin()                           経過時間の「分」を取得
- ESec()                           経過時間の「秒」を取得
- EMSec()                          経過時間の「ミリ秒」を取得
- ETime()                          経過時間をを秒数で取得
+● Time
+ EHour() Gets the "time" of elapsed time
+ EMin() Gets "min" of elapsed time
+ ESec() Gets "seconds" of elapsed time
+ EMSec() Gets "milliseconds" of elapsed time
+ ETime() Get the elapsed time in seconds
  EtStr(hLength=2, hDelim=':', mDelim=':', sDelim='', msLength=0)
-                                  経過時間を文字列に変換して取得
+                                  Converting elapsed time to a string to get
 
-● 数値処理
- Round(n, place=0)                小数点の指定位で四捨五入
- Floor(n, place=0)                小数点の指定位で切り捨て
- Ceil(n, place=0)                 小数点の指定位で切り上げ
- Justify(n)                       丸め誤差の修正
- Rand(n=0, times=0)               乱数の生成
+● Numerical processing
+ Round(n, place=0) Round to the nearest decimal point
+ Floor(n, place=0) Truncate at the specified decimal point
+ Ceil(n, place=0) round up to the specified decimal point
+ Justify(n) Rounding error correction
+ Rand(n=0, times=0) Generate random numbers
 
-● クッキー
- Save(name, value, expireDays)    クッキーへセーブ
- Load(name)                       クッキーからロード
+● Cookies
+ Save(name, value, expireDays) Save to cookie
+ Load(name) Load from cookie
 
-● 起動
- Execute()                        起動( body タグの onLoad イベントから呼び出してください)
+● Startup
+ Execute() launch (call from the onLoad event in the body tag)
 
-● オブジェクト
- Layer                            レイヤー
-   Show()                           表示
-   Hide()                           隠す
-   MoveTo(x, y)                     指定位置に移動
-   MoveBy(dX, dY)                   指定量だけ移動
-   ResizeTo(width, height)          サイズ変更
-   ResizeBy(dWidth, dHeight)        相対値を指定してサイズ変更
-   Write(text, overwrites=true)     テキスト( HTML ソース)の記入
+● Object
+ Layer
+   Show()
+   Hide() Hide
+   MoveTo(x, y) Move to the specified position
+   MoveBy(dX, dY) Move by the specified amount
+   ResizeTo(width, height) Resize
+   ResizeBy(dWidth, dHeight) Resize by specifying a relative value
+   Write(text, overwrites=true) Fill in text (HTML source)
 
 ========================================================================================*/
 /*----------------------------------------------------------------------------------------
- ☆★ グローバル変数一覧 ★☆
+ ☆★ Global variable list ★☆
 
- 便宜上全公開変数となっていますが、このモジュール外からは値を変更しないでください。
+ For convenience, all public variables are used, but please do not change the value from outside this module.
 ----------------------------------------------------------------------------------------*/
-var gTimer;         // メインループの制御用タイマー
-var gStartTime;     // 開始時刻
-var gFrames;        // 経過フレーム数
-var gInputs;        // [〜255] 各キーを押し続けているフレーム数
-var gConsole;       // コンソールウィンドウ
+var gTimer;         // Main loop control timer
+
+var gStartTime;     // Start moment
+
+var gFrames;        // Number of frames passed
+
+var gInputs;        // [~255] Number of frames to hold each key
+
+var gConsole;       // Console window
 /*----------------------------------------------------------------------------------------
- ☆★ キー押下時の処理 ★☆
+ ☆★ Processing when pressing a key ★☆
 ----------------------------------------------------------------------------------------*/
 document.onkeydown = function(e){
-  // Mozilla, Opera
+  // Mozilla, work
+
   if(e != null){
     keyCode = e.which;
-    // イベント実行を防ぐ
+    // Prevent event execution
+
     e.preventDefault();
     e.stopPropagation();
   // Internet Explorer
+
   } else {
     keyCode = event.keyCode;
-    // イベント実行を防ぐ
+    // Prevent event execution
+
     event.returnValue = false;
     event.cancelBubble = true;
   }
-  //「キーを押し始めた」ことの反映
+  //Reflecting "starting pressing key"
+
   if(gInputs[keyCode] <= 0) gInputs[keyCode] = 0;
 }
 /*----------------------------------------------------------------------------------------
- ☆★ キーを離した時の処理 ★☆
+ ☆★ Processing when you release the key ★☆
 ----------------------------------------------------------------------------------------*/
 document.onkeyup = function(e){
-  // Mozilla, Opera
+  // Mozilla, work
+
   if(e != null){
     keyCode = e.which;
-    // イベント実行を防ぐ
+    // Prevent event execution
+
     e.preventDefault();
     e.stopPropagation();
   // Internet Explorer
+
   } else {
     keyCode = event.keyCode;
-    // イベント実行を防ぐ
+    // Prevent event execution
+
     event.returnValue = false;
     event.cancelBubble = true;
   }
-  //「キーを離した」ことの反映
+  //Reflecting "released the key"
+
   gInputs[keyCode] = -1;
 }
 /*----------------------------------------------------------------------------------------
- ☆★ ウィンドウがフォーカスを失った時の処理 ★☆
+ ☆★ What to do when the window loses focus ★☆
 
- キー入力を消去します( onkeyup イベントが発生しなくなるため)。
+ Clears key inputs (as the onkeyup event will not occur).
 ----------------------------------------------------------------------------------------*/
 window.onblur = function(){
   gInputs = []; for(var i = 0; i < 256; i++) gInputs.push(-1);
 }
 /*----------------------------------------------------------------------------------------
- ☆★ キーが何フレーム押されているか ★☆
+ ☆★ How many frames are the keys pressed ★☆
 
- <keyName>で指定したキーが何フレーム押され続けているかを返します。離すと -1 になり、押され
- 始めると再び 0 からカウントされます。
+ Returns how many frames the key specified by <keyName> is pressed. When you release it, it becomes -1 and is pressed
+ When you start, it counts from 0 again.
 ----------------------------------------------------------------------------------------*/
 function PressedDuration(keyName){
   return gInputs[ToKc(keyName)];
 }
 /*----------------------------------------------------------------------------------------
- ☆★ キーは入力開始状態? ★☆
+ ☆★ Is the key input start state? ★☆
 
- <keyName>で指定したキーが押され始めたかを取得します。押され始めたフレーム時だけ true を返
- します。<keyName>に負の数を指定(省略時)すると、どのキーにも反応します。
+ Gets whether the key specified by <keyName> has begun to be pressed. Returns true only when frames start to be pressed
+ I will. If you specify a negative number (if omitted) for <keyName>, it will react to any key.
 ----------------------------------------------------------------------------------------*/
 function IsPressed(keyName){
   keyName = InitArg(keyName, -1);
@@ -168,10 +185,10 @@ function IsPressed(keyName){
   return gInputs[ToKc(keyName)] == 1;
 }
 /*----------------------------------------------------------------------------------------
- ☆★ キーが押されている? ★☆
+ ☆★ Is the key pressed? ★☆
 
- <keyName>で指定したキーが押されているかを取得します。押されてから離すまでの間 true を返し
- ます。<keyName>に負の数を指定(省略時)すると、どのキーにも反応します。
+ Gets whether the key specified by <keyName> is pressed. Returns true from pressed until released.
+ Masu. If you specify a negative number (if omitted) for <keyName>, it will react to any key.
 ----------------------------------------------------------------------------------------*/
 function IsHolded(keyName){
   keyName = InitArg(keyName, -1);
@@ -184,11 +201,11 @@ function IsHolded(keyName){
   return gInputs[ToKc(keyName)] > 0;
 }
 /*----------------------------------------------------------------------------------------
- ☆★ キーは入力を与えている? ★☆
+ ☆★ Does the key give input? ★☆
 
- <keyName>で指定したキーが入力を与えるかを取得します。キーを押し始めた時とキーリピートの最
- 中であれば「入力を与えている」と見なされます。<keyName>に負の数を指定(省略時)すると、どの
- キーにも反応します。
+ Gets whether the key specified by <keyName> gives input. When you start pressing a key and when you repeat the key
+ If it is inside, it is considered to be "giving input". If you specify a negative number (if omitted), which
+ It also responds to keys.
 ----------------------------------------------------------------------------------------*/
 function IsInputting(keyName){
   keyName = InitArg(keyName, -1);
@@ -204,11 +221,11 @@ function IsInputting(keyName){
   return (gInputs[keyCode] - KEY_CHARGE_DURATION - 1) % KEY_REPEAT_SPAN == 0;
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 文字列をキーコードに変換する ( TO KeyCode ) ★☆
+ ☆★ Convert a string to a keycode (TO KeyCode) ★☆
 
- <keyString>で指定したキーのコードを返します。<keyString>に対応するキーがない場合は 0 を返
- します。複数のキーコードがあるキー(たとえば数字の '0' のキーコードは 48 と 96 (テンキー))
- の場合は、代表する 1 つのコードを返します。
+ Returns the code for the key specified by <keyString>. Returns 0 if no corresponding key is found for <keyString>
+ I will. Keys with multiple key codes (for example, the number '0' key codes are 48 and 96 (number pad))
+ If so, it returns one representative code.
 ----------------------------------------------------------------------------------------*/
 function ToKc(keyString){
   switch(keyString){
@@ -301,40 +318,46 @@ function ToKc(keyString){
   }
 }
 /*----------------------------------------------------------------------------------------
- ☆★ コンソールに表示 ★☆
+ ☆★ Display on console ★☆
 
- コンソールに<value>の内容を表示します。<variableName>に変数名を文字列で指定すると、変数名
- が明示されるためより見やすくなります。
+ Displays the <value> contents in the console. If you specify a variable name as a string in <variableName>, the variable name is
+ is clearly stated, making it easier to see.
 
  var a = [1, 2, 3];
- p(a);       // => 1,2,3
- p(a, "a");  // => <a> = 1,2,3
+ p(a); //=> 1,2,3
+ p(a, "a"); //=> <a> = 1,2,3
 ----------------------------------------------------------------------------------------*/
 function p(value, variableName){
-  // コンソールが開いていない場合は開く
+  // If the console is not open, open
+
   if(typeof gConsole === 'undefined') openConsole();
   else if(gConsole.closed) openConsole();
-  // 文字列の変換
-  value = "" + value;  // 文字列化
+  // Conversion of strings
+
+  value = "" + value;  // String
+
   value = value.replace(/</g, '&lt;');
   value = value.replace(/>/g, '&gt;');
   if(typeof variableName !== 'undefined'){
-    variableName = "" + variableName;  // 文字列化
+    variableName = "" + variableName;  // String
+
     variableName = variableName.replace(/</g, '&lt;');
     variableName = variableName.replace(/>/g, '&gt;');
   }
-  // コンソールに表示
+  // Show on console
+
   if(typeof variableName !== 'undefined'){
     gConsole.document.write('&lt;' + variableName + '&gt; = ');
   }
   gConsole.document.write(value + '<br>');
-  // 最下端へスクロール
+  // Scroll to the bottom
+
   gConsole.scroll(0, 16777215);
 }
 /*----------------------------------------------------------------------------------------
- ☆★ コンソールウィンドウの開始 ★☆
+ ☆★ Start of console window ★☆
 
- コンソールウィンドウを開きます。p 内で必要に応じて自動的に開かれます。
+ Open the console window. It will open automatically within p if necessary.
 ----------------------------------------------------------------------------------------*/
 function openConsole(){
   var cwOptions = 'width=480, height=160, menubar=no, toolbar=no, scrollbars=yes';
@@ -343,31 +366,31 @@ function openConsole(){
   gConsole.document.write(cwStyle);
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 定義済の値かデフォルト値を取得 ( INITialize ARGument ) ★☆
+ ☆★ Get defined or default value ( INITialize ARGument ) ★☆
 
- <variable>に値が定義されていない場合はデフォルト値として<defaultValue>を返します。
+ If no value is defined for <variable>, return <defaultValue> as the default value.
 ----------------------------------------------------------------------------------------*/
 function InitArg(variable, defaultValue){
   return (typeof variable === 'undefined') ? defaultValue : variable;
 }
 /*----------------------------------------------------------------------------------------
- ☆★ テキストの表示 ★☆
+ ☆★ Display text ★☆
 
- <textBoxId>で指定した ID のテキストボックスに文字<text>を表示します。
+ Displays the character <text> in the text box with the ID specified by <textBoxId>.
 ----------------------------------------------------------------------------------------*/
 function Say(textBoxId, text){
   document.getElementById(textBoxId).value = text;
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 表示 ★☆
+ ☆★ Express ★☆
 ----------------------------------------------------------------------------------------*/
 function ShowImage(imageId){
   document.getElementById(imageId).style.display = "inline";
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 画像の表示 ★☆
+ ☆★ Display image ★☆
 
- <imageId>で指定した画像のアドレスを<src>にします。アドレスが変わらなければ何もしません。
+ The address of the image specified by <imageId> is set to <src>. If the address does not change, then nothing will be done.
 ----------------------------------------------------------------------------------------*/
 function SetImage(imageId, src){
   if(document.getElementById(imageId).src != src){
@@ -375,61 +398,61 @@ function SetImage(imageId, src){
   }
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 経過時間の指定された部分を取得 ( Elapsed HOURs/MINutes/SEConds/MilliSEConds ) ★☆
+ ☆★ Get the specified part of the elapsed time (Elapsed HOURs/MINutes/SEConds/MilliSEConds) ★☆
 
- 起動からの経過時間のうち、時間/分/秒/ミリ秒 の部分の値を返します。経過時間は経過フレーム数
- から計算した値ですので、実際の時間に対して多少の誤差があります。
+ Returns the value for the hour/minute/second/millisecond portion of the time since startup. Elapsed time is the number of frames elapsed
+ Since this is a value calculated from, there may be some errors in actual time.
 
- ◎ 起動から 1 時間 23 分 45.678 秒が経過した場合
- p(EHour());  // => 1
- p(EMin());   // => 23
- p(ESec());   // => 45
- p(EMSec());  // => 678
+ ◎ If 1 hour, 23 minutes, 45.678 seconds have passed since startup
+ p(EHour()); //=> 1
+ p(EMin()); //=> 23
+ p(ESec()); //=> 45
+ p(EMSec()); //=> 678
 ----------------------------------------------------------------------------------------*/
 function EHour(){return Math.floor(gFrames / FPS / 3600); }
 function EMin() {return Math.floor(gFrames / FPS / 60) % 60; }
 function ESec() {return Math.floor(gFrames / FPS) % 60; }
 function EMSec(){return Math.floor(gFrames / FPS * 1000) % 1000; }
 /*----------------------------------------------------------------------------------------
- ☆★ 経過時間を秒数で取得 ( Elapsed TIME ) ★☆
+ ☆★ Get elapsed time in seconds (Elapsed TIME) ★☆
 
- 起動からの経過時間を秒単位で返します。小数点部分も返されます。EHour() 等と同様に、実際の
- 時間に対して多少の誤差があります。
+ Returns the time since startup in seconds. The decimal part is also returned. Like EHour() etc., the actual
+ There may be some errors over time.
 ----------------------------------------------------------------------------------------*/
 function ETime(){
   return gFrames / FPS;
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 経過時間を文字列に変換して取得 ( Elapsed Time STRing ) ★☆
+ ☆★ Convert and retrieve elapsed time to a string (Elapsed Time STRing) ★☆
 
- 起動からの経過時間を一般的な時間表現で返します。EHour() 等と同様に、実際の時間に対して多
- 少の誤差があります。
+ Returns the time elapsed since launching in a general time expression. Like EHour() etc, it is more than actual time.
+ There is a small error.
 
- ◎ 起動から 1 時間 23 分 45 秒が経過した場合
- p(EtStr());  // => '01:23:45'
+ ◎ If 1 hour, 23 minutes, and 45 seconds have passed since startup
+ p(EtStr()); //=> '01:23:45'
 ------------------------------------------------------------------------------------------
- <hLength>(省略時 2 )で時間の桁数を指定します。その桁数に足りなければ、空いた部分を 0 で
- 埋めます。桁数より多い場合は、時間の部分はそのままにします。
+ Specify the number of digits of time with <hLength> (default 2). If the number of digits is not enough, set the empty part to 0.
+ I'll fill it up. If it is greater than the number of digits, leave the time portion as is.
 
- ◎ 起動から 10 時間が経過した場合
- p(EtStr(4));  // => '0010:00:00'
- p(EtStr(3));  // => '010:00:00'
- p(EtStr(2));  // => '10:00:00'
- p(EtStr(1));  // => '10:00:00'
+ ◎ If 10 hours have passed since startup
+ p(EtStr(4)); //=> '0010:00:00'
+ p(EtStr(3)); //=> '010:00:00'
+ p(EtStr(2)); //=> '10:00:00'
+ p(EtStr(1)); //=> '10:00:00'
 ------------------------------------------------------------------------------------------
- <hDelim>(省略時 ':' ), <mDelim>(省略時 ':' ), <sDelim>(省略時 '' )はそれぞれ時間、分、秒
- の区切り記号( Hour/Minute/Second DELIMiter )です。
+ <hDelim>(default ':' ), <mDelim>(default ':' ), and <sDelim>(default '' ) are hours, minutes, and seconds respectively
+ The delimiter (Hour/Minute/Second DELIMiter).
 
- ◎ 起動から 1 時間 23 分 45 秒が経過した場合
- p(EtStr(1, '時間', '分', '秒'));  // => '1時間23分45秒'
+ ◎ If 1 hour, 23 minutes, and 45 seconds have passed since startup
+ p(EtStr(1, 'hour', 'min', 'second')); //=> '1 hour 23 minutes 45 seconds'
 ------------------------------------------------------------------------------------------
- <msLength>(省略時 0 )で秒を小数点何位まで文字列にするかを指定できます。
+ <msLength> (default 0) allows you to specify how many decimal places the seconds are to be strings.
 
- ◎ 起動から 1 時間 23 分 45.666 秒が経過した場合
- p(EtStr(undefined, undefined, undefined, undefined, 0));  // => '01:23:45'
- p(EtStr(undefined, undefined, undefined, '.', 1));        // => '01:23:45.6'
- p(EtStr(undefined, undefined, undefined, '.', 2));        // => '01:23:45.66'
- p(EtStr(undefined, undefined, undefined, '.', 3));        // => '01:23:45.666'
+ ◎ If 1 hour, 23 minutes, 45.666 seconds have passed since startup
+ p(EtStr(undefined, undefined, undefined, undefined, undefined, 0)); //=> '01:23:45'
+ p(EtStr(undefined, undefined, undefined, '.', 1)); //=> '01:23:45.6'
+ p(EtStr(undefined, undefined, undefined, undefined, '.', 2)); //=> '01:23:45.66'
+ p(EtStr(undefined, undefined, undefined, '.', 3));        //=> '01:23:45.666'
 ----------------------------------------------------------------------------------------*/
 function EtStr(hLength, hDelim, mDelim, sDelim, msLength){
   hLength = InitArg(hLength, 2);
@@ -449,18 +472,18 @@ function EtStr(hLength, hDelim, mDelim, sDelim, msLength){
   return result;
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 小数点の指定位で四捨五入/切り捨て/切り上げ ★☆
+ ☆★ Round/Truncate/Run up at the specified decimal point ★☆
 
- 数値<n>を四捨五入/切り捨て/切り上げします。
+ Round/Truncate/Run up the number <n>.
 ------------------------------------------------------------------------------------------
- <place>が 0 (省略時)なら整数になるように、正の数なら小数点以下が<place>桁になるように処理
- します。負の数を指定すると -<place>桁目の整数部分を処理します。
+ If <place> is 0 (default), then it becomes an integer, and if it is a positive number, it becomes a <place> digit.
+ I will. A negative number is specified to process the integer part of the -<place> column.
 
- p(Round(1234.5678))      // => 1235
- p(Round(1234.5678, 2))   // => 1234.57
- p(Round(1234.5678, -2))  // => 1200
+ p(Round(1234.5678)) //=> 1235
+ p(Round(1234.5678, 2)) //=> 1234.57
+ p(Round(1234.5678, -2)) //=> 1200
 ------------------------------------------------------------------------------------------
- 丸め誤差は Justify によって自動修正されます。
+ Rounding errors are automatically corrected by Justify.
 ----------------------------------------------------------------------------------------*/
 function Round(n, place){
   place = InitArg(place, 0);
@@ -477,224 +500,254 @@ function Ceil(n, place){
   return Justify(Math.ceil(n * Math.pow(10, place)) / Math.pow(10, place));
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 丸め誤差の修正 ★☆
+ ☆★ Correcting rounding errors ★☆
 
- <n>の丸め誤差を修正して返します。丸め誤差とは、コンピュータが小数を計算すると生じる微小な
- 誤差のことです。
+ Correct the rounding error for <n> and return it. Rounding error is the smallest possible occurrence of a computer when calculating decimals.
+ It refers to error.
 
- p(0.01 + 0.05);           // => 0.060000000000000005
- p(Justify(0.01 + 0.05));  // => 0.06
+ p(0.01 + 0.05); //=> 0.0600000000005
+ p(Justify(0.01 + 0.05)); //=> 0.06
 ------------------------------------------------------------------------------------------
- 具体的には、有効数字が 15 桁になるように四捨五入しています。もともと有効数字が 16 桁以上
- の場合、意図しない値の変化が起こる可能性があります。
+ Specifically, the significant numbers are rounded to 15 digits. Originally, significant numbers are 16 or more digits
+ In the case of this, an unintended change in value may occur.
 ----------------------------------------------------------------------------------------*/
 function Justify(n){
-  // ちょうど 0 ならそのまま返す( log(0) が定義されていないため)
+  // If it is exactly 0, it will return as is (because log(0) is not defined)
+
   if(n == 0) return 0;
-  // 正の数に変換
+  // Convert to positive numbers
+
   var pn = Math.abs(n);
-  // 15 桁の整数に補正
+  // Corrected to 15 digit integers
+
   var cl = Math.floor(Math.log(pn) / Math.LN10);  // Common Logarithm
+
   pn = Math.round(pn * Math.pow(10, 14 - cl));
-  // 文字列化
+  // String
+
   var result = "" + pn;
   var zeros = "";
-  // 適切な位置に小数点を付加
+  // Add decimal points to the appropriate position
+
   if(0 <= cl && cl <= 14){
     result = result.slice(0, cl + 1) + "." + result.slice(cl + 1);
   }else if(cl < 0){
-    // 先頭に「0.000…」を付加
+    // Add "0.000..." to the beginning
+
     for(var i = 0; i < Math.abs(cl) - 1; i++) zeros += "0";
     result = "0." + zeros + result;
   }else{
-    // 最後尾に「000…」を付加
+    // Add "000..." to the end
+
     for(var i = 15; i < cl; i++) zeros += "0";
     result = result + zeros;
   }
-  // 再び数値に戻して返す
+  // Return to the number again
+
   return parseFloat(result) * (n > 0 ? 1 : -1);
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 乱数( RANDom number )の生成 ★☆
+ ☆★ Generation of RANDom number ★☆
 
- 0 以上<n>未満の乱数を整数で返します。<n>に 0 (省略時)が指定された場合は、0 以上 1 未満の
- 乱数を実数で返します。
+ Returns random numbers that are greater than or equal to 0 <n> as integers. If <n> is specified as 0 (default), then 0 or more and less than 1
+ Returns a random number as a real number.
 ------------------------------------------------------------------------------------------
- <times>に 1 以上の整数を指定した場合は、重複のないように<times>個の乱数配列を作成して返し
- ます。<times>が<n>より大きい場合は、重複しない乱数配列が繰り返し生成されます。
+ If an integer greater than 1 is specified for <times>, create and return <times> random number arrays to avoid duplicates.
+ Masu. If <times> is greater than <n>, a non-overlapping random array is repeatedly generated.
 
- p(Rand(5, 2))   // => 4,2
- p(Rand(5, 5))   // => 2,0,3,1,4
- p(Rand(5, 15))  // => 1,2,0,3,4,2,1,0,4,3,0,1,4,3,2
+ p(Rand(5, 2)) //=> 4,2
+ p(Rand(5, 5)) //=> 2,0,3,1,4
+ p(Rand(5, 15)) //=> 1,2,0,3,4,2,1,0,4,3,0,1,4,3,2
 
- ※ 結果は呼び出されるごとに変わります。
+ *The result changes with each call.
 ----------------------------------------------------------------------------------------*/
 function Rand(n, times){
   n = InitArg(n, 0);
   times = InitArg(times, 0);
 
   if(times <= 0){
-    // 値で返す
+    // Return as value
+
     if(n <= 0) return Math.random();
     return Math.floor(Math.random() * n);
   }else{
-    // 配列で返す
+    // Return as an array
+
     var result = [];
     var sequence;
     var choice;
     while(true){
       sequence = [];
-      // 連番配列を作成する
+      // Create a sequential array
+
       for(var i = 0; i < n; i++) sequence.push(i);
-      // 連番配列からランダムで抜き出していく
+      // Randomly extract from a sequence number array
+
       for(var i = 0; i < n; i++){
         choice = Math.floor(Math.random() * sequence.length);
         result.push(sequence[choice]);
-        // 必要数になったら終了
+        // Finish when the number is required
+
         if(result.length == times) return result;
-        // 抜き出した要素を削除
+        // Delete extracted elements
+
         sequence = sequence.slice(0, choice).concat(sequence.slice(choice + 1));
       }
     }
   }
 }
 /*----------------------------------------------------------------------------------------
- ☆★ クッキーへセーブ ★☆
+ ☆★ Save to cookies ★☆
 
- クッキー( Cookie )に情報を書き込みます。<name>に名前、<value>に値、<expireDays>に有効期限
- までの日数(省略時 7305 (約 20 年間))をそれぞれ指定します。書き込むデータは
- 「名前=値; expires=有効期限;」のような書式になります。
+ Write information in a cookie. Name in <name>, value in <value>, and expireDays>
+ Specify the number of days until (default is 7305 (approximately 20 years). The data to be written is
+ It will be formatted like "Name=value; expires=expire;".
 ------------------------------------------------------------------------------------------
- ブラウザでクッキーの期限や使用禁止が指定されている場合は、そちらが優先されると思います。
+ If your browser specifies that cookie deadlines or disallows it, that will take priority.
 ----------------------------------------------------------------------------------------*/
 function Save(name, value, expireDays){
   expireDays = InitArg(expireDays, 7305);
 
-  // 保存用文字列の作成
+  // Creating a saved string
+
   var s = encodeURIComponent(name) + "="
   s += encodeURIComponent(value) + "; expires=";
-  // 有効期限の設定
+  // Setting expiration date
+
   var xpDate = new Date().getTime();  // eXPire DATE
+
   xpDate -= 60000 * new Date().getTimezoneOffset();
   xpDate += expireDays * 86400000;
   s += new Date(xpDate).toUTCString();
-  // 保存
+  // keep
+
   document.cookie = s;
 }
 /*----------------------------------------------------------------------------------------
- ☆★ クッキーからロード ★☆
+ ☆★ Load from cookies ★☆
 
- クッキーを読み込んで、名前<name>に対応する値を返します。指定した名前が存在しない場合は
- <defaultValue>が返ります。
+ Loads the cookie and returns the value corresponding to the name <name>. If the specified name does not exist
+ Returns <defaultValue>.
 ----------------------------------------------------------------------------------------*/
 function Load(name, defaultValue){
   var cookieStr = document.cookie;  // COOKIE STRing
+
   var namePos = cookieStr.indexOf(name);  // NAME POSition
+
   if(namePos == -1) return defaultValue;
 
   var si = namePos + name.length + 1;   // Start Index
+
   var ei = cookieStr.indexOf(';', si);  // End Index
+
   ei = (ei == -1) ? cookieStr.length : ei;
   return decodeURIComponent(cookieStr.substring(si, ei));
 }
 /*----------------------------------------------------------------------------------------
- ☆★ メインループ ★☆
+ ☆★ Main loop ★☆
 
- 1 フレームに相当する時間( 1 / <FPS> 秒)が経過したら、フレーム内処理を行います。初期化と割
- り込み(キー入力等)以外は原則としてこのループ内で処理されます。
+ After a time equivalent to one frame (1/<FPS> seconds) has passed, in-frame processing is performed. Initialization and distribution
+ As a general rule, all other than insertions (key input, etc.) are processed within this loop.
 ----------------------------------------------------------------------------------------*/
 function MainLoop(){
-  // フレーム経過判定
-  // setInterval は精度が低いので、フレーム経過判定を別途行って時間管理をしています。
+  // Frame progress determination
+  // Since setInterval is low in accuracy, frame progression is determined separately to manage time.
+
   if(new Date() - gStartTime < 1000 / FPS * gFrames) return;
   gFrames++;
-  // 押されているキーの管理
+  // Manage pressed keys
+
   for(var i = 0; i < 256; i++) if(gInputs[i] >= 0) gInputs[i]++;
-  // フレーム内処理。呼び出し側で定義してください
+  // Intra-frame processing. Please define it on the caller
+
   Main();
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 終了時処理 ★☆
+ ☆★ End processing ★☆
 
- 別のページに移るときや、閉じるときに自動的に実行される処理です。
+ This is the process that is automatically executed when you move to another page or close it.
 ----------------------------------------------------------------------------------------*/
 window.onbeforeunload = function(){
-  // コンソールが開いていれば閉じる
+  // Close if the console is open
+
   if(typeof gConsole !== 'undefined') if(!gConsole.closed) gConsole.close();
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 起動 ★☆
+ ☆★ Start ★☆
 
- 最初に呼び出されます。初期化とメインループの起動を行います。
+ It is called first. It initializes and starts the main loop.
 ----------------------------------------------------------------------------------------*/
 function Execute(){
-  // モジュール内の初期化処理
+  // Initialization processing within the module
+
   gStartTime = new Date();
   gFrames = 0;
   gInputs = []; for(var i = 0; i < 256; i++) gInputs.push(-1);
-  // 初期化処理。呼び出し側で定義してください
+  // Initialization process. Please define it on the caller
+
   Setup();
-  // タイマー起動
+  // Start the timer
+
   gTimer = setInterval('MainLoop()', LOOP_INTERVAL)
 }
 /*----------------------------------------------------------------------------------------
- ☆★ オブジェクト: レイヤー ★☆
+ ☆★ Object: Layer ★☆
 
- div タグ等で指定したブロックをレイヤーとして扱います。初期化時、<id>にはブロックの id
- を指定してください(<div id="my_layer"> の my_layer の部分)。
+ The blocks specified using div tags, etc. are treated as layers. When initializing, <id> is the block id
+ (the my_layer part of <div id="my_layer">).
 ----------------------------------------------------------------------------------------*/
 function Layer(id){
   this.layer = document.getElementById(id);
   /*
-  ここで絶対座標指定にしていますが、できる限り前もってスタイルシートで絶対座標指定にしてく
-  ださい。例: <div id="my_layer" style="position: absolute;"></div>
+  I've specified absolute coordinates here, but I'll specify absolute coordinates as soon as possible using a style sheet
+  Good job. Example: <div id="my_layer" style="position: absolute;"></div>
   */
   this.layer.style.position = "absolute";
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 表示 ★☆
+ ☆★ Express ★☆
 ----------------------------------------------------------------------------------------*/
 Layer.prototype.Show = function(){
   this.layer.style.visibility = "visible";
 };
 /*----------------------------------------------------------------------------------------
- ☆★ 隠す ★☆
+ ☆★ Hide ★☆
 ----------------------------------------------------------------------------------------*/
 Layer.prototype.Hide = function(){
   this.layer.style.visibility = "hidden";
 };
 /*----------------------------------------------------------------------------------------
- ☆★ 指定位置に移動 ★☆
+ ☆★ Move to the specified position ★☆
 ----------------------------------------------------------------------------------------*/
 Layer.prototype.MoveTo = function(x, y){
   this.layer.style.left = x;
   this.layer.style.top = y;
 };
 /*----------------------------------------------------------------------------------------
- ☆★ 指定量だけ移動 ★☆
+ ☆★ Move by the specified amount ★☆
 ----------------------------------------------------------------------------------------*/
 Layer.prototype.MoveBy = function(dX, dY){
   this.layer.style.left = parseFloat(this.layer.style.left) + dX;
   this.layer.style.top = parseFloat(this.layer.style.top) + dY;
 };
 /*----------------------------------------------------------------------------------------
- ☆★ サイズ変更 ★☆
+ ☆★ Size change ★☆
 ----------------------------------------------------------------------------------------*/
 Layer.prototype.ResizeTo = function(width, height){
   this.layer.style.width = width;
   this.layer.style.height = height;
 };
 /*----------------------------------------------------------------------------------------
- ☆★ 相対値を指定してサイズ変更 ★☆
+ ☆★ Resize by specifying relative values ★☆
 ----------------------------------------------------------------------------------------*/
 Layer.prototype.ResizeBy = function(dWidth, dHeight){
   this.layer.style.width = parseFloat(this.layer.style.width) + dWidth;
   this.layer.style.height = parseFloat(this.layer.style.height) + dHeight;
 };
 /*----------------------------------------------------------------------------------------
- ☆★ テキスト( HTML ソース)の記入 ★☆
+ ☆★ Fill in text (HTML source) ★☆
 
- レイヤーに<text>を記入します。<overwrites>=true ならば上書き、false ならば追加します。
+ Enter the <text> in the layer. If <overwrites>=true, overwrite, if false, add.
 ----------------------------------------------------------------------------------------*/
 Layer.prototype.Write = function(text, overwrites){
   overwrites = InitArg(overwrites, true);
@@ -702,3 +755,37 @@ Layer.prototype.Write = function(text, overwrites){
   if(overwrites) this.layer.innerHTML = text;
   else this.layer.innerHTML += text;
 };
+
+/*
+
+// Initialize variables for the lock timer
+let lockTimerDuration = 3000; // Lock time in milliseconds (3 seconds)
+let lockTimerInterval;
+let lockTimerStartTime;
+
+// Function to start the lock timer
+function startLockTimer() {
+  lockTimerStartTime = Date.now();
+  lockTimerInterval = setInterval(updateLockTimer, 16); // Update every ~16ms (60 FPS)
+}
+
+// Function to update the progress bar
+function updateLockTimer() {
+  const elapsedTime = Date.now() - lockTimerStartTime;
+  const progress = Math.min((elapsedTime / lockTimerDuration) * 100, 100); // Calculate percentage
+  document.getElementById("lock_timer_bar").style.width = progress + "%";
+
+  // Stop the timer when it reaches 100%
+  if (progress >= 100) {
+    clearInterval(lockTimerInterval);
+    lockPiece(); // Call the function to lock the piece
+  }
+}
+
+// Function to stop the lock timer (e.g., if the piece moves or rotates)
+function stopLockTimer() {
+  clearInterval(lockTimerInterval);
+  document.getElementById("lock_timer_bar").style.width = "0%"; // Reset the progress bar
+}
+
+// Example: Call startLockTimer() when the piece lands */

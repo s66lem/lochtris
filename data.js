@@ -2,23 +2,42 @@
 □■ data.js ■□
 ========================================================================================*/
 /*----------------------------------------------------------------------------------------
-☆★ 定数一覧 ★☆
+☆★ Constant list ★☆
 ----------------------------------------------------------------------------------------*/
-var MATRIX_WIDTH = 10;               // マトリックスの横ブロック数
-var DEADLINE_HEIGHT = 3;             // デッドライン以上でブロックの情報を保持する高さ
-var MATRIX_HEIGHT = 23;              // マトリックスの縦ブロック数。デッドライン以上を含む
-var SOFT_DROP_SPAN = 1;              // <フレーム> ソフトドロップで 1 マス進むまでの時間
-var NATURAL_DROP_SPAN = 36;          // <フレーム> 自然落下で 1 マス進むまでの時間
-var LINE_CLEAR_DURATION = 15;        // <フレーム> ライン消去演出の時間
-var DISPLAY_FEATURES_DURATION = 45;  // <フレーム> 発動した技の表示時間
-var NEXT_MINOS = 5;                  // ネクスト表示数
-var ROTATE_RULES = 5;                // 回転ルール数
-var HORIZONTAL_CHARGE_DURATION = 7;  // <フレーム> キーを押し始めてから横移動リピート開始までの時間
-var HORIZONTAL_REPEAT_SPAN = 1;      // <フレーム> 横移動の時間感覚
+var MATRIX_WIDTH = 10;               // Number of horizontal blocks in the matrix
 
-var INITIAL_DIR = 0;                  // 出現時のミノの向き
-var INITIAL_X = 3;                    // 出現時のミノの X 座標
-var INITIAL_Y = DEADLINE_HEIGHT - 2;  // 出現時のミノの Y 座標
+var DEADLINE_HEIGHT = 3;             // The height at which block information is held above the deadline
+
+var MATRIX_HEIGHT = 23;              // Number of vertical blocks in the matrix. Includes more than deadlines
+
+var SOFT_DROP_SPAN = 1;              // <Frame> Time to proceed to 1 square with soft drop
+
+var NATURAL_DROP_SPAN = 36;          // <Frame> Time to advance to 1 square when natural falls
+
+var LINE_CLEAR_DURATION = 15;        // <Frame> Line Erase Performance Time
+
+var DISPLAY_FEATURES_DURATION = 45;  // <Frame> Display time for the triggered move
+
+var LOCK_DELAY_DURATION = 30;      // <Frame> Time it takes from the moment mino reaches the deadline to the moment it is locked - - - - - - - - !!!!!
+
+var LOCK_DELAY_INPUTMAX = 15;  // <Rotation> Maximum number of rotations/movements during lock delay before locked - - - - - - - - - - - - - - - !!!!!
+
+var NEXT_MINOS = 5;                  // Next display number
+
+var ROTATE_RULES = 5;                // Number of rotation rules
+
+var HORIZONTAL_CHARGE_DURATION = 7;  // <Frame> Time from the start of pressing the key to the start of horizontal movement repeat
+
+var HORIZONTAL_REPEAT_SPAN = 1;      // <Frame> Time sense of lateral movement
+
+
+
+var INITIAL_DIR = 0;                  // Mino's orientation when it appears
+
+var INITIAL_X = 3;                    // The X coordinate of the mino at the time of appearance
+
+var INITIAL_Y = DEADLINE_HEIGHT - 2;  // Y coordinate of mino when it appeared
+
 
 var DEFAULT_KEY_MOVE_LEFT    = 'Left';
 var DEFAULT_KEY_MOVE_RIGHT   = 'Right';
@@ -29,14 +48,16 @@ var DEFAULT_KEY_ROTATE_LEFT  = 'Ctrl';
 var DEFAULT_KEY_HOLD         = 'C';
 var DEFAULT_KEY_GUIDE        = 'R';
 
-var DUMP_GUIDE_DATA = true;            // ガイド配列ダンプ用
+var DUMP_GUIDE_DATA = true;            // For guide array dump
 
-var SECTION_NUM = 21;            // ガイド配列ダンプ用
+
+var SECTION_NUM = 21;            // For guide array dump
+
 
 /*----------------------------------------------------------------------------------------
-☆★ マトリックス配列  [y][x] ★☆
+☆★ Matrix array [y][x] ★☆
 
-設置済ブロックの配列です。落下中のブロック等は別に管理します。
+An arrangement of installed blocks. Falling blocks etc. will be managed separately.
 ----------------------------------------------------------------------------------------*/
 var gMatrix = [];
 for(var i = 0; i < MATRIX_HEIGHT; i++){
@@ -46,27 +67,34 @@ for(var i = 0; i < MATRIX_HEIGHT; i++){
   }
 }
 /*----------------------------------------------------------------------------------------
-☆★ オブジェクト: 各種ブロック ★☆
+☆★ Object: Various blocks ★☆
 ----------------------------------------------------------------------------------------*/
 function Block(id){
   this.id = id;
-  this.toVanish = (id == 2);           // 消去予約されているブロック?
+  this.toVanish = (id == 2);           // Blocks reserved for erasure?
+
 
   switch(id){
-    case 0:  // 空き
-    this.passable = true;    // すり抜け可能?
+    case 0:  // Vacant
+
+    this.passable = true;    // Can you slip through?
+
     break;
-    case 1:  // 灰色ブロック
+    case 1:  // Grey Block
+
     this.passable = false;
     break;
-    case 2:  // 消去演出中のブロック。RemoveReservedLines で一斉消去される
+    case 2:  // Blocks undergoing an erasure. RemoveReservedLines is erased at once
+
     this.passable = true;
     break;
-    // 設置済の各ブロック
+    // Each installed block
+
     case 21: case 22: case 23: case 24: case 25: case 26: case 27:
     this.passable = false;
     break;
-    // その他の各ブロック
+    // Each other block
+
     case 11: case 12: case 13: case 14: case 15: case 16: case 17:
     case 31: case 32: case 33: case 34: case 35: case 36: case 37:
     case 41: case 42: case 43: case 44: case 45: case 46: case 47:
@@ -80,81 +108,119 @@ function Block(id){
     case 571: case 572: case 573: case 574: case 575: case 576: case 577:
     this.passable = false;
     break;
-    // その他の番号(存在しないブロック)なら画像のキャッシュを取らない
+    // If other numbers (non-existent blocks) do not cache images
+
     default:
     this.passable = false;
     return;
   }
 
-  this.image = 'img/b' + id + '.png';  // 画像。24 x 24 ピクセル
+  this.image = 'img/b' + id + '.png';  // image. 24 x 24 pixels
+
   this.cache = new Image();
   this.cache.src = this.image;
 }
 /*----------------------------------------------------------------------------------------
-☆★ ブロックオブジェクトへのアクセス ★☆
+☆★ Access to block objects ★☆
 ----------------------------------------------------------------------------------------*/
 var gBlocks = [];
 //for(var i = 0; i <= 57; i++) gBlocks.push(new Block(i));
+
 for(var i = 0; i <= 577; i++) gBlocks.push(new Block(i));
 function BlkEmpty(){return gBlocks[0] }
 function BlkVanishing(){return gBlocks[2] }
 /*----------------------------------------------------------------------------------------
-☆★ オブジェクト: 一般的な回転ルール (ROTation RULE - GENeral) ★☆
+☆★ Object: General Rotation Rules (ROTation RULE -GENeral) ★☆
 ----------------------------------------------------------------------------------------*/
 function RotRuleGen(){
-  // [回転方向(0=右, 1=左)][回転前のミノの向き(0=出現時, 1=右, 2=逆, 3=左)][ルール ID ]
+  // [Rotation direction (0=right, 1=left)][Mode of mino before rotation (0=on appearance, 1=right, 2=reverse, 3=left)][Rule ID]
+
   this.dx = [[[0, -1, -1,  0, -1],    // i → r
+
   [0,  1,  1,  0,  1],    // r → v
+
   [0,  1,  1,  0,  1],    // v → l
+
   [0, -1, -1,  0, -1]],   // l → i
+
   [[0,  1,  1,  0,  1],    // i → l
+
   [0,  1,  1,  0,  1],    // r → i
+
   [0, -1, -1,  0, -1],    // v → r
+
   [0, -1, -1,  0, -1]]];  // l → v
+
   this.dy = [[[0,  0, -1,  2,  2],    // i → r
+
   [0,  0,  1, -2, -2],    // r → v
+
   [0,  0, -1,  2,  2],    // v → l
+
   [0,  0,  1, -2, -2]],   // l → i
+
   [[0,  0, -1,  2,  2],    // i → l
+
   [0,  0,  1, -2, -2],    // r → i
+
   [0,  0, -1,  2,  2],    // v → r
+
   [0,  0,  1, -2, -2]]];  // l → v
+
   return this;
 }
 /*----------------------------------------------------------------------------------------
-☆★ オブジェクト: I ミノの回転ルール (ROTation RULE - I) ★☆
+☆★ Object: I ROTation RULE -I ★☆
 ----------------------------------------------------------------------------------------*/
 function RotRuleI(){
-  // [回転方向(0=右, 1=左)][回転前のミノの向き(0=出現時, 1=右, 2=逆, 3=左)][ルール ID ]
+  // [Rotation direction (0=right, 1=left)][Mode of mino before rotation (0=on appearance, 1=right, 2=reverse, 3=left)][Rule ID]
+
   this.dx = [[[0, -2,  1, -2,  1],    // i → r
+
   [0, -1,  2, -1,  2],    // r → v
+
   [0,  2, -1,  2, -1],    // v → l
+
   [0,  1, -2,  1, -2]],   // l → i
+
   [[0, -1,  2, -1,  2],    // i → l
+
   [0,  2, -1,  2, -1],    // r → i
+
   [0,  1, -2,  1, -2],    // v → r
+
   [0, -2,  1, -2,  1]]];  // l → v
+
   this.dy = [[[0,  0,  0,  1, -2],    // i → r
+
   [0,  0,  0, -2,  1],    // r → v
+
   [0,  0,  0, -1,  2],    // v → l
+
   [0,  0,  0,  2, -1]],   // l → i
+
   [[0,  0,  0, -2,  1],    // i → l
+
   [0,  0,  0, -1,  2],    // r → i
+
   [0,  0,  0,  2, -1],    // v → r
+
   [0,  0,  0,  1, -2]]];  // l → v
+
   return this;
 }
 /*----------------------------------------------------------------------------------------
-☆★ 各回転ルールへのアクセス設定 ★☆
+☆★ Access settings for each rotation rule ★☆
 ----------------------------------------------------------------------------------------*/
 var gRotationRuleGeneral = new RotRuleGen();
 var gRotationRuleI = new RotRuleI();
 /*----------------------------------------------------------------------------------------
-☆★ オブジェクト: 各種ミノ ★☆
+☆★ Object: Various Minoh ★☆
 ----------------------------------------------------------------------------------------*/
 function IMino(){
   this.id = 1;
-  // [ミノの向き(0=出現時, 1=右, 2=逆, 3=左)][ Y 座標][ X 座標]
+  // [Mino orientation (0=on occurrence, 1=right, 2=reverse, 3=left)][ Y coordinate][ X coordinate]
+
   this.shape = [[[0, 0, 0, 0],
   [1, 1, 1, 1],
   [0, 0, 0, 0],
@@ -185,7 +251,8 @@ function IMino(){
 //----------------------------------------------------------------------------------------
 function TMino(){
   this.id = 2;
-  // [ミノの向き(0=出現時, 1=右, 2=逆, 3=左)][ Y 座標][ X 座標]
+  // [Mino orientation (0=on occurrence, 1=right, 2=reverse, 3=left)][ Y coordinate][ X coordinate]
+
   this.shape = [[[0, 1, 0, 0],
   [1, 1, 1, 0],
   [0, 0, 0, 0],
@@ -216,7 +283,8 @@ function TMino(){
 //----------------------------------------------------------------------------------------
 function JMino(){
   this.id = 3;
-  // [ミノの向き(0=出現時, 1=右, 2=逆, 3=左)][ Y 座標][ X 座標]
+  // [Mino orientation (0=on occurrence, 1=right, 2=reverse, 3=left)][ Y coordinate][ X coordinate]
+
   this.shape = [[[1, 0, 0, 0],
   [1, 1, 1, 0],
   [0, 0, 0, 0],
@@ -247,7 +315,8 @@ function JMino(){
 //----------------------------------------------------------------------------------------
 function LMino(){
   this.id = 4;
-  // [ミノの向き(0=出現時, 1=右, 2=逆, 3=左)][ Y 座標][ X 座標]
+  // [Mino orientation (0=on occurrence, 1=right, 2=reverse, 3=left)][ Y coordinate][ X coordinate]
+
   this.shape = [[[0, 0, 1, 0],
   [1, 1, 1, 0],
   [0, 0, 0, 0],
@@ -278,7 +347,8 @@ function LMino(){
 //----------------------------------------------------------------------------------------
 function ZMino(){
   this.id = 5;
-  // [ミノの向き(0=出現時, 1=右, 2=逆, 3=左)][ Y 座標][ X 座標]
+  // [Mino orientation (0=on occurrence, 1=right, 2=reverse, 3=left)][ Y coordinate][ X coordinate]
+
   this.shape = [[[1, 1, 0, 0],
   [0, 1, 1, 0],
   [0, 0, 0, 0],
@@ -309,7 +379,8 @@ function ZMino(){
 //----------------------------------------------------------------------------------------
 function SMino(){
   this.id = 6;
-  // [ミノの向き(0=出現時, 1=右, 2=逆, 3=左)][ Y 座標][ X 座標]
+  // [Mino orientation (0=on occurrence, 1=right, 2=reverse, 3=left)][ Y coordinate][ X coordinate]
+
   this.shape = [[[0, 1, 1, 0],
   [1, 1, 0, 0],
   [0, 0, 0, 0],
@@ -340,7 +411,8 @@ function SMino(){
 //----------------------------------------------------------------------------------------
 function OMino(){
   this.id = 7;
-  // [ミノの向き(0=出現時, 1=右, 2=逆, 3=左)][ Y 座標][ X 座標]
+  // [Mino orientation (0=on occurrence, 1=right, 2=reverse, 3=left)][ Y coordinate][ X coordinate]
+
   this.shape = [[[0, 1, 1, 0],
   [0, 1, 1, 0],
   [0, 0, 0, 0],
@@ -365,14 +437,15 @@ function OMino(){
   this.ghostBlockId  = 37;
   this.guideBlockId  = 47;
   this.ghostGuideBlockId = 57;
-  this.rotationRule = gRotationRuleGeneral;  // 必要ないですが便宜上
+  this.rotationRule = gRotationRuleGeneral;  // It's not necessary but for convenience
+
   return this;
 }
 /*----------------------------------------------------------------------------------------
-★☆ T-SPIN 判定に用いるブロック位置 ☆★
+★☆ Block position used for T-SPIN judgment ☆★
 
-ttt.js の TsType 内から呼び出されます。[dir][y][x]
-1 になっている場所(各 4 箇所)のうち 3 箇所以上が通過不可ならば T-SPIN と判定されます。
+Called from within TsType in ttt.js. [dir][y][x]
+If more than three of the 1 locations (4 locations each) cannot pass, it is judged as T-SPIN.
 ----------------------------------------------------------------------------------------*/
 var gTsTiles = [[[1, 0, 1, 0],
 [0, 0, 0, 0],
@@ -391,14 +464,14 @@ var gTsTiles = [[[1, 0, 1, 0],
 [1, 0, 1, 0],
 [0, 0, 0, 0]]];
 /*----------------------------------------------------------------------------------------
-★☆ T-SPIN MINI 判定に用いるブロック位置 ☆★
+★☆ Block position used for T-SPIN MINI judgment ☆★
 
-ttt.js の TsType 内から呼び出されます。[dir][y][x]
-//----------------------------------------------------------------------------------------
-T-SPIN が成立している場合、それが通常の T-SPIN か、あるいは T-SPIN MINI かを判定します。
-1 になっている場所(各 2 箇所)が 2 箇所とも通過不可ならば T-SPIN に、そうでなければ T-SPIN
-MINI と判定されます。例外的に、直前に第 5 候補の回転をした場合は T-SPIN MINI にならなくな
-ります( TST 風の回転や「 T-SPIN FIN 」等)。
+Called from within TsType in ttt.js. [dir][y][x]
+//-------------------------
+If T-SPIN is true, it is determined whether it is a normal T-SPIN or a T-SPIN MINI.
+If two locations marked 1 (two locations each) cannot pass through, then the T-SPIN is placed, otherwise the T-SPIN
+It is judged as MINI. Exceptionally, if you rotate the fifth candidate just before, it will not become a T-SPIN MINI.
+(TST wind rotation, "T-SPIN FIN" etc.).
 ----------------------------------------------------------------------------------------*/
 var gTssTiles = [[[1, 0, 1, 0],
 [0, 0, 0, 0],
@@ -417,7 +490,7 @@ var gTssTiles = [[[1, 0, 1, 0],
 [1, 0, 0, 0],
 [0, 0, 0, 0]]];
 /*----------------------------------------------------------------------------------------
-☆★ 各ミノへのアクセス設定 ★☆
+☆★ Access settings for each mino ★☆
 ----------------------------------------------------------------------------------------*/
 var I = new IMino();
 var T = new TMino();
@@ -428,18 +501,19 @@ var S = new SMino();
 var O = new OMino();
 var gMino = [null, I, T, J, L, Z, S, O];
 /*----------------------------------------------------------------------------------------
-☆★ オブジェクト: ガイド ★☆
+☆★ Object: Guide ★☆
 
-ミノは自動的に今動かしているものが選ばれます。
+Mino will automatically choose what you are currently running.
 ----------------------------------------------------------------------------------------*/
 function Guide(mino, dir, x, y){
   this.mino = mino;
   this.dir = dir;
   this.x = x;
-  this.y = y;  // デッドラインの分は含めない
+  this.y = y;  // Do not include deadlines
+
 }
 /*----------------------------------------------------------------------------------------
-☆★ ガイドオブジェクト生成の簡略表記 ★☆
+☆★ Simplified description of guide object generation ★☆
 ----------------------------------------------------------------------------------------*/
 function G(mino, dir, x, y){
   return new Guide(mino, dir, x, y);

@@ -2,21 +2,27 @@
  □■ ttt.js ■□
 ========================================================================================*/
 /*----------------------------------------------------------------------------------------
- ☆★ グローバル変数一覧 ★☆
+ ☆★ Global variable list ★☆
 ----------------------------------------------------------------------------------------*/
-var gButton;          // 押されたボタンの名前。フレーム終了時に初期化(空文字列代入)される
-var gLyrSections;     // セクション選択レイヤー( LaYeR )
-var gLyrPerform;      // ゲームレイヤー
-var gLyrPreferences;  // 設定レイヤー
-var gScene;           // シーン名
-var gPrevScene;       // 前のフレームでのシーン名( PREVious SCENE )
+var gButton;          // The name of the button that was pressed. Initialized (empty string assigned) at the end of the frame
+
+var gLyrSections;     // Section selection layer (LaYeR)
+
+var gLyrPerform;      // Game Layer
+
+var gLyrPreferences;  // Settings Layer
+
+var gScene;           // Scene name
+
+var gPrevScene;       // Scene name in the previous frame ( PREVious SCENE )
 /*
-● シーン構造
+● Scene structure
  select_sections ⇔ preferences
    ↓↑
- perform
+ Perform
 */
-var gKeys;            // キーの名前
+var gKeys;            // Key name
+
 var gSelectForms = ['key_left', 'key_right', 'key_softdrop', 'key_harddrop',
                     'key_rot_right', 'key_rot_left' , 'key_hold' , 'key_guide'];  // キー選択ボックスの名前
 /*
@@ -24,31 +30,58 @@ var gSelectForms = ['key_left', 'key_right', 'key_softdrop', 'key_harddrop',
  取得メソッド)および設定セレクトボックスの追加を忘れないでください。
 */
 
-var gCurSectionId;    // 選択中( CURrent )のセクション ID
-var gCurProblemId;    // 選択中の問題 ID
-var gCurProblem;      // 選択中の問題オブジェクト
-var gCurProblemReq;   // 問題ノルマ
-var gQueue;           // ネクスト列
+var gCurSectionId;    // Section ID for Selected (CURrent)
+
+var gCurProblemId;    // Selecting Issue ID
+
+var gCurProblem;      // Selected Problem Object
+
+var gCurProblemReq;   // Problem quota
+
+var gQueue;           // Next row
+
 var gCurMino;
 var gCurHold;
-var gCurUseGuideFlg   // ガイドを利用するかどうか
+var gCurUseGuideFlg   // Whether to use the guide
+
 var gCurX;
 var gCurY;
 var gCurDir;
 var gNdCount;         // ( Natural Drop COUNT )
-var gDfCount;         // ( Display Features COUNT )
-var gCurGuide;        // 現在のガイド
-var gGuidesQueue;     // ガイド配列
 
-var gLineClearCount;  // ライン消去演出のカウント
-var gTSpinType;       // 0= T スピンなし, 1= T スピン・ミニ, 2=T スピン
-var gRens;            // 継続中の REN 数
-var gIsReadyToB2b;    // 次が BACK to BACK になりうる?
+var gDfCount;         // ( Display Features COUNT )
+
+var gCurGuide;        // Current Guide
+
+var gGuidesQueue;     // Guide array
+
+
+var gLineClearCount;  // Counting the line erasure performance
+
+var gTSpinType;       // 0= T No spin, 1= T spin mini, 2= T spin
+
+var gRens;            // Ongoing REN (Combo) number
+
+var gIsReadyToB2b;    // Could the next be BACK to BACK?
+
+
+// Lock delay variables
+var gLockDelayTimer = 0;        // Tracks frames since lock delay started
+var gLockDelayInputs = 0;       // Tracks inputs during lock delay
+var gIsLockDelayActive = false; // Whether lock delay is currently active
+var gWasFloorkicked = false; // Whether the last move was a floorkick
+
+// lock delay vars 2 cause i fucking HATE JAVASCRIPT FUCK YOU JAVASCRIPT DIE
+var lockDelay = 0;                              // frames since piece landed
+var lockDelayLimit = LOCK_DELAY_DURATION;       // max frames before locking
+var manipulations = 0;                          // number of inputs after reaching lowestY
+var manipulationLimit = LOCK_DELAY_INPUTMAX;    // max inputs before locking
+var lowestY = 100;                              // tracks lowest y pos the mino has reached
 
 /*----------------------------------------------------------------------------------------
- ☆★ 各問題へのアクセス設定 ★☆
+ ☆★ Access settings for each problem ★☆
 
- 問題データは problem.js 等に記載されています。
+ Problem data is listed in problem.js etc.
 ----------------------------------------------------------------------------------------*/
 var gProblems = getProblems();
 var gCurProgmeIdList = [];
@@ -58,9 +91,9 @@ for(var i = 0; i < SECTION_NUM; i++){
 }
 
 /*----------------------------------------------------------------------------------------
- ☆★ 初期化 ★☆
+ ☆★ Initialization ★☆
 
- 起動時に 1 度だけ呼び出されます。経過フレーム数は 0 として扱われます。
+ It is called only once at startup. The number of frames that have passed is treated as 0.
 ----------------------------------------------------------------------------------------*/
 function Setup(){
   SetupLayers();
@@ -70,9 +103,9 @@ function Setup(){
   LoadData();
 }
 /*----------------------------------------------------------------------------------------
- ☆★ レイヤー初期化 ★☆
+ ☆★ Layer initialization ★☆
 
- レイヤーのサイズ等は css ファイルで、内容は HTML 上で定義しています。
+ Layer sizes etc. are defined in a css file, and the contents are defined in HTML.
 ----------------------------------------------------------------------------------------*/
 function SetupLayers(){
   gLyrSections = new Layer('list_sections');
@@ -80,12 +113,13 @@ function SetupLayers(){
   gLyrPreferences = new Layer('preferences');
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 読込 ★☆
+ ☆★ Load ★☆
 
- クッキーから設定と進捗を読み込みます。
+ Load settings and progress from cookies.
 ----------------------------------------------------------------------------------------*/
 function LoadData(){
-  // キー設定の読込
+  // Loading Key Settings
+
   gKeys = [];
   gKeys.push(Load('MoveLeft', DEFAULT_KEY_MOVE_LEFT));
   gKeys.push(Load('MoveRight', DEFAULT_KEY_MOVE_RIGHT));
@@ -95,29 +129,32 @@ function LoadData(){
   gKeys.push(Load('RotateLeft', DEFAULT_KEY_ROTATE_LEFT));
   gKeys.push(Load('Hold', DEFAULT_KEY_HOLD));
   gKeys.push(Load('Guide', DEFAULT_KEY_GUIDE));
-  // 進捗の読込
+  // Loading progress
+
   for(var i = 0; i < SECTION_NUM; i++){
     gProblemsCleared[i] = (Load('Prg' + i, '0') == '1');
   }
 }
 /*----------------------------------------------------------------------------------------
- ☆★ フレーム内処理 ★☆
+ ☆★ Intra-frame processing ★☆
 
- 1 フレームに 1 回呼び出される処理です。フレーム管理は jsmod.js で行っています。
+ This is a process that is called once per frame. Frame management is done using jsmod.js.
 ----------------------------------------------------------------------------------------*/
 function Main(){
-  // シーンが変わっていれば切り替え
+  // If the scene changes, switch
+
   if(gPrevScene != gScene){
     TerminateScene(gPrevScene);
     SetupScene(gScene);
-    //「前のシーン」の更新
+    //Updated "Previous Scene"
+
     gPrevScene = gScene;
   }
   PerformScene(gScene);
   gButton = '';
 }
 /*----------------------------------------------------------------------------------------
- ☆★ シーン開始 ★☆
+ ☆★ Scene begins ★☆
 ----------------------------------------------------------------------------------------*/
 function SetupScene(scene){
   switch(scene){
@@ -132,7 +169,8 @@ function SetupScene(scene){
     PrepareProblem();
     Refresh();
     gLyrPerform.Show();
-    window.scroll(0, 0);    // 一番上へスクロール
+    window.scroll(0, 0);    // Scroll to the top
+
     break;
   case 'perform_falling':
     break;
@@ -154,12 +192,14 @@ function SetupScene(scene){
     Say('perform_caption', 'Guide Mode');
     break;
   case 'preferences':
-    // キー設定の表示反映
+    // Key settings display
+
     for(var i = 0; i < gKeys.length; i++){
       document.getElementById(gSelectForms[i]).value = gKeys[i];
     }
     gLyrPreferences.Show();
-    window.scroll(0, 0);    // 一番上へスクロール
+    window.scroll(0, 0);    // Scroll to the top
+
     break;
   default:
     gScene = 'select_section';
@@ -167,7 +207,7 @@ function SetupScene(scene){
   }
 }
 /*----------------------------------------------------------------------------------------
- ☆★ シーン終了 ★☆
+ ☆★ Scene ends ★☆
 ----------------------------------------------------------------------------------------*/
 function TerminateScene(scene){
   switch(scene){
@@ -195,7 +235,7 @@ function TerminateScene(scene){
   }
 }
 /*----------------------------------------------------------------------------------------
- ☆★ シーン処理 ★☆
+ ☆★ Scene processing ★☆
 ----------------------------------------------------------------------------------------*/
 function PerformScene(scene){
   switch(scene){
@@ -226,23 +266,26 @@ function PerformScene(scene){
   }
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 問題準備 ★☆
+ ☆★ Problem preparation ★☆
 ----------------------------------------------------------------------------------------*/
 function PrepareProblem(){
 
   var curProblemId = gCurProgmeIdList[gCurProblemId];
   gCurProblem = gProblems[curProblemId];
 
-  // ノルマ配列をディープコピー
+  // Deep copy of quota sequence
+
   gCurProblemReq = [];
   for(var i = 0; i < gCurProblem.req.length; i++){
     gCurProblemReq.push(gCurProblem.req[i]);
   }
 
-  // 情報表示
+  // Intelligence statement
+
   DisplayCaption();
   RefreshHint();
-  // マトリックス準備
+  // Matrix preparation
+
   for(var i = 0; i < DEADLINE_HEIGHT; i++){
     for(var j = 0; j < MATRIX_WIDTH; j++){
       gMatrix[i][j] = 0;
@@ -253,7 +296,8 @@ function PrepareProblem(){
       gMatrix[i][j] = gCurProblem.initialBlocks[i - DEADLINE_HEIGHT][j];
     }
   }
-  // ネクスト準備
+  // Next Preparation
+
   gQueue = [];
   gGuidesQueue = [];
   gCurHold = gCurProblem.ingredients[0][0];
@@ -263,26 +307,28 @@ function PrepareProblem(){
   for(var i = 0; i < gCurProblem.guides.length; i++){
     gGuidesQueue.push(gCurProblem.guides[i]);
   }
-  // 各種フラグ初期化
+  // Various flag initialization
+
   gLineClearCount = -1;
   gTSpinType = 0;
   gRens = -1;
   gIsReadyToB2b = false;
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 問題タイトル表示 ★☆
+ ☆★ Display problem title ★☆
 ----------------------------------------------------------------------------------------*/
 function DisplayCaption(){
   var curProblemId = gCurProgmeIdList[gCurProblemId];
 //  var caption = " " + String(Number(gCurProblemId) + 1) + "/" + gCurProgmeIdList.length + "  ";
+
   var caption = SectionTitle(gCurSectionId) + "       " +((gCurProblemId) + 1) + "/" + gCurProgmeIdList.length + "     ";
   caption += gCurProblem.caption;
   Say("perform_caption", caption);
 }
 /*----------------------------------------------------------------------------------------
- ☆★ ネクストを送る ★☆
+ ☆★ Send the next ★☆
 
- ネクストが存在したかを返します。
+ Returns whether the next existed.
 ----------------------------------------------------------------------------------------*/
 function Dequeue(){
   if(gQueue.length == 0 && !gCurHold) return false;
@@ -299,11 +345,12 @@ function Dequeue(){
   gCurY = INITIAL_Y;
 
   gNdCount = NATURAL_DROP_SPAN;
+  ResetLockDelay();
   RefreshHint();
   return true;
 }
 /*----------------------------------------------------------------------------------------
- ☆★ ヒント表示を反映 ★☆
+ ☆★ Reflects hint display ★☆
 ----------------------------------------------------------------------------------------*/
 function RefreshHint(){
   var hint = gCurProblem.hint;
@@ -313,13 +360,13 @@ function RefreshHint(){
   Say('perform_hint', hint);
 }
 /*----------------------------------------------------------------------------------------
- ☆★ セクション名の記載 ★☆
+ ☆★ Description of section name ★☆
 ----------------------------------------------------------------------------------------*/
 function RefreshSectionTitle(){
   Say('section_title', SectionTitle(gCurSectionId));
 }
 /*----------------------------------------------------------------------------------------
- ☆★ クリア状況をボタンに反映 ★☆
+ ☆★ Reflects clear status on buttons ★☆
 ----------------------------------------------------------------------------------------*/
 function RefreshProblemButtons(){
   for(var i = 0; i < SECTION_NUM; i++){
@@ -328,7 +375,7 @@ function RefreshProblemButtons(){
   }
 }
 /*----------------------------------------------------------------------------------------
- ☆★ シーン: セクション選択 ★☆
+ ☆★ Scene: Select section ★☆
 ----------------------------------------------------------------------------------------*/
 function SceneSelectSection(){
   switch(gButton){
@@ -341,81 +388,81 @@ function SceneSelectSection(){
     gCurProblemId = 0;
 
     switch(gButton){
-    case 'section1':  /* テンプレを組んでみよう */
+    case 'section1':  /* Let's create a template */
       gCurProgmeIdList = getProblemIdList(WARMING_UP);
       break;
-    case 'section2':  /* I 縦置き （ガイドあり）*/
+    case 'section2':  /* I Vertical placement (with guide)*/
       gCurProgmeIdList = getProblemIdList(GUIDANCE_VERTICAL);
       break;
-    case 'section3':  /* I 縦置き ランダム 30問 */
+    case 'section3':  /* I vertically positioned random 30 questions */
       gCurProgmeIdList = (shuffle(getProblemIdList(PROB840_VERTICAL))).slice(0,20);
       break;
-    case 'section4':  /* 初手 I ミノ１段目（ガイドあり） */
+    case 'section4':  /* First move I Minno 1st stage (with guide) */
       gCurProgmeIdList = getProblemIdList(GUIDANCE_HORIZONTAL_1);
       break;
-    case 'section5':  /* 初手 I ミノ１段目 */
+    case 'section5':  /* First move I Minno first stage */
       gCurProgmeIdList = (shuffle(getProblemIdList(PROB840_HORIZONTAL_1))).slice(0,20);
       break;
-    case 'section6':  /* 全部寝かせ（ガイドあり） */
+    case 'section6':  /* All set aside (with guide) */
       gCurProgmeIdList = getProblemIdList(GUIDANCE_HORIZONTAL_LAYDOWN);
       break;
-    case 'section7':  /* 全部寝かせ */
+    case 'section7':  /* Let it all go to sleep */
       gCurProgmeIdList = (shuffle(getProblemIdList(PROB840_HORIZONTAL_LAYDOWN))).slice(0,20);
       break;
-    case 'section8':  /* I I L O（ガイドあり） */
+    case 'section8':  /* I I L O (with guide) */
       gCurProgmeIdList = getProblemIdList(GUIDANCE_HORIZONTAL_IILO);
       break;
-    case 'section9':  /* I I L O */
+    case 'section9':  /* I l o */
       gCurProgmeIdList = (shuffle(getProblemIdList(PROB840_HORIZONTAL_IILO))).slice(0,10);
       break;
-    case 'section10':  /* 初手 I ミノ3段目（ガイドあり） */
+    case 'section10':  /* First move I, 3rd stage of mino (with guide) */
       gCurProgmeIdList = getProblemIdList(GUIDANCE_HORIZONTAL_3);
       break;
-    case 'section11':  /* 初手 I ミノ3段目 */
+    case 'section11':  /* First move I Minno 3rd stage */
       gCurProgmeIdList = (shuffle(getProblemIdList(PROB840_HORIZONTAL_3))).slice(0,20);
       break;
-    case 'section12':  /* 中間テスト 20問 */
+    case 'section12':  /* Midterm Test 20 Questions */
       var array1 = shuffle(getProblemIdList(PROB840_HORIZONTAL_1));
       var array2 = shuffle(getProblemIdList(PROB840_HORIZONTAL_LAYDOWN));
       var array3 = shuffle(getProblemIdList(PROB840_HORIZONTAL_IILO));
       var array4 = shuffle(getProblemIdList(PROB840_HORIZONTAL_3));
       gCurProgmeIdList = (shuffle(((array1.concat(array2)).concat(array3)).concat(array4))).slice(0,20);
       break;
-    case 'section13':  /* LSIO (ガイドあり)*/
+    case 'section13':  /* LSIO (with guide)*/
       gCurProgmeIdList = getProblemIdList(GUIDANCE_LSIO);
       break;
-    case 'section14':  /* LSIO  */
+    case 'section14':  /* Lsio  */
       gCurProgmeIdList = shuffle(getProblemIdList(PROB840_LSIO));
       break;
-    case 'section15':  /* 期末テスト 30問 */
+    case 'section15':  /* Final exam 30 questions */
       gCurProgmeIdList = (shuffle(getProblemIdList(PROB840))).slice(0,30);
       break;
-    case 'section16':  /* 卒業テスト */
+    case 'section16':  /* Graduation test */
       var array1 = (shuffle(getProblemIdList(PROB840))).slice(0,50);
       var array2 = (shuffle(getProblemIdList(PROB840_MIRROR))).slice(0,50);
       gCurProgmeIdList = shuffle(array1.concat(array2));
       break;
-    case 'section17':  /* そのほかの消し方 */
+    case 'section17':  /* Other ways to erase */
       gCurProgmeIdList = getProblemIdList(GUIDANCE_OTHER_WISE);
       break;
-    case 'section18':  /* I 縦置き ランダム 514問 */
+    case 'section18':  /* I Vertical Random 514 Questions */
       gCurProgmeIdList = shuffle(getProblemIdList(PROB840_VERTICAL));
       break;
-    case 'section19':  /* I 横置き ランダム 196問 */
+    case 'section19':  /* I Laying horizontally Random 196 questions */
       var array1 = shuffle(getProblemIdList(PROB840_HORIZONTAL_1));
       var array2 = shuffle(getProblemIdList(PROB840_HORIZONTAL_LAYDOWN));
       var array3 = shuffle(getProblemIdList(PROB840_HORIZONTAL_IILO));
       var array4 = shuffle(getProblemIdList(PROB840_HORIZONTAL_3));
       gCurProgmeIdList = shuffle(((array1.concat(array2)).concat(array3)).concat(array4));
       break;
-    case 'section20':  /* 全711問 */
+    case 'section20':  /* All 711 questions */
       gCurProgmeIdList = shuffle(getProblemIdList(PROB840));
       break;
-    case 'section21':  /* 全問ミラー */
+    case 'section21':  /* All Questions Mirror */
       gCurProgmeIdList = shuffle(getProblemIdList(PROB840_MIRROR));
       break;
     default:
-      gCurProgmeIdList = [];/* ここに入ると、画面が白色になって落ちるように見えるはず */
+      gCurProgmeIdList = [];/* Once you enter this, the screen should turn white and appear to fall off */
       break;
     }
 
@@ -424,7 +471,7 @@ function SceneSelectSection(){
 }
 
 /*----------------------------------------------------------------------------------------
- ☆★ シーン: レッスン開始 ★☆
+ ☆★ Scene: Lesson starts ★☆
 ----------------------------------------------------------------------------------------*/
 function ScenePerform(){
   switch(gButton){
@@ -435,21 +482,155 @@ function ScenePerform(){
   if(IsPressed()) gScene = 'perform_falling';
 }
 /*----------------------------------------------------------------------------------------
- ☆★ シーン: レッスン中 ★☆
+ ☆★ Scene: Lessons ★☆
 ----------------------------------------------------------------------------------------*/
-function ScenePerformFalling(){
+
+function ScenePerformFalling() {
+  switch (gButton) {
+    case 'back':
+      gScene = 'select_section';
+      return;
+  }
+
+  // Tech name displayed
+  if (gDfCount > 0) {
+    gDfCount--;
+    if (gDfCount == 0) DisplayCaption();
+  }
+
+  // Line erasing
+  if (gLineClearCount > 0) {
+    gLineClearCount--;
+    if (gLineClearCount == 0) {
+      var caption = (gCurSectionId + 1) + "-" + (gCurProblemId + 1) + " ";
+      caption += gCurProblem.caption;
+      RemoveReservedLines();
+    }
+    return;
+  }
+
+  // If you are not operating the mino
+  if (!gCurMino) {
+    // Clear confirmation
+    if (ReqIsCleared()) gScene = 'perform_cleared';
+    // Send the next one. Fail without the next
+    else if (!Dequeue()) {
+      gCurMino = null;
+      gScene = 'perform_failed';
+    }
+    // Lockout determination
+    if (AppearsToLockout()) {
+      Lockout();
+      return;
+    }
+  } else {
+    // Handle lock delay
+    if (!CanMoveDown(gCurMino, gCurX, gCurY, gCurDir)) {
+      if (gCurY > lowestY) {
+        // Reset lock delay and manipulations if the piece drops below its previous lowest position
+        lockDelay = 0;
+        manipulations = 0;
+        lowestY = gCurY;
+      } else {
+        // Increment lock delay
+        lockDelay++;
+        UpdateLockTimerBar(lockDelay / lockDelayLimit); // Update progress bar
+        if (lockDelay >= lockDelayLimit || manipulations >= manipulationLimit) {
+          // Lock the piece if delay or manipulations exceed limits
+          Land();
+          ResetLockDelay();
+          Refresh();
+          return;
+        }
+      }
+    } else {
+      
+      ResetLockDelay();
+      lowestY = gCurY; 
+    }
+
+    // Key input forks
+    if (InputsHorizontalMove(true)) {
+      if (PlaceTest(gCurDir, gCurMino, gCurX + 1, gCurY)) {
+        gCurX++;
+        manipulations++;
+        lockDelay = 0;
+        gTSpinType = 0;
+        UpdateManipulationIndicatiors();
+        if (IsLanding()) gNdCount = NATURAL_DROP_SPAN;
+      }
+    } else if (InputsHorizontalMove(false)) {
+      if (PlaceTest(gCurDir, gCurMino, gCurX - 1, gCurY)) {
+        gCurX--;
+        gTSpinType = 0;
+        manipulations++;
+        lockDelay = 0;
+        UpdateManipulationIndicatiors();
+        if (IsLanding()) gNdCount = NATURAL_DROP_SPAN;
+      }
+    }
+    if (InputsSoftDrop()) {
+      SoftDrop();
+    }
+    if (IsPressed(KeyRR())) {
+      RotateRight();
+      manipulations++;
+      lockDelay = 0;
+      UpdateManipulationIndicatiors();
+    }
+    if (IsPressed(KeyRL())) {
+      RotateLeft();
+      manipulations++;
+      lockDelay = 0;
+      UpdateManipulationIndicatiors();
+    }
+    if (IsPressed(KeyG()) && !(gCurProblem.useGuide || gCurUseGuideFlg)) {
+      gScene = 'perform_guide';
+    }
+    if (IsPressed(KeyH())) {
+      Hold();
+      ResetLockDelay(); // Reset both timer and inputs
+    }
+    if (IsPressed(KeyHD())) {
+      HardDrop(); // Hard drop input should be checked at the end
+    }
+
+    // Fall/landing treatment
+    if (--gNdCount <= 0) {
+      gNdCount = NATURAL_DROP_SPAN;
+      if (!IsLanding()) {
+        gCurY++;
+        gTSpinType = 0;
+        gLandingCount = NATURAL_DROP_SPAN;
+      } else {
+        // Guide array dump
+        if (DUMP_GUIDE_DATA) {
+          console.log("G(%s, %d, %d, %d)", gCurMino, gCurDir, gCurX, gCurY - 3);
+        }
+        // Landing
+        Land();
+      }
+    }
+  }
+
+  Refresh();
+}
+/* function ScenePerformFalling(){
   switch(gButton){
   case 'back':
     gScene = 'select_section';
     return;
   }
-  // 技名表示中
+  // Tech name displayed
+
   if(gDfCount > 0){
     gDfCount--;
-    // カウント終了で表示を戻す
+    // Returns display when count ends
+
     if(gDfCount == 0) DisplayCaption();
   }
-  // ライン消去中
+  // Line erasing
+
   if(gLineClearCount > 0){
     gLineClearCount--;
     if(gLineClearCount == 0){
@@ -457,31 +638,38 @@ function ScenePerformFalling(){
       caption += gCurProblem.caption;
       RemoveReservedLines()
     }
-    // 他の操作禁止
+    // No other operations allowed
+
     return;
   }
-  // ミノを操作中でない場合
+  // If you are not operating the minho
+
   if(!gCurMino){
-    // クリア確認
+    // Clear confirmation
+
     if(ReqIsCleared()) gScene = 'perform_cleared';
-    // ネクストを送る。ネクストがなければ失敗
+    // Send the next one. Fail without the next
+
     else if(!Dequeue()){
       gCurMino = null;
       gScene = 'perform_failed';
     }
-    // ロックアウト判定
+    // Lockout determination
+
     if(AppearsToLockout()){
       Lockout();
       return;
     }
-  // ミノを操作中の場合
+  // When operating the minho
+
   }else{
-    // キー入力で分岐
+    // Key input forks
+
     if(InputsHorizontalMove(true)){
       if(PlaceTest(gCurDir, gCurMino, gCurX + 1, gCurY)){
         gCurX++;
         gTSpinType = 0;
-        if(IsLanding()) gNdCount = NATURAL_DROP_SPAN;
+        if(IsLanding()){} gNdCount = NATURAL_DROP_SPAN;
       }
     }else if(InputsHorizontalMove(false)){
       if(PlaceTest(gCurDir, gCurMino, gCurX - 1, gCurY)){
@@ -497,8 +685,9 @@ function ScenePerformFalling(){
       gScene = 'perform_guide';
     }
     if(IsPressed(KeyH())) Hold();
-    if(IsPressed(KeyHD())) HardDrop();  // ハードドロップ入力は最後に判定すること
-    // 落下/着地処理
+    if(IsPressed(KeyHD())) HardDrop();  // Hard drop input should be checked at the end
+    // Fall/landing treatment
+
     if(--gNdCount <= 0){
       gNdCount = NATURAL_DROP_SPAN;
       if(!IsLanding()){
@@ -506,11 +695,13 @@ function ScenePerformFalling(){
         gTSpinType = 0;
         gLandingCount = NATURAL_DROP_SPAN;
       }else{
-        // ガイド配列ダンプ
+        // Guide array dump
+
         if(DUMP_GUIDE_DATA){
           console.log("G(%s, %d, %d, %d)", gCurMino, gCurDir, gCurX, gCurY-3);
         }
-        // 着地
+        // Landing
+
         Land();
       }
     }
@@ -519,10 +710,10 @@ function ScenePerformFalling(){
   Refresh();
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 横移動を与える? ★☆
+ ☆★ Give horizontal movement? ★☆
 
- 横移動キーを押しっぱなしにしたとき、横移動を与える瞬間かを判断して返します。押し始めた瞬
- 間や規定のリピート間隔で true を返します。
+ When the horizontal movement key is pressed and the next step is determined whether the moment when the horizontal movement is applied is applied. The moment when I started pushing
+ Returns true at intervals or specified repeat intervals.
 ----------------------------------------------------------------------------------------*/
 function InputsHorizontalMove(toRight){
   keyName = toRight ? KeyR() : KeyL();
@@ -530,9 +721,9 @@ function InputsHorizontalMove(toRight){
   return (PressedDuration(keyName) - HORIZONTAL_CHARGE_DURATION) % HORIZONTAL_REPEAT_SPAN == 0;
 }
 /*----------------------------------------------------------------------------------------
- ☆★ ソフトドロップ実行? ★☆
+ ☆★ Soft Drop Run? ★☆
 
- 押した瞬間と、以降ソフトドロップ間隔が経過する度に true を返します。
+ Returns true the moment you press it and every time the soft drop interval has elapsed thereafter.
 ----------------------------------------------------------------------------------------*/
 function InputsSoftDrop(){
   if(IsPressed(KeySD())) return true;
@@ -540,12 +731,13 @@ function InputsSoftDrop(){
   return PressedDuration(KeySD()) % SOFT_DROP_SPAN == 0;
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 揃ったラインがあれば消去予約する ★☆
+ ☆★ If there are any lines that are all set, make an appointment ★☆
 
- 達成した技 ID を配列にして返します。
+ Returns the achieved move IDs as an array.
 ----------------------------------------------------------------------------------------*/
 function EraseLine(){
-  // 揃ったラインの検査
+  // Inspection of the line that is in place
+
   var eraseLines = [];
   var lineErases;
   for(var i = 0; i < MATRIX_HEIGHT; i++){
@@ -558,15 +750,18 @@ function EraseLine(){
     }
     if(lineErases){
       eraseLines.push(i);
-      // ライン削除予約
+      // Reserve to delete line
+
       ReserveCutLine(i);
     }
   }
   var numEls = eraseLines.length;
-  // REN 数管理
+  // REN Number Management
+
   if(numEls == 0) gRens = -1;
   else gRens++;
-  // 達成した技 ID の配列を作成
+  // Create an array of accomplished move IDs
+
   var features = [];
   switch(numEls){
   case 0:
@@ -582,14 +777,15 @@ function EraseLine(){
     if(gIsReadyToB2b && (numEls >= 4 || gTSpinType > 0)) features.push(11);
     if(IsEmptyMatrix()) features.push(10);
   }
-  // B2B フラグ管理
+  // B2B flag management
+
   if(numEls >= 1) gIsReadyToB2b = (numEls >= 4 || (gTSpinType > 0 && numEls >= 1));
 
   return features;
 }
 
 /*----------------------------------------------------------------------------------------
- ☆★ マトリックスは空? ★☆
+ ☆★ Is the matrix empty? ★☆
 ----------------------------------------------------------------------------------------*/
 function IsEmptyMatrix(){
   for(var i = 0; i < MATRIX_HEIGHT; i++){
@@ -600,9 +796,9 @@ function IsEmptyMatrix(){
   return true;
 }
 /*----------------------------------------------------------------------------------------
- ☆★ ライン消去予約 ★☆
+ ☆★ Line Erase Reservation ★☆
 
- <line>行目にあるブロックを削除予約します。これらは RemoveReservedLines() で削除されます。
+ Reserve to delete the block in line <line>. These are removed with RemoveReservedLines().
 ----------------------------------------------------------------------------------------*/
 function ReserveCutLine(line){
   for(var i = 0; i < MATRIX_WIDTH; i++){
@@ -611,9 +807,9 @@ function ReserveCutLine(line){
   gLineClearCount = LINE_CLEAR_DURATION;
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 消去予約済のライン消去 ★☆
+ ☆★ Erase of lines that have been cancelled ★☆
 
- 消去予約済のブロックを消去し、できた空間を上から詰めます。
+ Erase Erase the blocks that have been reserved for removal and fill in the space you have created from above.
 ----------------------------------------------------------------------------------------*/
 function RemoveReservedLines(){
   for(var i = 0; i < MATRIX_HEIGHT; i++){
@@ -628,9 +824,9 @@ function RemoveReservedLines(){
   }
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 技名取得 ★☆
+ ☆★ Get the technique name ★☆
 
- 複数の技を達成した場合、まとめて 1 つの文字列にして返します。
+ If multiple moves are achieved, they will be returned together as a single string.
 ----------------------------------------------------------------------------------------*/
 function FeatureName(features){
   var result = "☆ ";
@@ -650,22 +846,25 @@ function FeatureName(features){
     case 10: result += "PERFECT CLEAR"; break;
     case 11: result += "BACK to BACK"; break;
     default: result += (features[i] - 100 + 1) + "x Combo"; break;  // 100 + n: n REN
+
     }
   }
   result += " ☆";
   return result;
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 接地中? ★☆
+ ☆★ Underground? ★☆
 ----------------------------------------------------------------------------------------*/
 function IsLanding(){
   return !PlaceTest(gCurDir, gCurMino, gCurX, gCurY + 1);
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 着地 ★☆
+ ☆★ Landing ★☆
 ----------------------------------------------------------------------------------------*/
 function Land(){
-  // フィールドに反映
+  ResetLockDelay(); // reset lock delay state
+  // Reflected in the field
+  
   for(var i = 0; i < 4; i++){
     for(var j = 0; j < 4; j++){
       if(IsValidPos(j + gCurX, i + gCurY)){
@@ -675,7 +874,8 @@ function Land(){
       }
     }
   }
-  // 厳密なガイドなら従わないと失敗に
+  // If you don't follow a strict guide, you'll fail.
+
   if(gCurGuide){
     if((gCurProblem.useGuide || gCurUseGuideFlg) && GuideBlocksPos().join() != CurMinoBlocksPos().join()){
       gScene = 'perform_failed';
@@ -683,29 +883,35 @@ function Land(){
       return;
     }
   }
-  // ロックアウト判定
+  // Lockout determination
+
   if(LandsToLockout()){
     Lockout();
     return;
   }
-  // 技が発動していれば表示および処理
+  // Display and process if the move is activated
+
   var features = EraseLine();
   if(features.length > 0){
-    // 表示管理
+    // Indicates management
+
     Say('perform_caption', FeatureName(features));
     gDfCount = DISPLAY_FEATURES_DURATION;
-    // ノルマへ反映
+    // Reflected in quotas
+
     RemoveReq(features);
-    // ラインが揃っていればライン消去
+    // If the lines are all together, then the lines are erased
+
     if(IsErased(features)) gLineClearCount = LINE_CLEAR_DURATION;
   }
-  // アクティブミノ解除
+  // Active Minno unlocked
+
   gCurMino = null;
 }
 /*----------------------------------------------------------------------------------------
- ★☆ 着地した結果、ロックアウト? ☆★
+ ★☆ Lock out as a result of landing? ☆★
 
- ミノの全ブロックがデッドラインより上になった場合は true を返します。
+ Returns true if all blocks of Mino are above the deadline.
 ----------------------------------------------------------------------------------------*/
 function LandsToLockout(){
   var minoPos = MinoToBlockPositions(gCurDir, gCurMino, gCurX, gCurY);
@@ -715,23 +921,23 @@ function LandsToLockout(){
   return true;
 }
 /*----------------------------------------------------------------------------------------
- ★☆ ミノが出現した結果、ロックアウト? ☆★
+ ★☆ As a result of Minho appearing, it becomes a lockout? ☆★
 
- ミノのブロックと既存のブロックの位置が 1 つでも重複したら true を返します。
+ Returns true if even one existing block overlaps with one existing block.
 ----------------------------------------------------------------------------------------*/
 function AppearsToLockout(){
   if(!gCurMino) return;
   return !PlaceTest(INITIAL_DIR, gCurMino, INITIAL_X, INITIAL_Y);
 }
 /*----------------------------------------------------------------------------------------
- ★☆ ロックアウト時処理 ☆★
+ ★☆ Lockout processing ☆★
 ----------------------------------------------------------------------------------------*/
 function Lockout(){
   gScene = 'perform_failed';
   gCurMino = null;
 }
 /*----------------------------------------------------------------------------------------
- ☆★ ラインを消した? ★☆
+ ☆★ Did you delete the line? ★☆
 ----------------------------------------------------------------------------------------*/
 function IsErased(features){
   for(var i = 0; i < features.length; i++){
@@ -752,23 +958,24 @@ function IsErased(features){
   return false;
 }
 /*----------------------------------------------------------------------------------------
- ☆★ ガイドのブロックがある座標の一覧を取得 ★☆
+ ☆★ Get a list of coordinates with guide blocks ★☆
 ----------------------------------------------------------------------------------------*/
 function GuideBlocksPos(){
   var g = gCurGuide;
 //  return MinoToBlockPositions(g.dir, gCurMino, g.x, g.y + DEADLINE_HEIGHT);
+
   return MinoToBlockPositions(g.dir, g.mino, g.x, g.y + DEADLINE_HEIGHT);
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 操作中のミノのブロックがある座標の一覧を取得 ★☆
+ ☆★ Get a list of coordinates where the mino block is currently being operated ★☆
 ----------------------------------------------------------------------------------------*/
 function CurMinoBlocksPos(){
   return MinoToBlockPositions(gCurDir, gCurMino, gCurX, gCurY);
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 指定位置にミノを置いたときのブロックの座標の一覧を取得 ★☆
+ ☆★ Get a list of block coordinates when placing mino at the specified position ★☆
 
- 大きさ 2 の配列 [ x 座標, y 座標] の一覧をさらに配列にして返します(事実上 2 次元配列)。
+ Returns an array of size 2 [x coordinates, y coordinates] as an additional array (effectively a two-dimensional array).
 ----------------------------------------------------------------------------------------*/
 function MinoToBlockPositions(dir, mino, x, y){
   var result = [];
@@ -780,18 +987,19 @@ function MinoToBlockPositions(dir, mino, x, y){
   return result;
 }
 /*----------------------------------------------------------------------------------------
- ☆★ ハードドロップをすると Y がどれだけ増加( DIFFerence of Y )するかを取得 ★☆
+ ☆★ Get how much DIFFerence of Y increases when you make a hard drop ★☆
 ----------------------------------------------------------------------------------------*/
 function HarddropDiffY(){
   var i = 0;
   while(PlaceTest(gCurDir, gCurMino, gCurX, gCurY + i)){
     i++;
   }
-  // 通過不能になる直前の点までの増加量を返す
+  // Returns the amount of increase to the point just before it becomes unpassable.
+
   return i - 1;
 }
 /*----------------------------------------------------------------------------------------
- ☆★ ハードドロップ ★☆
+ ☆★ Hard Drop ★☆
 ----------------------------------------------------------------------------------------*/
 function HardDrop(){
   var dY = HarddropDiffY();
@@ -801,7 +1009,7 @@ function HardDrop(){
   gLandingCount = 0;
 }
 /*----------------------------------------------------------------------------------------
- ☆★ ソフトドロップ ★☆
+ ☆★ Soft Drop ★☆
 ----------------------------------------------------------------------------------------*/
 function SoftDrop(){
   if(!IsLanding()){
@@ -811,7 +1019,7 @@ function SoftDrop(){
   }
 }
 /*----------------------------------------------------------------------------------------
- ☆★ ホールド ★☆
+ ☆★ Hold ★☆
 ----------------------------------------------------------------------------------------*/
 function Hold(){
   if(gQueue.length == 0 && !gCurHold) return;
@@ -833,14 +1041,15 @@ function Hold(){
 
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 達成した技に応じてノルマ( REQuired features )を減らす ★☆
+ ☆★ Reduce the quota (REQuireed features) according to the technique achieved ★☆
 ----------------------------------------------------------------------------------------*/
 function RemoveReq(features){
   var index;
   for(var i = 0; i < features.length; i++){
     index = (features[i] > 100) ? 12 : features[i];
     gCurProblemReq[index]--;
-    // T スピンなら通常の消し方のノルマも減らす。たとえば TST ならトリプルのノルマも減らす
+    // If you use T spin, the normal elimination quota will also be reduced. For example, TST reduces the triple quota.
+
     switch(index){
     case 6:
     case 7:
@@ -856,7 +1065,7 @@ function RemoveReq(features){
   }
 }
 /*----------------------------------------------------------------------------------------
- ☆★ ノルマクリア? ★☆
+ ☆★ Clear the quota? ★☆
 ----------------------------------------------------------------------------------------*/
 function ReqIsCleared(){
   for(var i = 0; i < gCurProblemReq.length; i++){
@@ -865,7 +1074,7 @@ function ReqIsCleared(){
   return true;
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 指定座標にミノを置ける? ★☆
+ ☆★ Can you place mino at specified coordinates? ★☆
 ----------------------------------------------------------------------------------------*/
 function PlaceTest(dir, mino, x, y){
   var block;
@@ -875,7 +1084,8 @@ function PlaceTest(dir, mino, x, y){
         block = gBlocks[gMatrix[y + i][x + j]];
         if(mino.shape[dir][i][j] == 1 && !block.passable) return false;
       }else{
-        // 無効な場所でデッドラインより上以外なら置けない
+        // Cannot be placed in an invalid location unless above the deadline
+
         if(mino.shape[dir][i][j] == 1 &&
                 (x + j < 0 || MATRIX_WIDTH <= x + j || MATRIX_HEIGHT <= y + i)){
           return false;
@@ -886,16 +1096,17 @@ function PlaceTest(dir, mino, x, y){
   return true;
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 指定座標は配列の範囲内? ★☆
+ ☆★ The specified coordinates are within the range of the array? ★☆
 ----------------------------------------------------------------------------------------*/
 function IsValidPos(x, y){
   return (0 <= x && x < MATRIX_WIDTH && 0 <= y && y < MATRIX_HEIGHT);
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 画面上にミノを描画 ★☆
+ ☆★ Draw mino on the screen ★☆
 ----------------------------------------------------------------------------------------*/
 function DisplayMino(dir, mino, x, y, blockId){
-  var block;  // 0=空き, 1=あり
+  var block;  // 0=available, 1=available
+
 
   for(var i = 0; i < 4; i++){
     for(var j = 0; j < 4; j++){
@@ -904,10 +1115,56 @@ function DisplayMino(dir, mino, x, y, blockId){
   }
 }
 /*----------------------------------------------------------------------------------------
- ☆★ ブロックの描画 ★☆
+ ☆★ Lock Delay Helper Functions ★☆
+----------------------------------------------------------------------------------------*/
+function CanMoveDown(mino, x, y, dir) {
+  return PlaceTest(dir, mino, x, y + 1);
+}
 
- マトリックス上の座標(<x>, <y>)に ID が<blockId>のブロックを描画します。 <ignoresZero>に
- true を指定すると、ID が 0 のブロックを描画しません(透明として扱う)。
+function ResetLockDelay() {
+  lockDelay = 0;
+  manipulations = 0;
+  UpdateLockTimerBar(0); // Reset progress bar
+  UpdateManipulationIndicators(); // Reset manipulation indicators
+}
+
+function UpdateLockTimerBar() {
+  // lockDelay and lockDelayLimit should be global or accessible here
+  const bar = document.getElementById('lock_timer_bar');
+  if (!bar) return;
+  // Clamp progress between 0 and 1
+  let progress = Math.min(lockDelay / lockDelayLimit, 1);
+  bar.style.width = (progress * 241.99) + "px"; // 241.99px is the full width
+}
+
+function UpdateManipulationIndicators() {
+  const indicators = document.getElementById('manipulation_indicators');
+  indicators.innerHTML = ''; // Clear existing indicators
+  for (let i = 0; i < manipulationLimit - manipulations; i++) {
+    const pip = document.createElement('div');
+    pip.className = 'pip';
+    indicators.appendChild(pip);
+  }
+}
+
+
+/* function UpdateLockTimerBar() {
+  const lockTimerBar = document.getElementById('lock_timer_bar');
+  if (gIsLockDelayActive) {
+    // calcs the percentage of time elapsed
+    const progress = (gLockDelayTimer / LOCK_DELAY_DURATION) * 100;
+    lockTimerBar.style.width = `${progress}%`;
+  } else {
+    // reset bar when lock delay is not active
+    lockTimerBar.style.width = '0%';
+  }
+} */
+
+/*----------------------------------------------------------------------------------------
+ ☆★ Drawing blocks ★☆
+
+ Draws a block with ID <blockId> at coordinates (<x>, <y>) on the matrix. In <ignoresZero>
+ If true, blocks with ID 0 will not be drawn (treated as transparent).
 ----------------------------------------------------------------------------------------*/
 function DisplayBlock(x, y, blockId, ignoresZero){
   if(ignoresZero && blockId == 0) return;
@@ -916,7 +1173,7 @@ function DisplayBlock(x, y, blockId, ignoresZero){
   }
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 通行可? ★☆
+ ☆★ Is it accessible? ★☆
 ----------------------------------------------------------------------------------------*/
 function IsPassable(x, y){
   if(x < 0 || MATRIX_WIDTH <= x || MATRIX_HEIGHT <= y) return false;
@@ -924,75 +1181,106 @@ function IsPassable(x, y){
   return gBlocks[gMatrix[y][x]].passable;
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 表示区域内? ★☆
+ ☆★ Indicates within the area? ★☆
 ----------------------------------------------------------------------------------------*/
 function CanDisplayPos(x, y){
   return (0 <= x && x < MATRIX_WIDTH && DEADLINE_HEIGHT <= y && y < MATRIX_HEIGHT);
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 右回転 ★☆
+ ☆★ Rotate right ★☆
 ----------------------------------------------------------------------------------------*/
 function RotateRight(){
   Rotate(true);
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 左回転 ★☆
+ ☆★ Rotate left ★☆
 ----------------------------------------------------------------------------------------*/
 function RotateLeft(){
   Rotate(false);
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 回転 ★☆
+ ☆★ Rotation ★☆
 
- <toRight>が true なら右回転、false なら左回転をします。
+ If <toRight> is true, it rotates right, and if false, it rotates left.
 ----------------------------------------------------------------------------------------*/
-function Rotate(toRight){
+function Rotate(toRight) {
   var newDir = (gCurDir + (toRight ? 1 : 3)) % 4;
   var rotRule = gCurMino.rotationRule;
   var newX, newY;
   var rotateRuleId;
-  // 回転ルールのテスト。成功したら反映
+  gWasFloorkicked = false; // Reset the flag at the start of the function
+
+  // Check pre-rotation state
+  var wasLockDelayActive = gIsLockDelayActive;
+  var cannotMoveDownBefore = !CanMoveDown(gCurMino, gCurX, gCurY, gCurDir);
+
+  // Test rotation rules
   var canRotate = false;
-  for(var i = 0; i < ROTATE_RULES; i++){
+  for (var i = 0; i < ROTATE_RULES; i++) {
     newX = gCurX + rotRule.dx[toRight ? 0 : 1][gCurDir][i];
     newY = gCurY + rotRule.dy[toRight ? 0 : 1][gCurDir][i];
-    if(PlaceTest(newDir, gCurMino, newX, newY)){
+    if (PlaceTest(newDir, gCurMino, newX, newY)) {
       gCurX = newX;
       gCurY = newY;
       gCurDir = newDir;
       canRotate = true;
       rotateRuleId = i;
+
+      // Check post-rotation state
+      if (wasLockDelayActive && cannotMoveDownBefore) {
+        var canMoveDownAfter = CanMoveDown(gCurMino, gCurX, gCurY, gCurDir);
+        var canMoveDownTwice = CanMoveDown(gCurMino, gCurX, gCurY + 1, gCurDir);
+
+        // Determine if this is a floorkick
+        if (canMoveDownAfter && !canMoveDownTwice) {
+          if (gCurMino === I) {
+            // For I-mino, allow moving down 2 positions
+            if (!CanMoveDown(gCurMino, gCurX, gCurY + 2, gCurDir)) {
+              gWasFloorkicked = true; // Set the flag for floorkick
+            }
+          } else {
+            gWasFloorkicked = true; // Set the flag for floorkick
+          }
+        }
+      }
+
       break;
     }
   }
-  if(canRotate){
-    SetTSpinType(i);
-    if(IsLanding()) gNdCount = NATURAL_DROP_SPAN;
+
+  if (canRotate) {
+    SetTSpinType(rotateRuleId);
+    if (IsLanding()) gNdCount = NATURAL_DROP_SPAN;
+
+    // Reset lock delay timer only if it was a floorkick
+    if (gWasFloorkicked) {
+      ResetLockDelayTimer(); // Reset only the timer, not the inputs
+    }
   }
 }
 /*----------------------------------------------------------------------------------------
- ★☆ T-SPIN 成立判定 ☆★
+ ★☆ T-SPIN success judgment ☆★
 
- T-SPIN 不成立なら 0、T-SPIN MINI なら 1、T-SPIN なら 2 を返します。
-//----------------------------------------------------------------------------------------
- 回転処理の中で取得してください。
- 次の条件を満たすと T-SPIN になります。
- ・ T ミノであること
- ・最後に成功した操作が回転である(この関数を呼び出す前提)
- ・凸部の周囲 4 ブロック( ※ と × の部分)のうち 3 箇所以上にブロックがある
+ Returns 0 if T-SPIN is not satisfied, 1 if T-SPIN MINI, and 2 if T-SPIN.
+//-------------------------
+ Please obtain it during the rotation process.
+ If the following conditions are met, the T-SPIN will be created.
+ ・ Being T Minho
+ ・The last successful operation is rotation (assuming that this function is called)
+ ・There are more than three blocks (*and × parts) around the convex part.
 
- さらに次の条件のどちらかを満たすと T-SPIN に、満たさないと T-SPIN MINI になります。
- ・凸部の両隣( ※ の部分)の 2 箇所ともブロックがある
- ・直前の回転が第 5 候補( TST 風の回転、「 T-SPIN FIN 」等)である
+ Furthermore, if one of the following conditions is satisfied, it becomes T-SPIN, and if not, it becomes T-SPIN MINI.
+ ・There are blocks on both sides of the convex portion (part ※).
+ -The previous rotation is the fifth candidate (TST wind rotation, "T-SPIN FIN", etc.).
 
- ※■※　×■※　×　×　※■×
- ■■■　　■■　■■■　■■
- ×　×　×■※　※■※　※■×
+ *■※ ×■※ ×　×　※■×
+ ■■■■■■■■■■■■■■■■
+ × ×■※※※※※■×
 
- 回転以外の操作が成功したときは T-SPIN フラグ gTSpinType を 0 にしてください。
-//----------------------------------------------------------------------------------------
- 細かい条件はソフトによって異なるようです。とりあえず、壁蹴りや滑り込みの T-SPIN が MINI
- と判定されていれば良いと思われます。
+ If an operation other than rotation is successful, set the T-SPIN flag gTSpinType to 0.
+//-------------------------
+ The detailed conditions seem to vary depending on the software. For now, the wall kick and slipping T-SPIN is MINI.
+ It would be fine if it was determined.
 ----------------------------------------------------------------------------------------*/
 function SetTSpinType(rotateRuleId){
   if(gCurMino != T) return 0;
@@ -1000,7 +1288,8 @@ function SetTSpinType(rotateRuleId){
   var tsCnt = 0;
   var tssCnt = 0;
   var isBlock = false;
-  // TS 条件および TSS 条件の何箇所に通行不可ブロックがあるか
+  // How many TS and TSS conditions are there non-passing blocks?
+
   for(var i = 0; i < T.shape[gCurDir].length; i++){
     for(var j = 0; j < T.shape[gCurDir][i].length; j++){
       if(IsValidPos(j + gCurX, i + gCurY)){
@@ -1014,7 +1303,8 @@ function SetTSpinType(rotateRuleId){
       }
     }
   }
-  // TSS か TSM かの判定
+  // Determining whether TSS or TSM
+
   if(tsCnt >= 3){
     gTSpinType = (tssCnt >= 2 || rotateRuleId == 4) ? 2 : 1;
   }else{
@@ -1022,7 +1312,7 @@ function SetTSpinType(rotateRuleId){
   }
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 表示を反映 ★☆
+ ☆★ Reflects the display ★☆
 ----------------------------------------------------------------------------------------*/
 function Refresh(){
   RefreshMatrix();
@@ -1030,7 +1320,7 @@ function Refresh(){
   RefreshHold();
 }
 /*----------------------------------------------------------------------------------------
- ☆★ マトリックス反映 ★☆
+ ☆★ Matrix Reflection ★☆
 ----------------------------------------------------------------------------------------*/
 function RefreshMatrix(){
   RefreshPlacedMino();
@@ -1038,7 +1328,7 @@ function RefreshMatrix(){
   RefreshActiveMino();
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 設置済ブロック反映 ★☆
+ ☆★ Reflected blocks installed ★☆
 ----------------------------------------------------------------------------------------*/
 function RefreshPlacedMino(){
   for(var i = DEADLINE_HEIGHT; i < MATRIX_HEIGHT; i++){
@@ -1048,18 +1338,19 @@ function RefreshPlacedMino(){
   }
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 落下中ミノ反映 ★☆
+ ☆★ Mino reflects falling ★☆
 ----------------------------------------------------------------------------------------*/
 function RefreshActiveMino(){
   if(gCurMino) DisplayMino(gCurDir, gCurMino, gCurX, gCurY, gCurMino.activeBlockId);
 }
 /*----------------------------------------------------------------------------------------
- ☆★ ゴーストミノとガイドミノ反映 ★☆
+ ☆★ Ghost Mino and Guide Mino Reflection ★☆
 ----------------------------------------------------------------------------------------*/
 function RefreshGhostAndGuide(){
   if(!gCurMino) return;
   var ghostBlks = MinoToBlockPositions(gCurDir, gCurMino, gCurX, gCurY + HarddropDiffY());
-  // ゴーストミノの描画
+  // Ghost Mino drawing
+
   for(var i = 0; i < ghostBlks.length; i++){
     DisplayBlock(ghostBlks[i][0], ghostBlks[i][1], gCurMino.ghostBlockId, true);
   }
@@ -1067,7 +1358,8 @@ function RefreshGhostAndGuide(){
   var g = gCurGuide;
   if(!g) return;
   var guideBlks = MinoToBlockPositions(g.dir, g.mino, g.x, g.y + DEADLINE_HEIGHT);
-  // 共通部分の探索
+  // Exploring common parts
+
   var ghostGuideBlks = [];
   for(var i = 0; i < ghostBlks.length; i++){
     for(var j = 0; j < guideBlks.length; j++){
@@ -1077,22 +1369,24 @@ function RefreshGhostAndGuide(){
     }
   }
 
-  // ガイドミノの描画
+  // Guide mino drawing
+
   if(gCurProblem.useGuide || gCurUseGuideFlg){
     for(var i = 0; i < guideBlks.length; i++){
       DisplayBlock(guideBlks[i][0], guideBlks[i][1], g.mino.guideBlockId, true);
     }
 
-    // 共通部分の描画
+    // Drawing of common parts
+
     for(var i = 0; i < ghostGuideBlks.length; i++){
       DisplayBlock(ghostGuideBlks[i][0], ghostGuideBlks[i][1], String(g.mino.ghostGuideBlockId) + String(gCurMino.id), true);
     }
   }
 }
 /*----------------------------------------------------------------------------------------
- ☆★ ネクスト反映 ★☆
+ ☆★ Next reflect ★☆
 
- 空欄( 0 )か移動中のブロック( 11 〜 17 )の画像を表示します。1 マス下にずらします。
+ Displays images of blank spaces (0) or moving blocks (11 to 17). 1 Slide it down the square.
 ----------------------------------------------------------------------------------------*/
 function RefreshQueue(){
   var mino;
@@ -1108,7 +1402,8 @@ function RefreshQueue(){
     }
     i++;
   }
-  // 空欄
+  // blank
+
   while(i < NEXT_MINOS){
     for(var j = 0; j < 4; j++){
       for(var k = 0; k < 4; k++){
@@ -1119,9 +1414,9 @@ function RefreshQueue(){
   }
 }
 /*----------------------------------------------------------------------------------------
- ☆★ ホールド反映 ★☆
+ ☆★ Hold reflection ★☆
 
- 空欄( 0 )か移動中のブロック( 11 〜 17 )の画像を表示します。1 マス下にずらします。
+ Displays images of blank spaces (0) or moving blocks (11 to 17). 1 Slide it down the square.
 ----------------------------------------------------------------------------------------*/
 function RefreshHold(){
   var mino;
@@ -1135,7 +1430,8 @@ function RefreshHold(){
       }
     }
   }else{
-    // 空欄
+    // blank
+
     for(var j = 0; j < 4; j++){
       for(var k = 0; k < 4; k++){
         SetImage("h" + j + "_" + k, gBlocks[0].cache.src);
@@ -1145,7 +1441,7 @@ function RefreshHold(){
 
 }
 /*----------------------------------------------------------------------------------------
- ☆★ シーン: レッスン失敗 ★☆
+ ☆★ Scene: Lesson failure ★☆
 ----------------------------------------------------------------------------------------*/
 function ScenePerformFailed(){
   switch(gButton){
@@ -1156,7 +1452,7 @@ function ScenePerformFailed(){
   if(IsPressed()) gScene = 'perform';
 }
 /*----------------------------------------------------------------------------------------
- ☆★ シーン: ガイドモード ★☆
+ ☆★ Scene: Guide mode ★☆
 ----------------------------------------------------------------------------------------*/
 function ScenePerformGuideMode(){
   switch(gButton){
@@ -1167,7 +1463,7 @@ function ScenePerformGuideMode(){
   if(IsPressed()) gScene = 'perform';
 }
 /*----------------------------------------------------------------------------------------
- ☆★ シーン: クリア ★☆
+ ☆★ Scene: Clear ★☆
 ----------------------------------------------------------------------------------------*/
 function ScenePerformCleared(){
   switch(gButton){
@@ -1178,9 +1474,9 @@ function ScenePerformCleared(){
   if(IsPressed()) AfterClear();
 }
 /*----------------------------------------------------------------------------------------
- ☆★ クリア後のキー操作 ★☆
+ ☆★ Key operations after clearing ★☆
 
- 「問題10」ならばセクション一覧へ、それ以外なら次の問題に進みます。
+ If you are "Question 10", go to the section list, otherwise proceed to the next question.
 ----------------------------------------------------------------------------------------*/
 function AfterClear(){
   if(gCurProblemId >= gCurProgmeIdList.length - 1){
@@ -1194,18 +1490,25 @@ function AfterClear(){
   }
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 各キー名の取得 ★☆
+ ☆★ Get each key name ★☆
 ----------------------------------------------------------------------------------------*/
 function KeyL() {return gKeys[0]; }  // move Left
+
 function KeyR() {return gKeys[1]; }  // move Right
-function KeySD(){return gKeys[2]; }  // SoftDrop
-function KeyHD(){return gKeys[3]; }  // HardDrop
+
+function KeySD(){return gKeys[2]; }  // Soft drop
+
+function KeyHD(){return gKeys[3]; }  // Hard drop
+
 function KeyRR(){return gKeys[4]; }  // Rotate Right
+
 function KeyRL(){return gKeys[5]; }  // Rotate Left
+
 function KeyH() {return gKeys[6]; }  // Hold
+
 function KeyG() {return gKeys[7]; }  // Guide
 /*----------------------------------------------------------------------------------------
- ☆★ シーン: 設定 ★☆
+ ☆★ Scene: Settings ★☆
 ----------------------------------------------------------------------------------------*/
 function ScenePreferences(){
   switch(gButton){
@@ -1218,21 +1521,24 @@ function ScenePreferences(){
   }
 }
 /*----------------------------------------------------------------------------------------
- ☆★ 設定の保存 ★☆
+ ☆★ Saving settings ★☆
 
- 保存が成功したかどうかを返します。
+ Returns whether the save was successful.
 ----------------------------------------------------------------------------------------*/
 function SavePreferences(){
-  // 重複不可
+  // Repeat not
+
   if(KeyDuplicates()){
     alert("Duplicate keys.");
     return false;
   }
-  // 設定反映
+  // Settings Reflection
+
   for(var i = 0; i < gKeys.length; i++){
     gKeys[i] = document.getElementById(gSelectForms[i]).value;
   }
-  // クッキーに保存
+  // Store in cookies
+
   Save('MoveLeft', gKeys[0]);
   Save('MoveRight', gKeys[1]);
   Save('SoftDrop', gKeys[2]);
@@ -1244,9 +1550,9 @@ function SavePreferences(){
   return true;
 }
 /*----------------------------------------------------------------------------------------
- ☆★ キーが重複? ★☆
+ ☆★ Duplicate keys? ★☆
 
- 各セレクトボックスを確認して、重複があるかどうかを判定して返します。
+ Check each select box to determine if there are any duplicates and return it.
 ----------------------------------------------------------------------------------------*/
 function KeyDuplicates(){
   var target1, target2;
@@ -1259,3 +1565,4 @@ function KeyDuplicates(){
   }
   return false;
 }
+
