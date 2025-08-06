@@ -19,10 +19,8 @@ How To Delete:
 
 --------------------------------------------------------
 
-Credit Where Credit is Due:
+Credits
 
-TETR.IO & osk (https://TETR.IO/ & https://osk.sh/)
-	for block assets
 
 Davdav1233 (https://github.com/davdav1233/)
 	for whom this repo is forked from
