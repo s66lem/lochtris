@@ -1,7 +1,7 @@
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <title>Tetris PCO Trainer 84</title>
+  <title>Lochtris</title>
   <!--Load external css -->
   <link href="ttt.css" rel="stylesheet" type="text/css">
   <!--Please refer to each js file for detailed operation -->
@@ -9,7 +9,9 @@
   <script type="text/javascript" src="data.js"></script>
   <script type="text/javascript" src="problemData.js"></script>
   <script type="text/javascript" src="problem.js"></script>
-<script type="text/javascript" src="ttt.js"></script>
+  <script type="text/javascript" src="ttt.js"></script>
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
   <!--
   ■Note
   ・(Nothing in particular)
@@ -20,10 +22,10 @@
 
     <div id="list_sections" class="layer">
       <p id="title" class="center">
-        TETRIS PCO Trainer
+        Lochtris
       </p>
       <p class="subtitle">
-          <b><i>Originally created by <a href=https://github.com/sakuramochi84>sakuramochi84</a>, Translated & Refreshed by s6lem. </i></b>
+          <b><i>Originally created by <a href=https://github.com/sakuramochi84>Chotia</a>, Translated & Refreshed by s6lem. </i></b>
       </p>
 
       <p>
@@ -53,56 +55,56 @@
       </p>
       <!--If you edit a section, please also reflect it in the SectionTitle in data.js-->
       <p>
-        <p id="header">
+        <p class="section-group" id="group1">
           Introduction
         </p>
-        <input type="button" value="[1] Creating the Template (w/ Guide)" onClick="gButton='section1'">
+        <input type="button" id="section1" value="[1] Creating the Template (w/ Guide)" onClick="gButton='section1'">
         <img src="img/clear.png" class="clear" id="clear0"><br>
       </p>
       <p>
-        <p id="header">
+        <p class="section-group" id="group2">
         Vertical I-Mino Placement [61%]
         </p>
-        <input type="button" value="[2] Vertical I-Mino, 14 patterns (w/ Guide)" onClick="gButton='section2'">
+        <input type="button" id="section2"  value="[2] Vertical I-Mino, 14 patterns (w/ Guide)" onClick="gButton='section2'">
         <img src="img/clear.png" class="clear" id="clear1"><br>
-        <input type="button" value="[3] Vertical I-Mino, 20q" onClick="gButton='section3'">
+        <input type="button" id="section3"  value="[3] Vertical I-Mino, 20q" onClick="gButton='section3'">
         <img src="img/clear.png" class="clear" id="clear2"><br>
       </p>
 
       <p>
-      <p id= "header">
+      <p class="section-group" id="group3">
         Horizontal I-Mino Placement [84%]
       </p>
-        <input type="button" value="[4] I-Mino 1st Layer, 6 patterns (w/ Guide)" onClick="gButton='section4'">
+        <input type="button" id="section4"  value="[4] I-Mino 1st Layer, 6 patterns (w/ Guide)" onClick="gButton='section4'">
         <img src="img/clear.png" class="clear" id="clear3"><br>
 
-        <input type="button" value="[5] I-Mino 1st Layer, 20q" onClick="gButton='section5'">
+        <input type="button" id="section5"  value="[5] I-Mino 1st Layer, 20q" onClick="gButton='section5'">
         <img src="img/clear.png" class="clear" id="clear4"><br>
 
-        <input type="button" value="[6] I-Mino 3rd Layer, Flat Placement, 4 patterns (w/ Guide)" onClick="gButton='section6'">
+        <input type="button" id="section6"  value="[6] I-Mino 3rd Layer, Flat Placement, 4 patterns (w/ Guide)" onClick="gButton='section6'">
         <img src="img/clear.png" class="clear" id="clear5"><br>
 
-        <input type="button" value="[7] I-Mino 3rd Layer, Flat Placement, 20q" onClick="gButton='section7'">
+        <input type="button" id="section7"  value="[7] I-Mino 3rd Layer, Flat Placement, 20q" onClick="gButton='section7'">
         <img src="img/clear.png" class="clear" id="clear6"><br>
 
-        <input type="button" value="[8] IILO, 2 patterns (w/ Guide)" onClick="gButton='section8'">
+        <input type="button" id="section8"  value="[8] IILO, 2 patterns (w/ Guide)" onClick="gButton='section8'">
         <img src="img/clear.png" class="clear" id="clear7"><br>
 
-        <input type="button" value="[9] IILO, 10q" onClick="gButton='section9'">
+        <input type="button" id="section9"  value="[9] IILO, 10q" onClick="gButton='section9'">
         <img src="img/clear.png" class="clear" id="clear8"><br>
 
-        <input type="button" value="[10] 3rd Layer I-Mino, 3 patterns (w/ Guide)" onClick="gButton='section10'">
+        <input type="button" id="section10"  value="[10] 3rd Layer I-Mino, 3 patterns (w/ Guide)" onClick="gButton='section10'">
         <img src="IMG/Clear.png" class="Clear" ID="Clear9"><br>
-        <input type="button" value="[11] 3rd Layer I-Mino, 20q" onclick="gButton='section11'">
+        <input type="button" id="section11"  value="[11] 3rd Layer I-Mino, 20q" onclick="gButton='section11'">
         <img src="IMG/Clear.png" class="Clear" ID="Clear10"><br>
 
       </p>
 
       <p>
-        <p id="header"> 
+        <p class="section-group" id="group4"> 
           Horizontal I-Mino Summary
         </p>
-        <input type="button" value="[12] Midterm Test 20q" onClick="gButton='section12'">
+        <input type="button" id="section12"  value="[12] Midterm Test 20q" onClick="gButton='section12'">
         <img src="img/clear.png" class="clear" id="clear11"><br>
       </p>
 
@@ -112,50 +114,50 @@ combos for a perfect clear, <br>
           If you have the energy, try learning the last combo, LSIO types. <br>
       </p>
       <p>
-        <p id="header">
+        <p class="section-group" id="group5">
         LSIO type [84.6%]
         </p>
-        <input type="button" value="[13] LSIO type 1 pattern (w/ Guide)" onClick="gButton='section13'">
+        <input type="button" id="section13"  value="[13] LSIO type 1 pattern (w/ Guide)" onClick="gButton='section13'">
         <img src="img/clear.png" class="clear" id="clear12"><br>
 
-        <input type="button" value="[14] LSIO type 12q" onClick="gButton='section14'">
+        <input type="button" id="section14"  value="[14] LSIO type 12q" onClick="gButton='section14'">
         <img src="img/clear.png" class="clear" id="clear13"><br>
 
       </p>
 
       <p>
-        <p id="header">
+        <p class="section-group" id="group6">
           Summary
         </p>
 
-        <input type="button" value="[15] Final Exam, 30q" onClick="gButton='section15'">
+        <input type="button" id="section15"  value="[15] Final Exam, 30q" onClick="gButton='section15'">
 <img src="img/clear.png" class="clear" id="clear14"><br>
 
-        <input type="button" value="[16] Graduation test (+mirror q's) 100q" onClick="gButton='section16'">
+        <input type="button" id="section16"  value="[16] Graduation test (+mirror q's) 100q" onClick="gButton='section16'">
         <img src="img/clear.png" class="clear" id="clear15"><br>
       </p>
       <p>
-        <p id="header">
+        <p class="section-group" id="group7">
           Bonus
         </p>
-        <input type="button" value="[17] Skimming Patterns" onClick="gButton='section17'">
+        <input type="button" id="section17"  value="[17] Skimming Patterns" onClick="gButton='section17'">
         <img src="img/clear.png" class="clear" id="clear16"><br>
 
-        <input type="button" value="[18] Vertical I-Mino, 514q" onClick="gButton='section18'">
+        <input type="button" id="section18"  value="[18] Vertical I-Mino, 514q" onClick="gButton='section18'">
         <img src="img/clear.png" class="clear" id="clear17"><br>
 
-        <input type="button" value="[19] Horizontal I-Mino, 196q" onClick="gButton='section19'">
+        <input type="button" id="section19"  value="[19] Horizontal I-Mino, 196q" onClick="gButton='section19'">
         <img src="img/clear.png" class="clear" id="clear18"><br>
-        <input type="button" value="[20] All 711q" onclick="gButton='section20'">
+        <input type="button" id="section20"  value="[20] All 711q" onclick="gButton='section20'">
         <img src="img/clear.png" class="clear" id="clear19"><br>
 
-        <input type="button" value="[21] 711q mirror (Not Checked)" onclick="gButton='section21'">
+        <input type="button" id="section21"  value="[21] 711q mirror (Not Checked)" onclick="gButton='section21'">
         <img src="img/clear.png" class="clear" id="clear20"><br>
       </p>
 
       <p>
-        ■Adult<br>
-        <a href="https://form1ssl.fc2.com/form/?id=685FCA71E208118a">chotia</a><br>
+        ■ Contributors <br>
+        <a href="https://form1ssl.fc2.com/form/?id=685FCA71E208118a">Chotia</a><br>
       </p>
       <p>
         ■Reference sites and topics<br>
@@ -171,6 +173,8 @@ combos for a perfect clear, <br>
       <a href="http://www.tetr.io/">TETR.IO</a><br>
       <a href="https://www.youtube.com/watch?v=Lf0y3dZXXbk">9 Beginner Tips for TETR.IO! (sec)</a><br>
       <a href="https://youtube.com/playlist?list=PLYU_jykh138wCGC-omwpyqHxkVeJAiUWD&si=av2YPlND9prTeZBd">Complete Guide to TETR.IO (KezDaBez)</a><br>
+      <br>
+      <br>
       </p>
     </div>
     <div id="list_problems" class="layer">
@@ -182,7 +186,7 @@ combos for a perfect clear, <br>
         <input type="button" id="prob1" value="" onClick="gButton='problem2'"><br>
       </p>
       <p>
-        <input type="button" value="←前" onClick="gButton='previous'">　
+        <input type="button" value="←前" onClick="gButton='previous'">
         <input type="button" value="次→" onClick="gButton='next'">
       </p>
       <p>
@@ -361,272 +365,63 @@ combos for a perfect clear, <br>
         <!-- LOCK TIMER -->
         <!-- LOCK TIMER -->
         <!-- LOCK TIMER -->
-        <div id="lock_timer_container" style="width: 241.99px; height: 2px; background-color: #444; margin-top: 10px; margin-left: 66px;">
-        <div id="lock_timer_bar" style="width: 241.99px; height: 2px; background-color: #888;"></div>
+        <div id="pip-grid" style="display: flex; margin-left: 70px; gap: 6.43px; margin-top: 5px;"></div>
+        <div id="lock_timer_container" style="width: 239.98px; height: 2px; background-color: #444; margin-top: 10px; margin-left: 70px;">
+        <div id="lock_timer_bar" style="width: 239.98px; height: 2px; background-color: #888;"></div>
 </div>
       </div>
 
-      <div id="preferences" class="layer">
+
+      <div id="preferences" class="layer prefs-container">
+        <div class="key-setting-row"><span>Move Left</span><button id="key_left_btn" type="button">ARROWLEFT</button></div>
+        <div class="key-setting-row"><span>Move Right</span><button id="key_right_btn" type="button">ARROWRIGHT</button></div>
+        <div class="key-setting-row"><span>Soft Drop</span><button id="key_softdrop_btn" type="button">ARROWDOWN</button></div>
+        <div class="key-setting-row"><span>Hard Drop</span><button id="key_harddrop_btn" type="button">SPACE</button></div>
+        <div class="key-setting-row"><span>Rotate Clockwise</span><button id="key_rot_right_btn" type="button">CTRL</button></div>
+        <div class="key-setting-row"><span>Rotate Counterclockwise</span><button id="key_rot_left_btn" type="button">ARROWUP</button></div>
+        <div class="key-setting-row"><span>Rotate 180 (WIP)</span><button id="key_rot_180_btn" type="button">SHIFT</button></div>
+        <div class="key-setting-row"><span>Hold</span><button id="key_hold_btn" type="button">C</button></div>
+        <div class="key-setting-row"><span>See Guide</span><button id="key_guide_btn" type="button">G</button></div>
         <p>
-          Move Left ・・・・・・ <select id="key_left">
-            <option value="0">0</option><option value="1">1</option><option value="2">2</option>
-            <option value="3">3</option><option value="4">4</option><option value="5">5</option>
-            <option value="6">6</option><option value="7">7</option><option value="8">8</option>
-            <option value="9">9</option><option value="A">A</option><option value="B">B</option>
-            <option value="C">C</option><option value="D">D</option><option value="E">E</option>
-            <option value="F">F</option><option value="G">G</option><option value="H">H</option>
-            <option value="I">I</option><option value="J">J</option><option value="K">K</option>
-            <option value="L">L</option><option value="M">M</option><option value="N">N</option>
-            <option value="O">O</option><option value="P">P</option><option value="Q">Q</option>
-            <option value="R">R</option><option value="S">S</option><option value="T">T</option>
-            <option value="U">U</option><option value="V">V</option><option value="W">W</option>
-            <option value="X">X</option><option value="Y">Y</option><option value="Z">Z</option>
-            <option value="-">-</option><option value="^">^</option><option value="¥¥">¥</option>
-            <option value="@">@</option><option value="[">[</option><option value=";">;</option>
-            <option value=":">:</option><option value="]">]</option><option value=",">,</option>
-            <option value=".">.</option><option value="/">/</option><option value="+">+</option>
-            <option value="*">*</option><option value="Space">Space</option>
-            <option value="Enter">Enter</option><option value="Tab">Tab</option>
-            <option value="Shift">Shift</option><option value="Ctrl">Ctrl</option>
-            <option value="Alt">Alt</option><option value="Esc">Esc</option>
-            <option value="Backspace">Backspace</option><option value="Insert">Insert</option>
-            <option value="Delete">Delete</option><option value="F1">F1</option>
-            <option value="F2">F2</option><option value="F3">F3</option>
-            <option value="F4">F4</option><option value="F5">F5</option>
-            <option value="F6">F6</option><option value="F7">F7</option>
-            <option value="F8">F8</option><option value="F9">F9</option>
-            <option value="F10">F10</option><option value="F11">F11</option>
-            <option value="F12">F12</option><option value="Up">↑</option>
-            <option value="Left">←</option><option value="Right">→</option>
-            <option value="Down">↓</option>
-          </select><br>
-          Move Right・・・・・・ <select id="key_right">
-            <option value="0">0</option><option value="1">1</option><option value="2">2</option>
-            <option value="3">3</option><option value="4">4</option><option value="5">5</option>
-            <option value="6">6</option><option value="7">7</option><option value="8">8</option>
-            <option value="9">9</option><option value="A">A</option><option value="B">B</option>
-            <option value="C">C</option><option value="D">D</option><option value="E">E</option>
-            <option value="F">F</option><option value="G">G</option><option value="H">H</option>
-            <option value="I">I</option><option value="J">J</option><option value="K">K</option>
-            <option value="L">L</option><option value="M">M</option><option value="N">N</option>
-            <option value="O">O</option><option value="P">P</option><option value="Q">Q</option>
-            <option value="R">R</option><option value="S">S</option><option value="T">T</option>
-            <option value="U">U</option><option value="V">V</option><option value="W">W</option>
-            <option value="X">X</option><option value="Y">Y</option><option value="Z">Z</option>
-            <option value="-">-</option><option value="^">^</option><option value="¥¥">¥</option>
-            <option value="@">@</option><option value="[">[</option><option value=";">;</option>
-            <option value=":">:</option><option value="]">]</option><option value=",">,</option>
-            <option value=".">.</option><option value="/">/</option><option value="+">+</option>
-            <option value="*">*</option><option value="Space">Space</option>
-            <option value="Enter">Enter</option><option value="Tab">Tab</option>
-            <option value="Shift">Shift</option><option value="Ctrl">Ctrl</option>
-            <option value="Alt">Alt</option><option value="Esc">Esc</option>
-            <option value="Backspace">Backspace</option><option value="Insert">Insert</option>
-            <option value="Delete">Delete</option><option value="F1">F1</option>
-            <option value="F2">F2</option><option value="F3">F3</option>
-            <option value="F4">F4</option><option value="F5">F5</option>
-            <option value="F6">F6</option><option value="F7">F7</option>
-            <option value="F8">F8</option><option value="F9">F9</option>
-            <option value="F10">F10</option><option value="F11">F11</option>
-            <option value="F12">F12</option><option value="Up">↑</option>
-            <option value="Left">←</option><option value="Right">→</option>
-            <option value="Down">↓</option>
-          </select><br>
-          Soft Drop ・・・・・・ <select id="key_softdrop">
-            <option value="0">0</option><option value="1">1</option><option value="2">2</option>
-            <option value="3">3</option><option value="4">4</option><option value="5">5</option>
-            <option value="6">6</option><option value="7">7</option><option value="8">8</option>
-            <option value="9">9</option><option value="A">A</option><option value="B">B</option>
-            <option value="C">C</option><option value="D">D</option><option value="E">E</option>
-            <option value="F">F</option><option value="G">G</option><option value="H">H</option>
-            <option value="I">I</option><option value="J">J</option><option value="K">K</option>
-            <option value="L">L</option><option value="M">M</option><option value="N">N</option>
-            <option value="O">O</option><option value="P">P</option><option value="Q">Q</option>
-            <option value="R">R</option><option value="S">S</option><option value="T">T</option>
-            <option value="U">U</option><option value="V">V</option><option value="W">W</option>
-            <option value="X">X</option><option value="Y">Y</option><option value="Z">Z</option>
-            <option value="-">-</option><option value="^">^</option><option value="¥¥">¥</option>
-            <option value="@">@</option><option value="[">[</option><option value=";">;</option>
-            <option value=":">:</option><option value="]">]</option><option value=",">,</option>
-            <option value=".">.</option><option value="/">/</option><option value="+">+</option>
-            <option value="*">*</option><option value="Space">Space</option>
-            <option value="Enter">Enter</option><option value="Tab">Tab</option>
-            <option value="Shift">Shift</option><option value="Ctrl">Ctrl</option>
-            <option value="Alt">Alt</option><option value="Esc">Esc</option>
-            <option value="Backspace">Backspace</option><option value="Insert">Insert</option>
-            <option value="Delete">Delete</option><option value="F1">F1</option>
-            <option value="F2">F2</option><option value="F3">F3</option>
-            <option value="F4">F4</option><option value="F5">F5</option>
-            <option value="F6">F6</option><option value="F7">F7</option>
-            <option value="F8">F8</option><option value="F9">F9</option>
-            <option value="F10">F10</option><option value="F11">F11</option>
-            <option value="F12">F12</option><option value="Up">↑</option>
-            <option value="Left">←</option><option value="Right">→</option>
-            <option value="Down">↓</option>
-          </select><br>
-          Hard Drop ・・・・・・ <select id="key_harddrop">
-            <option value="0">0</option><option value="1">1</option><option value="2">2</option>
-            <option value="3">3</option><option value="4">4</option><option value="5">5</option>
-            <option value="6">6</option><option value="7">7</option><option value="8">8</option>
-            <option value="9">9</option><option value="A">A</option><option value="B">B</option>
-            <option value="C">C</option><option value="D">D</option><option value="E">E</option>
-            <option value="F">F</option><option value="G">G</option><option value="H">H</option>
-            <option value="I">I</option><option value="J">J</option><option value="K">K</option>
-            <option value="L">L</option><option value="M">M</option><option value="N">N</option>
-            <option value="O">O</option><option value="P">P</option><option value="Q">Q</option>
-            <option value="R">R</option><option value="S">S</option><option value="T">T</option>
-            <option value="U">U</option><option value="V">V</option><option value="W">W</option>
-            <option value="X">X</option><option value="Y">Y</option><option value="Z">Z</option>
-            <option value="-">-</option><option value="^">^</option><option value="¥¥">¥</option>
-            <option value="@">@</option><option value="[">[</option><option value=";">;</option>
-            <option value=":">:</option><option value="]">]</option><option value=",">,</option>
-            <option value=".">.</option><option value="/">/</option><option value="+">+</option>
-            <option value="*">*</option><option value="Space">Space</option>
-            <option value="Enter">Enter</option><option value="Tab">Tab</option>
-            <option value="Shift">Shift</option><option value="Ctrl">Ctrl</option>
-            <option value="Alt">Alt</option><option value="Esc">Esc</option>
-            <option value="Backspace">Backspace</option><option value="Insert">Insert</option>
-            <option value="Delete">Delete</option><option value="F1">F1</option>
-            <option value="F2">F2</option><option value="F3">F3</option>
-            <option value="F4">F4</option><option value="F5">F5</option>
-            <option value="F6">F6</option><option value="F7">F7</option>
-            <option value="F8">F8</option><option value="F9">F9</option>
-            <option value="F10">F10</option><option value="F11">F11</option>
-            <option value="F12">F12</option><option value="Up">↑</option>
-            <option value="Left">←</option><option value="Right">→</option>
-            <option value="Down">↓</option>
-          </select><br>
-          Rotate CW ・・・・・・ <select id="key_rot_right">
-            <option value="0">0</option><option value="1">1</option><option value="2">2</option>
-            <option value="3">3</option><option value="4">4</option><option value="5">5</option>
-            <option value="6">6</option><option value="7">7</option><option value="8">8</option>
-            <option value="9">9</option><option value="A">A</option><option value="B">B</option>
-            <option value="C">C</option><option value="D">D</option><option value="E">E</option>
-            <option value="F">F</option><option value="G">G</option><option value="H">H</option>
-            <option value="I">I</option><option value="J">J</option><option value="K">K</option>
-            <option value="L">L</option><option value="M">M</option><option value="N">N</option>
-            <option value="O">O</option><option value="P">P</option><option value="Q">Q</option>
-            <option value="R">R</option><option value="S">S</option><option value="T">T</option>
-            <option value="U">U</option><option value="V">V</option><option value="W">W</option>
-            <option value="X">X</option><option value="Y">Y</option><option value="Z">Z</option>
-            <option value="-">-</option><option value="^">^</option><option value="¥¥">¥</option>
-            <option value="@">@</option><option value="[">[</option><option value=";">;</option>
-            <option value=":">:</option><option value="]">]</option><option value=",">,</option>
-            <option value=".">.</option><option value="/">/</option><option value="+">+</option>
-            <option value="*">*</option><option value="Space">Space</option>
-            <option value="Enter">Enter</option><option value="Tab">Tab</option>
-            <option value="Shift">Shift</option><option value="Ctrl">Ctrl</option>
-            <option value="Alt">Alt</option><option value="Esc">Esc</option>
-            <option value="Backspace">Backspace</option><option value="Insert">Insert</option>
-            <option value="Delete">Delete</option><option value="F1">F1</option>
-            <option value="F2">F2</option><option value="F3">F3</option>
-            <option value="F4">F4</option><option value="F5">F5</option>
-            <option value="F6">F6</option><option value="F7">F7</option>
-            <option value="F8">F8</option><option value="F9">F9</option>
-            <option value="F10">F10</option><option value="F11">F11</option>
-            <option value="F12">F12</option><option value="Up">↑</option>
-            <option value="Left">←</option><option value="Right">→</option>
-            <option value="Down">↓</option>
-          </select><br>
-          Rotate CCW・・・・・・ <select id="key_rot_left">
-            <option value="0">0</option><option value="1">1</option><option value="2">2</option>
-            <option value="3">3</option><option value="4">4</option><option value="5">5</option>
-            <option value="6">6</option><option value="7">7</option><option value="8">8</option>
-            <option value="9">9</option><option value="A">A</option><option value="B">B</option>
-            <option value="C">C</option><option value="D">D</option><option value="E">E</option>
-            <option value="F">F</option><option value="G">G</option><option value="H">H</option>
-            <option value="I">I</option><option value="J">J</option><option value="K">K</option>
-            <option value="L">L</option><option value="M">M</option><option value="N">N</option>
-            <option value="O">O</option><option value="P">P</option><option value="Q">Q</option>
-            <option value="R">R</option><option value="S">S</option><option value="T">T</option>
-            <option value="U">U</option><option value="V">V</option><option value="W">W</option>
-            <option value="X">X</option><option value="Y">Y</option><option value="Z">Z</option>
-            <option value="-">-</option><option value="^">^</option><option value="¥¥">¥</option>
-            <option value="@">@</option><option value="[">[</option><option value=";">;</option>
-            <option value=":">:</option><option value="]">]</option><option value=",">,</option>
-            <option value=".">.</option><option value="/">/</option><option value="+">+</option>
-            <option value="*">*</option><option value="Space">Space</option>
-            <option value="Enter">Enter</option><option value="Tab">Tab</option>
-            <option value="Shift">Shift</option><option value="Ctrl">Ctrl</option>
-            <option value="Alt">Alt</option><option value="Esc">Esc</option>
-            <option value="Backspace">Backspace</option><option value="Insert">Insert</option>
-            <option value="Delete">Delete</option><option value="F1">F1</option>
-            <option value="F2">F2</option><option value="F3">F3</option>
-            <option value="F4">F4</option><option value="F5">F5</option>
-            <option value="F6">F6</option><option value="F7">F7</option>
-            <option value="F8">F8</option><option value="F9">F9</option>
-            <option value="F10">F10</option><option value="F11">F11</option>
-            <option value="F12">F12</option><option value="Up">↑</option>
-            <option value="Left">←</option><option value="Right">→</option>
-            <option value="Down">↓</option>
-          </select><br>
-          Hold Mino ・・・・・・ <select id="key_hold">
-            <option value="0">0</option><option value="1">1</option><option value="2">2</option>
-            <option value="3">3</option><option value="4">4</option><option value="5">5</option>
-            <option value="6">6</option><option value="7">7</option><option value="8">8</option>
-            <option value="9">9</option><option value="A">A</option><option value="B">B</option>
-            <option value="C">C</option><option value="D">D</option><option value="E">E</option>
-            <option value="F">F</option><option value="G">G</option><option value="H">H</option>
-            <option value="I">I</option><option value="J">J</option><option value="K">K</option>
-            <option value="L">L</option><option value="M">M</option><option value="N">N</option>
-            <option value="O">O</option><option value="P">P</option><option value="Q">Q</option>
-            <option value="R">R</option><option value="S">S</option><option value="T">T</option>
-            <option value="U">U</option><option value="V">V</option><option value="W">W</option>
-            <option value="X">X</option><option value="Y">Y</option><option value="Z">Z</option>
-            <option value="-">-</option><option value="^">^</option><option value="¥¥">¥</option>
-            <option value="@">@</option><option value="[">[</option><option value=";">;</option>
-            <option value=":">:</option><option value="]">]</option><option value=",">,</option>
-            <option value=".">.</option><option value="/">/</option><option value="+">+</option>
-            <option value="*">*</option><option value="Space">Space</option>
-            <option value="Enter">Enter</option><option value="Tab">Tab</option>
-            <option value="Shift">Shift</option><option value="Ctrl">Ctrl</option>
-            <option value="Alt">Alt</option><option value="Esc">Esc</option>
-            <option value="Backspace">Backspace</option><option value="Insert">Insert</option>
-            <option value="Delete">Delete</option><option value="F1">F1</option>
-            <option value="F2">F2</option><option value="F3">F3</option>
-            <option value="F4">F4</option><option value="F5">F5</option>
-            <option value="F6">F6</option><option value="F7">F7</option>
-            <option value="F8">F8</option><option value="F9">F9</option>
-            <option value="F10">F10</option><option value="F11">F11</option>
-            <option value="F12">F12</option><option value="Up">↑</option>
-            <option value="Left">←</option><option value="Right">→</option>
-            <option value="Down">↓</option>
-          </select><br>
-          See Guide ・・・・・・ <select id="key_guide">
-            <option value="0">0</option><option value="1">1</option><option value="2">2</option>
-            <option value="3">3</option><option value="4">4</option><option value="5">5</option>
-            <option value="6">6</option><option value="7">7</option><option value="8">8</option>
-            <option value="9">9</option><option value="A">A</option><option value="B">B</option>
-            <option value="C">C</option><option value="D">D</option><option value="E">E</option>
-            <option value="F">F</option><option value="G">G</option><option value="H">H</option>
-            <option value="I">I</option><option value="J">J</option><option value="K">K</option>
-            <option value="L">L</option><option value="M">M</option><option value="N">N</option>
-            <option value="O">O</option><option value="P">P</option><option value="Q">Q</option>
-            <option value="R">R</option><option value="S">S</option><option value="T">T</option>
-            <option value="U">U</option><option value="V">V</option><option value="W">W</option>
-            <option value="X">X</option><option value="Y">Y</option><option value="Z">Z</option>
-            <option value="-">-</option><option value="^">^</option><option value="¥¥">¥</option>
-            <option value="@">@</option><option value="[">[</option><option value=";">;</option>
-            <option value=":">:</option><option value="]">]</option><option value=",">,</option>
-            <option value=".">.</option><option value="/">/</option><option value="+">+</option>
-            <option value="*">*</option><option value="Space">Space</option>
-            <option value="Enter">Enter</option><option value="Tab">Tab</option>
-            <option value="Shift">Shift</option><option value="Ctrl">Ctrl</option>
-            <option value="Alt">Alt</option><option value="Esc">Esc</option>
-            <option value="Backspace">Backspace</option><option value="Insert">Insert</option>
-            <option value="Delete">Delete</option><option value="F1">F1</option>
-            <option value="F2">F2</option><option value="F3">F3</option>
-            <option value="F4">F4</option><option value="F5">F5</option>
-            <option value="F6">F6</option><option value="F7">F7</option>
-            <option value="F8">F8</option><option value="F9">F9</option>
-            <option value="F10">F10</option><option value="F11">F11</option>
-            <option value="F12">F12</option><option value="Up">↑</option>
-            <option value="Left">←</option><option value="Right">→</option>
-            <option value="Down">↓</option>
-          </select><br>
+         <div class="slider-setting-row">
+          <label for="arr_slider" class="slider-label" style="margin-right:10px;" title="Automatic Repeat Rate: # of Frames between repeated movement after DAS.">ARR</label>
+          <input type="range" class="slider" id="arr_slider" min="0.0" max="5.0" value="3.0" step="0.1" />
+          <span class="slider-value-label">
+            <span class="slider-value" id="arr_value">3</span>F
+          </span>
+        </div>
+          <div class="slider-setting-row">
+          <label for="das_slider" class="slider-label" style="margin-right:10px;" title="Delayed Auto Shift: # of Frames between initial movement press and automatic repeat.">DAS</label>
+          <input type="range" class="slider" id="das_slider" min="1.0" max="20.0" value="9.0" step="0.1" />
+          <span class="slider-value-label">
+            <span class="slider-value" id="das_value">9</span>F
+          </span>
+        </div>
+        <div class="slider-setting-row">
+          <label for="sdf_slider" class="slider-label" style="margin-right:10px;" title="Soft Drop Factor: Factor by which gravity is changed when soft dropping.">SDF</label>
+          <input type="range" class="slider" id="sdf_slider" min="5" max="40" value="10" />
+          <span class="slider-value-label">
+            <span class="slider-value" id="sdf_value">10</span>x
+          </span>
+        </div>
         </p>
-        <input type="button" value="Apply" onClick="gButton='ok'">
-        <input type="button" value="Cancel" onClick="gButton='cancel'">
+        <p>
+          <input type="button" value="Apply" class="prefs-appcan" onClick="gButton='ok'">
+          <input type="button" value="Cancel" class="prefs-appcan" onClick="gButton='cancel'">
+        </p>
+      </div>
+        <!-- <div class="input-boxes button-container" style="text-align: left;">
+          <p>
+            <button id="key_left_btn" type="button">ARROWLEFT</button><br>
+            <button id="key_right_btn" type="button">ARROWRIGHT</button><br>
+            <button id="key_softdrop_btn" type="button">ARROWDOWN</button><br>
+            <button id="key_harddrop_btn" type="button">SPACE</button><br>
+            <button id="key_rot_left_btn" type="button">ARROWUP</button><br>
+            <button id="key_rot_right_btn" type="button">CTRL</button><br>
+            <button id="key_hold_btn" type="button">C</button><br>
+            <button id="key_guide_btn" type="button">G</button><br>
+          </p>
+        </div> -->
       </div>
 
     </form>

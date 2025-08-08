@@ -12,7 +12,7 @@ var MATRIX_HEIGHT = 23;              // Number of vertical blocks in the matrix.
 
 var SOFT_DROP_SPAN = 1;              // <Frame> Time to proceed to 1 square with soft drop
 
-var NATURAL_DROP_SPAN = 36;          // <Frame> Time to advance to 1 square when natural falls
+var NATURAL_DROP_SPAN = 50;          // <Frame> Time to advance to 1 square when natural falls
 
 var LINE_CLEAR_DURATION = 15;        // <Frame> Line Erase Performance Time
 
@@ -43,10 +43,15 @@ var DEFAULT_KEY_MOVE_LEFT    = 'Left';
 var DEFAULT_KEY_MOVE_RIGHT   = 'Right';
 var DEFAULT_KEY_SOFTDROP     = 'Down';
 var DEFAULT_KEY_HARDDROP     = 'Space';
-var DEFAULT_KEY_ROTATE_RIGHT = 'Up';
-var DEFAULT_KEY_ROTATE_LEFT  = 'Ctrl';
+var DEFAULT_KEY_ROTATE_RIGHT = 'Ctrl';
+var DEFAULT_KEY_ROTATE_LEFT  = 'Up';
 var DEFAULT_KEY_HOLD         = 'C';
 var DEFAULT_KEY_GUIDE        = 'R';
+var DEFAULT_KEY_ROTATE_180  = 'Shift'; 
+var DEFAULT_DAS = 9;
+var DEFAULT_ARR = 3;
+var DEFAULT_SDF = 15; // Soft drop speed
+
 
 var DUMP_GUIDE_DATA = true;            // For guide array dump
 
@@ -135,7 +140,8 @@ function BlkVanishing(){return gBlocks[2] }
 function RotRuleGen(){
   // [Rotation direction (0=right, 1=left)][Mode of mino before rotation (0=on appearance, 1=right, 2=reverse, 3=left)][Rule ID]
 
-  this.dx = [[[0, -1, -1,  0, -1],    // i → r
+  this.dx = 
+  [[[0, -1, -1,  0, -1],    // i → r
 
   [0,  1,  1,  0,  1],    // r → v
 
@@ -166,6 +172,22 @@ function RotRuleGen(){
   [0,  0, -1,  2,  2],    // v → r
 
   [0,  0,  1, -2, -2]]];  // l → v
+
+  this.dx180 = [
+  // [from][rule#]
+  // 0: spawn→rev, 1: right→left, 2: rev→spawn, 3: left→right
+  [0,  1, -1,  0,  2, -2,  1, -1,  0], // 0->2
+  [0,  1, -1,  0,  2, -2,  1, -1,  0], // 1->3
+  [0,  1, -1,  0,  2, -2,  1, -1,  0], // 2->0
+  [0,  1, -1,  0,  2, -2,  1, -1,  0], // 3->1
+  ];
+  this.dy180 = [
+  [0,  0,  0,  1,  0,  0, -1, -1, -2], // 0->2
+  [0,  0,  0, -1,  0,  0,  1,  1,  2], // 1->3
+  [0,  0,  0, -1,  0,  0,  1,  1,  2], // 2->0
+  [0,  0,  0,  1,  0,  0, -1, -1, -2], // 3->1
+  ];
+
 
   return this;
 }
@@ -206,6 +228,21 @@ function RotRuleI(){
   [0,  0,  0,  2, -1],    // v → r
 
   [0,  0,  0,  1, -2]]];  // l → v
+
+  this.dx180 = [
+  [0, -2,  1, -2,  1,  0,  0,  0,  0], // 0->2
+  [0,  2, -1,  2, -1,  0,  0,  0,  0], // 1->3
+  [0,  2, -1,  2, -1,  0,  0,  0,  0], // 2->0
+  [0, -2,  1, -2,  1,  0,  0,  0,  0], // 3->1
+  ];
+  this.dy180 = [
+  [0,  0,  0,  1, -1,  2, -2,  3, -3], // 0->2
+  [0,  0,  0, -1,  1, -2,  2, -3,  3], // 1->3
+  [0,  0,  0, -1,  1, -2,  2, -3,  3], // 2->0
+  [0,  0,  0,  1, -1,  2, -2,  3, -3], // 3->1
+];
+
+
 
   return this;
 }

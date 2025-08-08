@@ -24,10 +24,10 @@ var gPrevScene;       // Scene name in the previous frame ( PREVious SCENE )
 var gKeys;            // Key name
 
 var gSelectForms = ['key_left', 'key_right', 'key_softdrop', 'key_harddrop',
-                    'key_rot_right', 'key_rot_left' , 'key_hold' , 'key_guide'];  // キー選択ボックスの名前
+                    'key_rot_right', 'key_rot_left' , 'key_hold' , 'key_guide', 'key_rot_180'];  // Key Selection Box Name
 /*
- キーを追加する際には LoadData() および SavePreferences() への追加、また Key**() (キー名の
- 取得メソッド)および設定セレクトボックスの追加を忘れないでください。
+ When adding keys, you can add them to LoadData() and SavePreferences() and also to Key**() (the key name
+ Don't forget to add the get method) and the setting select box。
 */
 
 var gCurSectionId;    // Section ID for Selected (CURrent)
@@ -64,19 +64,15 @@ var gRens;            // Ongoing REN (Combo) number
 
 var gIsReadyToB2b;    // Could the next be BACK to BACK?
 
-
-// Lock delay variables
-var gLockDelayTimer = 0;        // Tracks frames since lock delay started
-var gLockDelayInputs = 0;       // Tracks inputs during lock delay
-var gIsLockDelayActive = false; // Whether lock delay is currently active
-var gWasFloorkicked = false; // Whether the last move was a floorkick
+var gIsEditingSlider = false;
 
 // lock delay vars 2 cause i fucking HATE JAVASCRIPT FUCK YOU JAVASCRIPT DIE
 var lockDelay = 0;                              // frames since piece landed
 var lockDelayLimit = LOCK_DELAY_DURATION;       // max frames before locking
 var manipulations = 0;                          // number of inputs after reaching lowestY
 var manipulationLimit = LOCK_DELAY_INPUTMAX;    // max inputs before locking
-var lowestY = 100;                              // tracks lowest y pos the mino has reached
+var lowestY = 0;                              // tracks lowest y pos the mino has reached
+
 
 /*----------------------------------------------------------------------------------------
  ☆★ Access settings for each problem ★☆
@@ -102,6 +98,142 @@ function Setup(){
   gScene = 'select_section';
   LoadData();
 }
+
+function SetupSliderDisplays() {
+  const dasSlider = document.getElementById('das_slider');
+  const arrSlider = document.getElementById('arr_slider');
+  const sdfSlider = document.getElementById('sdf_slider');
+  const dasValue = document.getElementById('das_value');
+  const arrValue = document.getElementById('arr_value');
+  const sdfValue = document.getElementById('sdf_value');
+
+
+  if (dasSlider) {
+    const invertedDas = parseFloat(dasSlider.max) - window.KEY_CHARGE_DURATION + parseFloat(dasSlider.min);
+    dasSlider.value = invertedDas;
+  }
+  if (arrSlider) {
+    const invertedArr = parseFloat(arrSlider.max) - window.KEY_REPEAT_SPAN + parseFloat(arrSlider.min);
+    arrSlider.value = invertedArr;
+  }
+  if (sdfSlider) {
+    sdfSlider.value = window.SOFT_DROP_FACTOR;
+  }
+
+  if (dasSlider && dasValue) {
+    dasSlider.oninput = function() {
+      const invertedValue = parseFloat(this.max) - parseFloat(this.value) + parseFloat(this.min);
+      dasValue.innerHTML = `<span class="slider-value-number">${invertedValue.toFixed(1)}</span>`;
+    };
+    dasValue.innerHTML = `<span class="slider-value-number">${window.KEY_CHARGE_DURATION.toFixed(1)}</span>`;
+  }
+
+  if (arrSlider && arrValue) {
+    arrSlider.oninput = function() {
+      const invertedValue = parseFloat(this.max) - parseFloat(this.value) + parseFloat(this.min);
+      arrValue.innerHTML = `<span class="slider-value-number">${invertedValue.toFixed(1)}</span>`;
+    };
+    arrValue.innerHTML = `<span class="slider-value-number">${window.KEY_REPEAT_SPAN.toFixed(1)}</span>`;
+  }
+
+  if (sdfSlider && sdfValue) {
+    sdfSlider.oninput = function() {
+      sdfValue.innerHTML = `<span class="slider-value-number">${this.value}</span>`;
+    };
+    sdfValue.innerHTML = `<span class="slider-value-number">${window.SOFT_DROP_FACTOR}</span>`;
+  }
+  
+  makeSliderValueEditable('arr_slider', 'arr_value', 0.0, 5.0, 0.1);
+  makeSliderValueEditable('das_slider', 'das_value', 1.0, 20.0, 0.1);
+  makeSliderValueEditable('sdf_slider', 'sdf_value', 5, 40, 1);
+}
+
+function makeSliderValueEditable(sliderId, valueId, min, max, step) {
+  const slider = document.getElementById(sliderId);
+  const valueSpan = document.getElementById(valueId);
+
+  if (!slider || !valueSpan) return;
+
+  valueSpan.addEventListener('click', function() {
+    // Prevent multiple inputs
+    if (valueSpan.querySelector('input')) return;
+    
+    // Set flag to disable global keyboard handling
+    gIsEditingSlider = true;
+    
+    // Get current value without any unit
+    const currentValue = valueSpan.querySelector('.slider-value-number').textContent.trim();
+    
+    // Create input field
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.value = currentValue;
+    input.min = min;
+    input.max = max;
+    input.step = step;
+    input.className = 'slider-value-edit-input';
+    input.style.width = '50px';
+    
+    // Store original content for restoration if needed
+    const originalContent = valueSpan.innerHTML;
+    
+    // Clear and append input
+    valueSpan.innerHTML = '';
+    valueSpan.appendChild(input);
+    
+    // Set focus AFTER appending to DOM
+    setTimeout(() => {
+      input.focus();
+      input.select();
+    }, 50); // Longer delay to ensure DOM update
+    
+    // Save original slider handler and disable it
+    const originalHandler = slider.oninput;
+    slider.oninput = null;
+    
+    function finishEdit(apply) {
+      // Re-enable keyboard handling
+      gIsEditingSlider = false;
+      
+      // Restore original handler
+      slider.oninput = originalHandler;
+      
+      if (apply && !isNaN(input.value)) {
+        // Get and validate value
+        let v = Math.max(min, Math.min(max, parseFloat(input.value)));
+        v = Math.round(v / step) * step;
+        
+        // Update slider (handle inverted values for DAS/ARR)
+        if (sliderId === 'arr_slider' || sliderId === 'das_slider') {
+          slider.value = (parseFloat(slider.max) - v + parseFloat(slider.min)).toFixed(1);
+        } else {
+          slider.value = v;
+        }
+        
+        // Trigger slider's oninput to update display
+        slider.dispatchEvent(new Event('input'));
+      } else {
+        // Restore original content if invalid or canceled
+        valueSpan.innerHTML = originalContent;
+      }
+    }
+    
+    // Handle events
+    input.addEventListener('blur', () => finishEdit(true));
+    input.addEventListener('keydown', function(e) {
+      e.stopPropagation(); // Prevent game handlers from catching keys
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        finishEdit(true);
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        finishEdit(false);
+      }
+    });
+    input.addEventListener('click', e => e.stopPropagation());
+  });
+}
+
 /*----------------------------------------------------------------------------------------
  ☆★ Layer initialization ★☆
 
@@ -111,6 +243,65 @@ function SetupLayers(){
   gLyrSections = new Layer('list_sections');
   gLyrPerform = new Layer('perform');
   gLyrPreferences = new Layer('preferences');
+}
+/*----------------------------------------------------------------------------------------
+ ☆★ Prefs Page ★☆
+
+ uhhh its got the buttons to listen for keybinds and shii
+----------------------------------------------------------------------------------------*/
+
+function KeyDisplayer(arr) {
+    switch(arr.toLowerCase()){
+      case 'control':
+        return 'CTRL';
+      case 'space':
+      case ' ':
+        return 'SPACE';
+      default:
+        return arr.toUpperCase();
+    }
+  }
+
+function normalizeKeyName(key) {
+  // Normalize key names to match ToKc expectations
+  switch (key.toLowerCase()) {
+    case " ": case "Space": return "space";
+    // Add more as needed
+    default:
+      return key.toLowerCase();
+  }
+}
+
+function setupKeyButtons() {
+  const keyMap = [
+    { id: 'key_left_btn', idx: 0 },
+    { id: 'key_right_btn', idx: 1 },
+    { id: 'key_softdrop_btn', idx: 2 },
+    { id: 'key_harddrop_btn', idx: 3 },
+    { id: 'key_rot_left_btn', idx: 4 },
+    { id: 'key_rot_right_btn', idx: 5 },
+    { id: 'key_hold_btn', idx: 6 },
+    { id: 'key_guide_btn', idx: 7 },
+    { id: 'key_rot_180_btn', idx: 8 }
+  ];
+  keyMap.forEach(({ id, idx }) => {
+    const btn = document.getElementById(id);
+    if(!btn) return;
+    btn.textContent = KeyDisplayer(gKeys[idx]);
+    btn.onclick = () => {
+      btn.textContent = "PRESS KEY";
+      const onKeyDown = (e) => {
+        e.preventDefault();
+        let key = e.key
+        let normalizedKey = normalizeKeyName(key);
+        gKeys[idx] = normalizedKey;
+        let keyDisplay = KeyDisplayer(key);
+        btn.textContent = keyDisplay;
+        document.removeEventListener("keydown", onKeyDown);
+      };
+      document.addEventListener("keydown", onKeyDown);
+    };
+  });
 }
 /*----------------------------------------------------------------------------------------
  ☆★ Load ★☆
@@ -129,11 +320,41 @@ function LoadData(){
   gKeys.push(Load('RotateLeft', DEFAULT_KEY_ROTATE_LEFT));
   gKeys.push(Load('Hold', DEFAULT_KEY_HOLD));
   gKeys.push(Load('Guide', DEFAULT_KEY_GUIDE));
+  gKeys.push(Load('Rotate180', DEFAULT_KEY_ROTATE_180));
   // Loading progress
 
   for(var i = 0; i < SECTION_NUM; i++){
     gProblemsCleared[i] = (Load('Prg' + i, '0') == '1');
   }
+  RefreshHeaderClearedStatus();
+
+  window.KEY_CHARGE_DURATION = parseFloat(Load('DAS', 9.0));
+  window.KEY_REPEAT_SPAN = parseFloat(Load('ARR', 3.0));
+  window.SOFT_DROP_FACTOR = parseFloat(Load('SDF', 10));
+  /*
+  window.KEY_CHARGE_DURATION = parseFloat(Load('DAS', 9.0));
+  window.KEY_REPEAT_SPAN = parseFloat(Load('ARR', 3.0));
+  window.SOFT_DROP_FACTOR = parseFloat(Load('SDF', 10));
+  const dasSlider = document.getElementById('das_slider');
+  const arrSlider = document.getElementById('arr_slider');
+  const sdfSlider = document.getElementById('sdf_slider');
+  const dasValue = document.getElementById('das_value');
+  const arrValue = document.getElementById('arr_value');
+  const sdfValue = document.getElementById('sdf_value');
+  if (dasSlider) {
+  const invertedDas = parseFloat(dasSlider.max) - window.KEY_CHARGE_DURATION + parseFloat(dasSlider.min);
+  dasSlider.value = invertedDas;
+}
+if (dasValue) dasValue.textContent = window.KEY_CHARGE_DURATION.toFixed(1);
+
+if (arrSlider) {
+  const invertedArr = parseFloat(arrSlider.max) - window.KEY_REPEAT_SPAN + parseFloat(arrSlider.min);
+  arrSlider.value = invertedArr;
+}
+if (arrValue) arrValue.textContent = window.KEY_REPEAT_SPAN.toFixed(1);  
+if (sdfSlider) sdfSlider.value = window.SOFT_DROP_FACTOR;
+if (sdfValue) sdfValue.textContent = window.SOFT_DROP_FACTOR;
+*/
 }
 /*----------------------------------------------------------------------------------------
  ☆★ Intra-frame processing ★☆
@@ -164,6 +385,7 @@ function SetupScene(scene){
     gCurUseGuideFlg = false;
     break;
   case 'perform':
+    UpdateManipulationIndicators();
     gCurMino = null;
     gCurHold = null;
     PrepareProblem();
@@ -193,10 +415,11 @@ function SetupScene(scene){
     break;
   case 'preferences':
     // Key settings display
-
-    for(var i = 0; i < gKeys.length; i++){
+    setupKeyButtons();
+    /* for(var i = 0; i < gKeys.length; i++){
       document.getElementById(gSelectForms[i]).value = gKeys[i];
-    }
+    } */
+    SetupSliderDisplays();
     gLyrPreferences.Show();
     window.scroll(0, 0);    // Scroll to the top
 
@@ -343,10 +566,11 @@ function Dequeue(){
   gCurDir = INITIAL_DIR;
   gCurX = INITIAL_X;
   gCurY = INITIAL_Y;
-
+  
   gNdCount = NATURAL_DROP_SPAN;
   ResetLockDelay();
   RefreshHint();
+  lowestY = GetLowestBlockY(gCurMino, gCurDir, gCurY);
   return true;
 }
 /*----------------------------------------------------------------------------------------
@@ -370,8 +594,40 @@ function RefreshSectionTitle(){
 ----------------------------------------------------------------------------------------*/
 function RefreshProblemButtons(){
   for(var i = 0; i < SECTION_NUM; i++){
-    if(gProblemsCleared[i])  ShowImage('clear'+ i);
+    // if(gProblemsCleared[i])  ShowImage('clear'+ i);
+    var btn = document.getElementById('section' + (i + 1));
+    //if(!btn) continue;
+    if(gProblemsCleared[i]){
+      btn.classList.add('section-btn-cleared');
+    }else{
+      
+      //btn.classList.remove('section-btn-cleared');
+    }
+  }
+  
+}
+function RefreshHeaderClearedStatus() {
+  const groups = [
+    //problems in each section
+    { headerId: 'group1', sectionIds: [1] },
+    { headerId: 'group2', sectionIds: [2, 3] },
+    { headerId: 'group3', sectionIds: [4, 5, 6, 7, 8, 9, 10, 11] },
+    { headerId: 'group4', sectionIds: [12] },
+    { headerId: 'group5', sectionIds: [13, 14] },
+    { headerId: 'group6', sectionIds: [15, 16] },
+    { headerId: 'group7', sectionIds: [17, 18, 19, 20, 21] }
+  ];
 
+  for (const group of groups) {
+    const allCleared = group.sectionIds.every(idx => gProblemsCleared[idx - 1]);
+    const header = document.getElementById(group.headerId);
+    if (header) {
+      if (allCleared) {
+        header.classList.add('header-all-cleared');
+      } else {
+        header.classList.remove('header-all-cleared');
+      }
+    }
   }
 }
 /*----------------------------------------------------------------------------------------
@@ -486,6 +742,7 @@ function ScenePerform(){
 ----------------------------------------------------------------------------------------*/
 
 function ScenePerformFalling() {
+  if (gIsEditingSlider) return false;
   switch (gButton) {
     case 'back':
       gScene = 'select_section';
@@ -526,63 +783,87 @@ function ScenePerformFalling() {
   } else {
     // Handle lock delay
     if (!CanMoveDown(gCurMino, gCurX, gCurY, gCurDir)) {
-      if (gCurY > lowestY) {
-        // Reset lock delay and manipulations if the piece drops below its previous lowest position
-        lockDelay = 0;
-        manipulations = 0;
-        lowestY = gCurY;
-      } else {
-        // Increment lock delay
-        lockDelay++;
-        UpdateLockTimerBar(lockDelay / lockDelayLimit); // Update progress bar
-        if (lockDelay >= lockDelayLimit || manipulations >= manipulationLimit) {
-          // Lock the piece if delay or manipulations exceed limits
-          Land();
-          ResetLockDelay();
-          Refresh();
-          return;
-        }
-      }
+      let curLowestBlockY = GetLowestBlockY(gCurMino, gCurDir, gCurY);
+      if (curLowestBlockY > lowestY) {
+      // Reset lock delay and manipulations if the piece drops below its previous lowest position
+      lockDelay = 0;
+      manipulations = 0;
+      lowestY = curLowestBlockY;
     } else {
-      
-      ResetLockDelay();
-      lowestY = gCurY; 
+      // Increment lock delay
+      lockDelay++;
+      UpdateLockTimerBar(); // Update progress bar
+      if (lockDelay >= lockDelayLimit || manipulations >= manipulationLimit) {
+        // Lock the piece if delay or manipulations exceed limits
+        Land();
+        ResetLockDelay();
+        Refresh();
+        return;
+      }
     }
+  } else {
+  }
 
     // Key input forks
     if (InputsHorizontalMove(true)) {
       if (PlaceTest(gCurDir, gCurMino, gCurX + 1, gCurY)) {
         gCurX++;
-        manipulations++;
-        lockDelay = 0;
-        gTSpinType = 0;
-        UpdateManipulationIndicatiors();
+        let curLowestBlockY = GetLowestBlockY(gCurMino, gCurDir, gCurY);
+        if (curLowestBlockY >= lowestY) {
+          manipulations++;
+          lockDelay = 0;
+          lowestY = curLowestBlockY;
+          UpdateManipulationIndicators();
+        }
         if (IsLanding()) gNdCount = NATURAL_DROP_SPAN;
       }
     } else if (InputsHorizontalMove(false)) {
       if (PlaceTest(gCurDir, gCurMino, gCurX - 1, gCurY)) {
         gCurX--;
-        gTSpinType = 0;
-        manipulations++;
-        lockDelay = 0;
-        UpdateManipulationIndicatiors();
+        let curLowestBlockY = GetLowestBlockY(gCurMino, gCurDir, gCurY);
+        if (curLowestBlockY >= lowestY) {
+          manipulations++;
+          lockDelay = 0;
+          lowestY = curLowestBlockY;
+          UpdateManipulationIndicators();
+        }
         if (IsLanding()) gNdCount = NATURAL_DROP_SPAN;
       }
     }
     if (InputsSoftDrop()) {
       SoftDrop();
+      
     }
     if (IsPressed(KeyRR())) {
       RotateRight();
-      manipulations++;
-      lockDelay = 0;
-      UpdateManipulationIndicatiors();
+      let curLowestBlockY = GetLowestBlockY(gCurMino, gCurDir, gCurY);
+      if (curLowestBlockY >= lowestY) {
+        manipulations++;
+        lockDelay = 0;
+        lowestY = curLowestBlockY;
+        UpdateManipulationIndicators();
+      } 
     }
     if (IsPressed(KeyRL())) {
       RotateLeft();
-      manipulations++;
-      lockDelay = 0;
-      UpdateManipulationIndicatiors();
+      let curLowestBlockY = GetLowestBlockY(gCurMino, gCurDir, gCurY);;
+      if (curLowestBlockY >= lowestY) {
+        manipulations++;
+        lockDelay = 0;
+        lowestY = curLowestBlockY;
+        UpdateManipulationIndicators();
+      }
+    }
+    if (IsPressed(KeyR180())) {
+      Rotate180();
+      let curLowestBlockY = GetLowestBlockY(gCurMino, gCurDir, gCurY);
+
+      if (curLowestBlockY >= lowestY) {
+        manipulations++;
+        lockDelay = 0;
+        lowestY = curLowestBlockY;
+        UpdateManipulationIndicators();
+      }
     }
     if (IsPressed(KeyG()) && !(gCurProblem.useGuide || gCurUseGuideFlg)) {
       gScene = 'perform_guide';
@@ -590,6 +871,7 @@ function ScenePerformFalling() {
     if (IsPressed(KeyH())) {
       Hold();
       ResetLockDelay(); // Reset both timer and inputs
+      
     }
     if (IsPressed(KeyHD())) {
       HardDrop(); // Hard drop input should be checked at the end
@@ -600,6 +882,13 @@ function ScenePerformFalling() {
       gNdCount = NATURAL_DROP_SPAN;
       if (!IsLanding()) {
         gCurY++;
+        let curLowestBlockY = GetLowestBlockY(gCurMino, gCurDir, gCurY);
+        if (curLowestBlockY > lowestY) {
+          // Reset lock delay and manipulations if piece drops further
+          lockDelay = 0;
+          manipulations = 0;
+          lowestY = curLowestBlockY;
+        }
         gTSpinType = 0;
         gLandingCount = NATURAL_DROP_SPAN;
       } else {
@@ -716,9 +1005,17 @@ function ScenePerformFalling() {
  Returns true at intervals or specified repeat intervals.
 ----------------------------------------------------------------------------------------*/
 function InputsHorizontalMove(toRight){
+  if (gIsEditingSlider) return false;
   keyName = toRight ? KeyR() : KeyL();
-  if(PressedDuration(keyName) < HORIZONTAL_CHARGE_DURATION) return IsPressed(keyName);
-  return (PressedDuration(keyName) - HORIZONTAL_CHARGE_DURATION) % HORIZONTAL_REPEAT_SPAN == 0;
+  
+  // 1st frame after pressing, always move
+  if(PressedDuration(keyName) == 1) return true;
+  
+  // b4 das
+  if(PressedDuration(keyName) < window.KEY_CHARGE_DURATION) return false;
+  
+  // after das, move every arr frames
+  return (PressedDuration(keyName) - window.KEY_CHARGE_DURATION) % window.KEY_REPEAT_SPAN == 0;
 }
 /*----------------------------------------------------------------------------------------
  ☆★ Soft Drop Run? ★☆
@@ -726,9 +1023,12 @@ function InputsHorizontalMove(toRight){
  Returns true the moment you press it and every time the soft drop interval has elapsed thereafter.
 ----------------------------------------------------------------------------------------*/
 function InputsSoftDrop(){
+  if (gIsEditingSlider) return false;
   if(IsPressed(KeySD())) return true;
   if(!IsHolded(KeySD())) return false;
-  return PressedDuration(KeySD()) % SOFT_DROP_SPAN == 0;
+
+  var softDropInterval = Math.max(1, Math.floor(NATURAL_DROP_SPAN / window.SOFT_DROP_FACTOR));
+  return PressedDuration(KeySD()) % softDropInterval == 0;
 }
 /*----------------------------------------------------------------------------------------
  ☆★ If there are any lines that are all set, make an appointment ★☆
@@ -1012,9 +1312,16 @@ function HardDrop(){
  ☆★ Soft Drop ★☆
 ----------------------------------------------------------------------------------------*/
 function SoftDrop(){
-  if(!IsLanding()){
-    gCurY++;
-    gTSpinType = 0;
+  var softDropInterval = Math.max(1, Math.floor(NATURAL_DROP_SPAN / window.SOFT_DROP_FACTOR));
+  
+  if (PressedDuration(KeySD()) % softDropInterval == 0) {
+    if (!IsLanding()) {
+      gCurY++;
+      gTSpinType = 0;
+    }
+  }
+  
+  if (!IsLanding()) {
     gNdCount = NATURAL_DROP_SPAN;
   }
 }
@@ -1036,9 +1343,10 @@ function Hold(){
   gCurDir = INITIAL_DIR;
   gCurX = INITIAL_X;
   gCurY = INITIAL_Y;
+  
   gTSpinType = 0;
   gNdCount = NATURAL_DROP_SPAN;
-
+  lowestY = GetLowestBlockY(gCurMino, gCurDir, gCurY);
 }
 /*----------------------------------------------------------------------------------------
  ☆★ Reduce the quota (REQuireed features) according to the technique achieved ★☆
@@ -1124,7 +1432,7 @@ function CanMoveDown(mino, x, y, dir) {
 function ResetLockDelay() {
   lockDelay = 0;
   manipulations = 0;
-  UpdateLockTimerBar(0); // Reset progress bar
+  UpdateLockTimerBar(); // Reset progress bar
   UpdateManipulationIndicators(); // Reset manipulation indicators
 }
 
@@ -1138,14 +1446,31 @@ function UpdateLockTimerBar() {
 }
 
 function UpdateManipulationIndicators() {
-  const indicators = document.getElementById('manipulation_indicators');
-  indicators.innerHTML = ''; // Clear existing indicators
-  for (let i = 0; i < manipulationLimit - manipulations; i++) {
+  // console.log("lowestY:", lowestY, "curLowestBlockY:", GetLowestBlockY(gCurMino, gCurDir, gCurY));
+  const grid = document.getElementById('pip-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  for (let i = manipulationLimit; i > manipulations; i--) {
     const pip = document.createElement('div');
-    pip.className = 'pip';
-    indicators.appendChild(pip);
+    pip.classList.add('manip-pip');
+    pip.id = `pip-${i}`;
+    grid.appendChild(pip);
   }
+  
 }
+
+function GetLowestBlockY(mino, dir, y) {
+  let lowest = y;
+    for (let i = 0; i < 4; i++) { // rows
+      for (let j = 0; j < 4; j++) { // cols
+        if (mino.shape[dir][i][j]) {
+          if (y + i > lowest) lowest = y + i;
+        }
+      }
+    }
+  return lowest;
+}
+
 
 
 /* function UpdateLockTimerBar() {
@@ -1198,6 +1523,36 @@ function RotateRight(){
 function RotateLeft(){
   Rotate(false);
 }
+
+function Rotate180() {
+
+  var from = gCurDir;
+  var to = (gCurDir + 2) % 4;
+  var rotRule = gCurMino.rotationRule;
+  var dx180 = rotRule.dx180[from];
+  var dy180 = rotRule.dy180[from];
+  var canRotate = false;
+  var rotateRuleId;
+
+  for (var i = 0; i < dx180.length; i++) {
+    var newX = gCurX + dx180[i];
+    var newY = gCurY + dy180[i];
+    if (PlaceTest(to, gCurMino, newX, newY)) {
+      gCurX = newX;
+      gCurY = newY;
+      gCurDir = to;
+      canRotate = true;
+      rotateRuleId = i;
+      break;
+    }
+  }
+  if (canRotate) {
+    SetTSpinType(rotateRuleId);
+    if (IsLanding()) gNdCount = NATURAL_DROP_SPAN;
+  }
+}
+
+
 /*----------------------------------------------------------------------------------------
  ☆★ Rotation ★☆
 
@@ -1208,11 +1563,6 @@ function Rotate(toRight) {
   var rotRule = gCurMino.rotationRule;
   var newX, newY;
   var rotateRuleId;
-  gWasFloorkicked = false; // Reset the flag at the start of the function
-
-  // Check pre-rotation state
-  var wasLockDelayActive = gIsLockDelayActive;
-  var cannotMoveDownBefore = !CanMoveDown(gCurMino, gCurX, gCurY, gCurDir);
 
   // Test rotation rules
   var canRotate = false;
@@ -1226,24 +1576,6 @@ function Rotate(toRight) {
       canRotate = true;
       rotateRuleId = i;
 
-      // Check post-rotation state
-      if (wasLockDelayActive && cannotMoveDownBefore) {
-        var canMoveDownAfter = CanMoveDown(gCurMino, gCurX, gCurY, gCurDir);
-        var canMoveDownTwice = CanMoveDown(gCurMino, gCurX, gCurY + 1, gCurDir);
-
-        // Determine if this is a floorkick
-        if (canMoveDownAfter && !canMoveDownTwice) {
-          if (gCurMino === I) {
-            // For I-mino, allow moving down 2 positions
-            if (!CanMoveDown(gCurMino, gCurX, gCurY + 2, gCurDir)) {
-              gWasFloorkicked = true; // Set the flag for floorkick
-            }
-          } else {
-            gWasFloorkicked = true; // Set the flag for floorkick
-          }
-        }
-      }
-
       break;
     }
   }
@@ -1252,12 +1584,9 @@ function Rotate(toRight) {
     SetTSpinType(rotateRuleId);
     if (IsLanding()) gNdCount = NATURAL_DROP_SPAN;
 
-    // Reset lock delay timer only if it was a floorkick
-    if (gWasFloorkicked) {
-      ResetLockDelayTimer(); // Reset only the timer, not the inputs
     }
   }
-}
+
 /*----------------------------------------------------------------------------------------
  ★☆ T-SPIN success judgment ☆★
 
@@ -1482,7 +1811,9 @@ function AfterClear(){
   if(gCurProblemId >= gCurProgmeIdList.length - 1){
     gScene = 'select_section';
     gProblemsCleared[gCurSectionId] = true;
-    Save('Prg' + curSectionId, '1');
+    Save('Prg' + gCurSectionId, '1');
+    RefreshProblemButtons();
+    RefreshHeaderClearedStatus();
   }
   else{
     gCurProblemId++;
@@ -1507,6 +1838,8 @@ function KeyRL(){return gKeys[5]; }  // Rotate Left
 function KeyH() {return gKeys[6]; }  // Hold
 
 function KeyG() {return gKeys[7]; }  // Guide
+
+function KeyR180() {return gKeys[8]; }  // 180 degree rotation
 /*----------------------------------------------------------------------------------------
  ☆★ Scene: Settings ★☆
 ----------------------------------------------------------------------------------------*/
@@ -1525,20 +1858,30 @@ function ScenePreferences(){
 
  Returns whether the save was successful.
 ----------------------------------------------------------------------------------------*/
-function SavePreferences(){
-  // Repeat not
-
-  if(KeyDuplicates()){
+function SavePreferences() {
+  // Check for duplicates
+  if (KeyDuplicates()) {
     alert("Duplicate keys.");
     return false;
   }
-  // Settings Reflection
+  // Save keys from buttons
+  const buttonIds = [
+    'key_left_btn', 'key_right_btn', 'key_softdrop_btn', 'key_harddrop_btn',
+    'key_rot_left_btn', 'key_rot_right_btn', 'key_hold_btn', 'key_guide_btn', 'key_rot_180_btn'
+  ];
 
-  for(var i = 0; i < gKeys.length; i++){
-    gKeys[i] = document.getElementById(gSelectForms[i]).value;
+  for (let i = 0; i < gKeys.length; i++) {
+    gKeys[i] = document.getElementById(buttonIds[i]).textContent.toLowerCase();
   }
-  // Store in cookies
+  // handling preferences
+  const dasSlider = document.getElementById('das_slider');
+  const arrSlider = document.getElementById('arr_slider');
 
+  window.KEY_CHARGE_DURATION = parseFloat(dasSlider.max) - parseFloat(dasSlider.value) + parseFloat(dasSlider.min);
+  window.KEY_REPEAT_SPAN = parseFloat(arrSlider.max) - parseFloat(arrSlider.value) + parseFloat(arrSlider.min);
+  window.SOFT_DROP_FACTOR = parseFloat(document.getElementById('sdf_slider').value);
+
+  // Store in cookies
   Save('MoveLeft', gKeys[0]);
   Save('MoveRight', gKeys[1]);
   Save('SoftDrop', gKeys[2]);
@@ -1547,6 +1890,11 @@ function SavePreferences(){
   Save('RotateLeft', gKeys[5]);
   Save('Hold', gKeys[6]);
   Save('Guide', gKeys[7]);
+  Save('Rotate180', gKeys[8]);
+  Save('DAS', window.KEY_CHARGE_DURATION);
+  Save('ARR', window.KEY_REPEAT_SPAN);
+  Save('SDF', window.SOFT_DROP_FACTOR);
+
   return true;
 }
 /*----------------------------------------------------------------------------------------
@@ -1554,7 +1902,23 @@ function SavePreferences(){
 
  Check each select box to determine if there are any duplicates and return it.
 ----------------------------------------------------------------------------------------*/
-function KeyDuplicates(){
+
+function KeyDuplicates() {
+  const buttonIds = [
+    'key_left_btn', 'key_right_btn', 'key_softdrop_btn', 'key_harddrop_btn',
+    'key_rot_left_btn', 'key_rot_right_btn', 'key_hold_btn', 'key_guide_btn', 'key_rot_180_btn'
+  ];
+  for (let i = 0; i < buttonIds.length; i++) {
+    const key1 = document.getElementById(buttonIds[i]).textContent;
+    for (let j = i + 1; j < buttonIds.length; j++) {
+      const key2 = document.getElementById(buttonIds[j]).textContent;
+      if (key1 === key2) return true;
+    }
+  }
+  return false;
+}
+
+/* function KeyDuplicates(){
   var target1, target2;
   for(var i = 0; i < gSelectForms.length; i++){
     target1 = document.getElementById(gSelectForms[i]).value;
@@ -1565,4 +1929,5 @@ function KeyDuplicates(){
   }
   return false;
 }
-
+*/
+// making this comment so i can push changes to the site lmfao

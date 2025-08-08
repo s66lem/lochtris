@@ -6,13 +6,13 @@ This module supports frame management, key input, etc.
 /*----------------------------------------------------------------------------------------
 ☆★ Constant list ★☆
 ----------------------------------------------------------------------------------------*/
-var FPS = 30; //Frames Per Second; Frames per second
+var FPS = 60; //Frames Per Second; Frames per second
 
 var LOOP_INTERVAL = 17; //<milliseconds> Main loop startup interval. (1000 /<FPS>) to be smaller
 
-var KEY_CHARGE_DURATION = 7; //<frame> Number of frames until key repeat starts
+// var KEY_CHARGE_DURATION = 9; //<frame> Number of frames until key repeat starts ----------- DAS
 
-var KEY_REPEAT_SPAN = 2; //<frame> Number of frames up to the next key repeat
+// var KEY_REPEAT_SPAN = 3; //<frame> Number of frames up to the next key repeat ------------ ARR
 /*
 ● Key repeat
 When a key is pressed and held down, the keys are input continuously is called "key repeat." for example
@@ -166,6 +166,7 @@ window.onblur = function(){
  When you start, it counts from 0 again.
 ----------------------------------------------------------------------------------------*/
 function PressedDuration(keyName){
+  if (gIsEditingSlider) return false;
   return gInputs[ToKc(keyName)];
 }
 /*----------------------------------------------------------------------------------------
@@ -175,6 +176,7 @@ function PressedDuration(keyName){
  I will. If you specify a negative number (if omitted) for <keyName>, it will react to any key.
 ----------------------------------------------------------------------------------------*/
 function IsPressed(keyName){
+  if (gIsEditingSlider) return false;
   keyName = InitArg(keyName, -1);
   if(keyName < 0){
     for(i = 0; i < gInputs.length; i++){
@@ -191,6 +193,7 @@ function IsPressed(keyName){
  Masu. If you specify a negative number (if omitted) for <keyName>, it will react to any key.
 ----------------------------------------------------------------------------------------*/
 function IsHolded(keyName){
+  if (gIsEditingSlider) return false;
   keyName = InitArg(keyName, -1);
   if(keyName < 0){
     for(i = 0; i < gInputs.length; i++){
@@ -212,13 +215,13 @@ function IsInputting(keyName){
   if(keyName < 0){
     for(i = 0; i < gInputs.length; i++){
       if(gInputs[i] == 1) return true;
-      if((gInputs[i] - KEY_CHARGE_DURATION - 1) % KEY_REPEAT_SPAN == 0) return true;
+      if((gInputs[i] - window.KEY_CHARGE_DURATION - 1) % window.KEY_REPEAT_SPAN == 0) return true;
     }
     return false;
   }
   var keyCode = ToKc(keyName);
-  if(gInputs[keyCode] <= KEY_CHARGE_DURATION) return gInputs[keyCode] == 1;
-  return (gInputs[keyCode] - KEY_CHARGE_DURATION - 1) % KEY_REPEAT_SPAN == 0;
+  if(gInputs[keyCode] <= window.KEY_CHARGE_DURATION) return gInputs[keyCode] == 1;
+  return (gInputs[keyCode] - window.KEY_CHARGE_DURATION - 1) % window.KEY_REPEAT_SPAN == 0;
 }
 /*----------------------------------------------------------------------------------------
  ☆★ Convert a string to a keycode (TO KeyCode) ★☆
@@ -229,26 +232,26 @@ function IsInputting(keyName){
 ----------------------------------------------------------------------------------------*/
 function ToKc(keyString){
   switch(keyString){
-  case 'Break':      return   3; break;
-  case 'BackSpace':  return   8; break;
-  case 'Tab':        return   9; break;
-  case 'Enter':      return  13; break;
-  case 'Shift':      return  16; break;
-  case 'Ctrl':       return  17; break;
-  case 'Alt':        return  18; break;
-  case 'Pause':      return  19; break;
-  case 'Esc':        return  27; break;
-  case 'Space':      return  32; break;
-  case 'PageUp':     return  33; break;
-  case 'PageDown':   return  34; break;
-  case 'End':        return  35; break;
-  case 'Home':       return  36; break;
-  case 'Left':       return  37; break;
-  case 'Up':         return  38; break;
-  case 'Right':      return  39; break;
-  case 'Down':       return  40; break;
-  case 'Insert':     return  45; break;
-  case 'Delete':     return  46; break;
+  case 'break':      return   3; break;
+  case 'backspace':  return   8; break;
+  case 'tab':        return   9; break;
+  case 'enter':      return  13; break;
+  case 'shift':      return  16; break;
+  case 'ctrl':       return  17; break;
+  case 'alt':        return  18; break;
+  case 'pause':      return  19; break;
+  case 'esc':        return  27; break;
+  case 'space':      return  32; break;
+  case 'pageup':     return  33; break;
+  case 'pagedown':   return  34; break;
+  case 'end':        return  35; break;
+  case 'home':       return  36; break;
+  case 'arrowleft':  return  37; break;
+  case 'arrowup':    return  38; break;
+  case 'arrowright': return  39; break;
+  case 'arrowdown':  return  40; break;
+  case 'insert':     return  45; break;
+  case 'delete':     return  46; break;
   case '0':          return  48; break;
   case '1':          return  49; break;
   case '2':          return  50; break;
@@ -259,50 +262,50 @@ function ToKc(keyString){
   case '7':          return  55; break;
   case '8':          return  56; break;
   case '9':          return  57; break;
-  case 'A':          return  65; break;
-  case 'B':          return  66; break;
-  case 'C':          return  67; break;
-  case 'D':          return  68; break;
-  case 'E':          return  69; break;
-  case 'F':          return  70; break;
-  case 'G':          return  71; break;
-  case 'H':          return  72; break;
-  case 'I':          return  73; break;
-  case 'J':          return  74; break;
-  case 'K':          return  75; break;
-  case 'L':          return  76; break;
-  case 'M':          return  77; break;
-  case 'N':          return  78; break;
-  case 'O':          return  79; break;
-  case 'P':          return  80; break;
-  case 'Q':          return  81; break;
-  case 'R':          return  82; break;
-  case 'S':          return  83; break;
-  case 'T':          return  84; break;
-  case 'U':          return  85; break;
-  case 'V':          return  86; break;
-  case 'W':          return  87; break;
-  case 'X':          return  88; break;
-  case 'Y':          return  89; break;
-  case 'Z':          return  90; break;
-  case 'Windows':    return  91; break;
-  case 'Menu':       return  93; break;
+  case 'a':          return  65; break;
+  case 'b':          return  66; break;
+  case 'c':          return  67; break;
+  case 'd':          return  68; break;
+  case 'e':          return  69; break;
+  case 'f':          return  70; break;
+  case 'g':          return  71; break;
+  case 'h':          return  72; break;
+  case 'i':          return  73; break;
+  case 'j':          return  74; break;
+  case 'k':          return  75; break;
+  case 'l':          return  76; break;
+  case 'm':          return  77; break;
+  case 'n':          return  78; break;
+  case 'o':          return  79; break;
+  case 'p':          return  80; break;
+  case 'q':          return  81; break;
+  case 'r':          return  82; break;
+  case 's':          return  83; break;
+  case 't':          return  84; break;
+  case 'u':          return  85; break;
+  case 'v':          return  86; break;
+  case 'w':          return  87; break;
+  case 'x':          return  88; break;
+  case 'y':          return  89; break;
+  case 'z':          return  90; break;
+  case 'meta':       return  91; break;
+  case 'menu':       return  93; break;
   case '*':          return 106; break;
   case '+':          return 107; break;
-  case 'F1':         return 112; break;
-  case 'F2':         return 113; break;
-  case 'F3':         return 114; break;
-  case 'F4':         return 115; break;
-  case 'F5':         return 116; break;
-  case 'F6':         return 117; break;
-  case 'F7':         return 118; break;
-  case 'F8':         return 119; break;
-  case 'F9':         return 120; break;
-  case 'F10':        return 121; break;
-  case 'F11':        return 122; break;
-  case 'F12':        return 123; break;
-  case 'NumLock':    return 144; break;
-  case 'ScrollLock': return 145; break;
+  case 'f1':         return 112; break;
+  case 'f2':         return 113; break;
+  case 'f3':         return 114; break;
+  case 'f4':         return 115; break;
+  case 'f5':         return 116; break;
+  case 'f6':         return 117; break;
+  case 'f7':         return 118; break;
+  case 'f8':         return 119; break;
+  case 'f9':         return 120; break;
+  case 'f10':        return 121; break;
+  case 'f11':        return 122; break;
+  case 'f12':        return 123; break;
+  case 'numlock':    return 144; break;
+  case 'scrolllock': return 145; break;
   case ':':          return 186; break;
   case ';':          return 187; break;
   case ',':          return 188; break;
@@ -311,7 +314,7 @@ function ToKc(keyString){
   case '/':          return 191; break;
   case '@':          return 192; break;
   case '[':          return 219; break;
-  case '¥¥':         return 220; break;
+  case '\\':         return 220; break;
   case ']':          return 221; break;
   case '^':          return 222; break;
   default:           return   0; break;
