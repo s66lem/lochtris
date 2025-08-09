@@ -1719,25 +1719,26 @@ function RefreshGhostAndGuide(){
 ----------------------------------------------------------------------------------------*/
 function RefreshQueue(){
   var mino;
-  var filename;
   var i = 0;
+  
+  // Display preview images for actual pieces in queue
   while(i < Math.min(gQueue.length, NEXT_MINOS)){
     mino = gQueue[i];
-    for(var j = 0; j < 3; j++){
-      for(var k = 0; k < 4; k++){
-        SetImage("n" + i + "_" + (j + 1) + "_" + k,
-                 gBlocks[mino.shape[0][j][k] * mino.activeBlockId].cache.src);
-      }
+    var nextDisplay = document.getElementById("next_display_" + i);
+    
+    if(nextDisplay && mino && mino.id >= 1 && mino.id <= 7){
+      nextDisplay.src = GetPreviewImage(mino);
+    } else if(nextDisplay) {
+      nextDisplay.src = "img/b3.png";
     }
     i++;
   }
-  // blank
 
+  // Fill remaining empty next slots with b3.png
   while(i < NEXT_MINOS){
-    for(var j = 0; j < 4; j++){
-      for(var k = 0; k < 4; k++){
-        SetImage("n" + i + "_" + j + "_" + k, gBlocks[0].cache.src);
-      }
+    var nextDisplay = document.getElementById("next_display_" + i);
+    if(nextDisplay) {
+      nextDisplay.src = "img/b3.png";
     }
     i++;
   }
@@ -1748,26 +1749,16 @@ function RefreshQueue(){
  Displays images of blank spaces (0) or moving blocks (11 to 17). 1 Slide it down the square.
 ----------------------------------------------------------------------------------------*/
 function RefreshHold(){
-  var mino;
-
-  mino = gCurHold;
+  
+  var mino = gCurHold;
+  var holdDisplay = document.getElementById("hold_display");
+  if(!holdDisplay) return;
+  
   if(mino){
-    for(var j = 0; j < 3; j++){
-      for(var k = 0; k < 4; k++){
-        SetImage("h" + (j + 1) + "_" + k,
-                 gBlocks[mino.shape[0][j][k] * mino.activeBlockId].cache.src);
-      }
-    }
-  }else{
-    // blank
-
-    for(var j = 0; j < 4; j++){
-      for(var k = 0; k < 4; k++){
-        SetImage("h" + j + "_" + k, gBlocks[0].cache.src);
-      }
-    }
+    holdDisplay.src = GetPreviewImage(mino);
+  } else {
+    holdDisplay.src = "img/b3.png";
   }
-
 }
 /*----------------------------------------------------------------------------------------
  ☆★ Scene: Lesson failure ★☆

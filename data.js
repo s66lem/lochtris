@@ -50,7 +50,7 @@ var DEFAULT_KEY_GUIDE        = 'r';
 var DEFAULT_KEY_ROTATE_180  = 'shift'; 
 var DEFAULT_DAS = 9;
 var DEFAULT_ARR = 3;
-var DEFAULT_SDF = 15; // Soft drop speed
+var DEFAULT_SDF = 25; // Soft drop speed
 
 
 var DUMP_GUIDE_DATA = true;            // For guide array dump
@@ -80,7 +80,8 @@ function Block(id){
 
 
   switch(id){
-    case 0:  // Vacant
+    case 0: // Vacant (w/ grid)
+    case 3: // Empty
 
     this.passable = true;    // Can you slip through?
 
@@ -90,6 +91,8 @@ function Block(id){
     this.passable = false;
     break;
     case 2:  // Blocks undergoing an erasure. RemoveReservedLines is erased at once
+
+    
 
     this.passable = true;
     break;
@@ -134,6 +137,43 @@ var gBlocks = [];
 for(var i = 0; i <= 577; i++) gBlocks.push(new Block(i));
 function BlkEmpty(){return gBlocks[0] }
 function BlkVanishing(){return gBlocks[2] }
+
+/*----------------------------------------------------------------------------------------
+☆★ Object: Preview Images ★☆
+----------------------------------------------------------------------------------------*/
+function PreviewImg(id){
+  switch(id){
+    case 1: this.image = 'img/imino.png'; break;  // I piece
+    case 2: this.image = 'img/tmino.png'; break;  // T piece  
+    case 3: this.image = 'img/jmino.png'; break;  // J piece (was case J)
+    case 4: this.image = 'img/lmino.png'; break;  // L piece (was case L)
+    case 5: this.image = 'img/zmino.png'; break;  // Z piece (was case Z)
+    case 6: this.image = 'img/smino.png'; break;  // S piece (was case S)
+    case 7: this.image = 'img/omino.png'; break;  // O piece (was case O)
+    default: this.image = 'img/b3.png'; break;    // Default/blank
+  }
+  
+  this.cache = new Image();
+  this.cache.src = this.image;
+}
+function GetPreviewImage(mino) {
+  if (!mino) return "img/b3.png";
+  
+  switch(mino.id) {
+    case 1: return "img/imino.png";  // I piece
+    case 2: return "img/tmino.png";  // T piece  
+    case 3: return "img/jmino.png";  // J piece
+    case 4: return "img/lmino.png";  // L piece
+    case 5: return "img/zmino.png";  // Z piece
+    case 6: return "img/smino.png";  // S piece
+    case 7: return "img/omino.png";  // O piece
+    default: return "img/b3.png";    // Default/blank
+  }
+}
+
+var gPreviewImg = [];
+for(var i = 0; i <= 7; i++) gPreviewImg.push(new PreviewImg(i));
+
 /*----------------------------------------------------------------------------------------
 ☆★ Object: General Rotation Rules (ROTation RULE -GENeral) ★☆
 ----------------------------------------------------------------------------------------*/

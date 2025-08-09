@@ -178,7 +178,7 @@ combos for a perfect clear, <br>
       </p>
     </div>
     <div id="list_problems" class="layer">
-      <p>
+      <!-- <p>
         <input type="text" id="section_title" class="center" style="width: 560px;">
       </p>
       <p>
@@ -191,7 +191,7 @@ combos for a perfect clear, <br>
       </p>
       <p>
         <input type="button" value="最初の画面に戻る" onClick="gButton='back'">
-      </p>
+      </p> -->
     </div>
 
     <div id="perform" class="layer center">
@@ -199,24 +199,18 @@ combos for a perfect clear, <br>
         <input type="text" id="perform_caption" class="center" style="width: 560px;"><br>
       </p>
       <table>
-
-        <td style="padding-right: 16px">
-          <p class="small">
-            HOLD
-          </p>
-          <p>
-            <img src="img/b0.png" id="h0_0" width="12" height="12"><img src="img/b0.png" id="h0_1" width="12" height="12"
-            ><img src="img/b0.png" id="h0_2" width="12" height="12"><img src="img/b0.png" id="h0_3" width="12" height="12"><br>
-            <img src="img/b0.png" id="h1_0" width="12" height="12"><img src="img/b0.png" id="h1_1" width="12" height="12"
-            ><img src="img/b0.png" id="h1_2" width="12" height="12"><img src="img/b0.png" id="h1_3" width="12" height="12"><br>
-            <img src="img/b0.png" id="h2_0" width="12" height="12"><img src="img/b0.png" id="h2_1" width="12" height="12"
-            ><img src="img/b0.png" id="h2_2" width="12" height="12"><img src="img/b0.png" id="h2_3" width="12" height="12"><br>
-            <img src="img/b0.png" id="h3_0" width="12" height="12"><img src="img/b0.png" id="h3_1" width="12" height="12"
-            ><img src="img/b0.png" id="h3_2" width="12" height="12"><img src="img/b0.png" id="h3_3" width="12" height="12"><br>
+        <!-- HOLD -->
+        <td style="vertical-align: top; padding-left: 37px;">
+          <p style="margin: 0; padding: 0;">
+            <div id="hold">
+              <img src="img/b3.png" id="hold_display" width="80" height="60" style="display: block;">
+            </div>
           </p>
         </td>
 
-        <td>
+    <td style="vertical-align: top; width: 240px">
+      <div id="gb-wrapper">  
+        <div id="gb">
           <img src="img/b0.png" id="m0_0"><img src="img/b0.png" id="m0_1"><img src="img/b0.png" id="m0_2"
           ><img src="img/b0.png" id="m0_3"><img src="img/b0.png" id="m0_4"><img src="img/b0.png" id="m0_5"
           ><img src="img/b0.png" id="m0_6"><img src="img/b0.png" id="m0_7"><img src="img/b0.png" id="m0_8"
@@ -297,77 +291,33 @@ combos for a perfect clear, <br>
           ><img src="img/b0.png" id="m19_3"><img src="img/b0.png" id="m19_4"><img src="img/b0.png" id="m19_5"
           ><img src="img/b0.png" id="m19_6"><img src="img/b0.png" id="m19_7"><img src="img/b0.png" id="m19_8"
           ><img src="img/b0.png" id="m19_9"><br>
+        </div>
+      </div>
+        <div id="pip-grid" style="display: flex;  gap: 6.43px; margin-top: 10px;"></div>
+        <div id="lock_timer_container" style="width: 239.98px; height: 2px; background-color: #444; margin-top: 10px; ">
+        <div id="lock_timer_bar" style="width: 239.98px; height: 2px; background-color: #888;"></div>
+    </td>
+
+        <td id="next" style="padding-left: 10px; vertical-align: top;">
+          <div id="next-container">
+             <img src="img/b3.png" id="next_display_0" width="80" height="60">
+             <img src="img/b3.png" id="next_display_1" width="80" height="60">
+             <img src="img/b3.png" id="next_display_2" width="80" height="60">
+             <img src="img/b3.png" id="next_display_3" width="80" height="60">
+             <img src="img/b3.png" id="next_display_4" width="80" height="60">
+           </div>
         </td>
-        <td style="padding-left: 16px">
-          <p>
-            <input type="button" value="Main Menu" onClick="gButton='back'" style="width: 160px; height: 30px; margin-bottom: 96px;"><br>
+          <td style="width: 10%; vertical-align: top; padding-left: 10px;">
+            <p>
+            <input id="main_menu_btn" type="button" value="Main Menu" onClick="gButton='back'" style="width: 160px; height: 30px;"><br>
             <textarea type="text" id="perform_hint" style="width: 288px; height: 96px; background-color: #2a2c3000; color: #ffffff00; border: none; resize: none; display: none;" ></textarea>
           </p>
-          <p class="small">
-            NEXT
-          </p>
-          <p>
-            <img src="img/b0.png" id="n0_0_0" width="12" height="12"><img src="img/b0.png" id="n0_0_1" width="12" height="12"
-            ><img src="img/b0.png" id="n0_0_2" width="12" height="12"><img src="img/b0.png" id="n0_0_3" width="12" height="12"><br>
-            <img src="img/b0.png" id="n0_1_0" width="12" height="12"><img src="img/b0.png" id="n0_1_1" width="12" height="12"
-            ><img src="img/b0.png" id="n0_1_2" width="12" height="12"><img src="img/b0.png" id="n0_1_3" width="12" height="12"><br>
-            <img src="img/b0.png" id="n0_2_0" width="12" height="12"><img src="img/b0.png" id="n0_2_1" width="12" height="12"
-            ><img src="img/b0.png" id="n0_2_2" width="12" height="12"><img src="img/b0.png" id="n0_2_3" width="12" height="12"><br>
-            <img src="img/b0.png" id="n0_3_0" width="12" height="12"><img src="img/b0.png" id="n0_3_1" width="12" height="12"
-            ><img src="img/b0.png" id="n0_3_2" width="12" height="12"><img src="img/b0.png" id="n0_3_3" width="12" height="12"><br>
-          </p>
-          <p>
-            <img src="img/b0.png" id="n1_0_0" width="12" height="12"><img src="img/b0.png" id="n1_0_1" width="12" height="12"
-            ><img src="img/b0.png" id="n1_0_2" width="12" height="12"><img src="img/b0.png" id="n1_0_3" width="12" height="12"><br>
-            <img src="img/b0.png" id="n1_1_0" width="12" height="12"><img src="img/b0.png" id="n1_1_1" width="12" height="12"
-            ><img src="img/b0.png" id="n1_1_2" width="12" height="12"><img src="img/b0.png" id="n1_1_3" width="12" height="12"><br>
-            <img src="img/b0.png" id="n1_2_0" width="12" height="12"><img src="img/b0.png" id="n1_2_1" width="12" height="12"
-            ><img src="img/b0.png" id="n1_2_2" width="12" height="12"><img src="img/b0.png" id="n1_2_3" width="12" height="12"><br>
-            <img src="img/b0.png" id="n1_3_0" width="12" height="12"><img src="img/b0.png" id="n1_3_1" width="12" height="12"
-            ><img src="img/b0.png" id="n1_3_2" width="12" height="12"><img src="img/b0.png" id="n1_3_3" width="12" height="12"><br>
-          </p>
-          <p>
-            <img src="img/b0.png" id="n2_0_0" width="12" height="12"><img src="img/b0.png" id="n2_0_1" width="12" height="12"
-            ><img src="img/b0.png" id="n2_0_2" width="12" height="12"><img src="img/b0.png" id="n2_0_3" width="12" height="12"><br>
-            <img src="img/b0.png" id="n2_1_0" width="12" height="12"><img src="img/b0.png" id="n2_1_1" width="12" height="12"
-            ><img src="img/b0.png" id="n2_1_2" width="12" height="12"><img src="img/b0.png" id="n2_1_3" width="12" height="12"><br>
-            <img src="img/b0.png" id="n2_2_0" width="12" height="12"><img src="img/b0.png" id="n2_2_1" width="12" height="12"
-            ><img src="img/b0.png" id="n2_2_2" width="12" height="12"><img src="img/b0.png" id="n2_2_3" width="12" height="12"><br>
-            <img src="img/b0.png" id="n2_3_0" width="12" height="12"><img src="img/b0.png" id="n2_3_1" width="12" height="12"
-            ><img src="img/b0.png" id="n2_3_2" width="12" height="12"><img src="img/b0.png" id="n2_3_3" width="12" height="12"><br>
-          </p>
-          <p>
-            <img src="img/b0.png" id="n3_0_0" width="12" height="12"><img src="img/b0.png" id="n3_0_1" width="12" height="12"
-            ><img src="img/b0.png" id="n3_0_2" width="12" height="12"><img src="img/b0.png" id="n3_0_3" width="12" height="12"><br>
-            <img src="img/b0.png" id="n3_1_0" width="12" height="12"><img src="img/b0.png" id="n3_1_1" width="12" height="12"
-            ><img src="img/b0.png" id="n3_1_2" width="12" height="12"><img src="img/b0.png" id="n3_1_3" width="12" height="12"><br>
-            <img src="img/b0.png" id="n3_2_0" width="12" height="12"><img src="img/b0.png" id="n3_2_1" width="12" height="12"
-            ><img src="img/b0.png" id="n3_2_2" width="12" height="12"><img src="img/b0.png" id="n3_2_3" width="12" height="12"><br>
-            <img src="img/b0.png" id="n3_3_0" width="12" height="12"><img src="img/b0.png" id="n3_3_1" width="12" height="12"
-            ><img src="img/b0.png" id="n3_3_2" width="12" height="12"><img src="img/b0.png" id="n3_3_3" width="12" height="12"><br>
-          </p>
-          <p>
-            <p>
-              <img src="img/b0.png" id="n4_0_0" width="12" height="12"><img src="img/b0.png" id="n4_0_1" width="12" height="12"
-              ><img src="img/b0.png" id="n4_0_2" width="12" height="12"><img src="img/b0.png" id="n4_0_3" width="12" height="12"><br>
-              <img src="img/b0.png" id="n4_1_0" width="12" height="12"><img src="img/b0.png" id="n4_1_1" width="12" height="12"
-              ><img src="img/b0.png" id="n4_1_2" width="12" height="12"><img src="img/b0.png" id="n4_1_3" width="12" height="12"><br>
-              <img src="img/b0.png" id="n4_2_0" width="12" height="12"><img src="img/b0.png" id="n4_2_1" width="12" height="12"
-              ><img src="img/b0.png" id="n4_2_2" width="12" height="12"><img src="img/b0.png" id="n4_2_3" width="12" height="12"><br>
-              <img src="img/b0.png" id="n4_3_0" width="12" height="12"><img src="img/b0.png" id="n4_3_1" width="12" height="12"
-              ><img src="img/b0.png" id="n4_3_2" width="12" height="12"><img src="img/b0.png" id="n4_3_3" width="12" height="12"><br>
-            </p>
           </td>
           
 
           <td style="width: 10%"></td>
         </table>
-        <!-- LOCK TIMER -->
-        <!-- LOCK TIMER -->
-        <!-- LOCK TIMER -->
-        <div id="pip-grid" style="display: flex; margin-left: 70px; gap: 6.43px; margin-top: 5px;"></div>
-        <div id="lock_timer_container" style="width: 239.98px; height: 2px; background-color: #444; margin-top: 10px; margin-left: 70px;">
-        <div id="lock_timer_bar" style="width: 239.98px; height: 2px; background-color: #888;"></div>
+        
 </div>
       </div>
 
@@ -410,18 +360,6 @@ combos for a perfect clear, <br>
           <input type="button" value="Cancel" class="prefs-appcan" onClick="gButton='cancel'">
         </p>
       </div>
-        <!-- <div class="input-boxes button-container" style="text-align: left;">
-          <p>
-            <button id="key_left_btn" type="button">ARROWLEFT</button><br>
-            <button id="key_right_btn" type="button">ARROWRIGHT</button><br>
-            <button id="key_softdrop_btn" type="button">ARROWDOWN</button><br>
-            <button id="key_harddrop_btn" type="button">SPACE</button><br>
-            <button id="key_rot_left_btn" type="button">ARROWUP</button><br>
-            <button id="key_rot_right_btn" type="button">CTRL</button><br>
-            <button id="key_hold_btn" type="button">C</button><br>
-            <button id="key_guide_btn" type="button">G</button><br>
-          </p>
-        </div> -->
       </div>
 
     </form>
