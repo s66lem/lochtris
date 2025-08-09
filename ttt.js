@@ -330,7 +330,7 @@ function LoadData(){
 
   window.KEY_CHARGE_DURATION = parseFloat(Load('DAS', 9.0));
   window.KEY_REPEAT_SPAN = parseFloat(Load('ARR', 3.0));
-  window.SOFT_DROP_FACTOR = parseFloat(Load('SDF', 10));
+  window.SOFT_DROP_FACTOR = parseFloat(Load('SDF', 25));
   /*
   window.KEY_CHARGE_DURATION = parseFloat(Load('DAS', 9.0));
   window.KEY_REPEAT_SPAN = parseFloat(Load('ARR', 3.0));
