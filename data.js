@@ -18,7 +18,7 @@ var LINE_CLEAR_DURATION = 15;        // <Frame> Line Erase Performance Time
 
 var DISPLAY_FEATURES_DURATION = 45;  // <Frame> Display time for the triggered move
 
-var LOCK_DELAY_DURATION = 30;      // <Frame> Time it takes from the moment mino reaches the deadline to the moment it is locked - - - - - - - - !!!!!
+var LOCK_DELAY_DURATION = 50;      // <Frame> Time it takes from the moment mino reaches the deadline to the moment it is locked - - - - - - - - !!!!!
 
 var LOCK_DELAY_INPUTMAX = 15;  // <Rotation> Maximum number of rotations/movements during lock delay before locked - - - - - - - - - - - - - - - !!!!!
 
@@ -39,15 +39,15 @@ var INITIAL_X = 3;                    // The X coordinate of the mino at the tim
 var INITIAL_Y = DEADLINE_HEIGHT - 2;  // Y coordinate of mino when it appeared
 
 
-var DEFAULT_KEY_MOVE_LEFT    = 'Left';
-var DEFAULT_KEY_MOVE_RIGHT   = 'Right';
-var DEFAULT_KEY_SOFTDROP     = 'Down';
-var DEFAULT_KEY_HARDDROP     = 'Space';
-var DEFAULT_KEY_ROTATE_RIGHT = 'Ctrl';
-var DEFAULT_KEY_ROTATE_LEFT  = 'Up';
-var DEFAULT_KEY_HOLD         = 'C';
-var DEFAULT_KEY_GUIDE        = 'R';
-var DEFAULT_KEY_ROTATE_180  = 'Shift'; 
+var DEFAULT_KEY_MOVE_LEFT    = 'arrowleft';
+var DEFAULT_KEY_MOVE_RIGHT   = 'arrowright';
+var DEFAULT_KEY_SOFTDROP     = 'arrowdown';
+var DEFAULT_KEY_HARDDROP     = 'space';
+var DEFAULT_KEY_ROTATE_RIGHT = 'arrowup';
+var DEFAULT_KEY_ROTATE_LEFT  = 'ctrl';
+var DEFAULT_KEY_HOLD         = 'c';
+var DEFAULT_KEY_GUIDE        = 'r';
+var DEFAULT_KEY_ROTATE_180  = 'shift'; 
 var DEFAULT_DAS = 9;
 var DEFAULT_ARR = 3;
 var DEFAULT_SDF = 15; // Soft drop speed
