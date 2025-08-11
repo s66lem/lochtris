@@ -669,7 +669,6 @@ function displayPB(problem) {
     smPb.textContent = problem.personalBest !== (null || Infinity || NaN || undefined)
       ? formatTime(problem.personalBest, false)
       : '.---';
-  console.log(`Displaying PB for problem ${problem.id}: ${problem.personalBest}`);
   }
 
 
@@ -1494,7 +1493,6 @@ function UpdateLockTimerBar() {
 }
 
 function UpdateManipulationIndicators() {
-  // console.log("lowestY:", lowestY, "curLowestBlockY:", GetLowestBlockY(gCurMino, gCurDir, gCurY));
   const grid = document.getElementById('pip-grid');
   if (!grid) return;
   grid.innerHTML = '';
