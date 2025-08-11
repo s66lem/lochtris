@@ -339,6 +339,7 @@ text-align: center;
 }
 .slider {
   -webkit-appearance: none;
+  appearance: none;
   width: 600px;
   margin: 0;
   height: 8px;
@@ -439,7 +440,7 @@ a:hover {
 }
 
 #gb {
-  outline: 3px solid #FFFFFF;
+  outline: 3px solid #888;
   outline-offset: 0px;
   position: relative;
   margin: 0;
@@ -457,24 +458,24 @@ a:hover {
 }
 
 #next-container {
-  outline: 3px solid #ffffff;
+  outline: 3px solid #888;
   padding: 0;
   /* margin-left: -10px; */
   margin: 0;
   width: 80px;
   position: relative;
   top: 3px;
-  left: -10px;
+  left: -9px;
 }
 #hold {
-  outline: 3px solid #ffffff;
+  outline: 3px solid #888;
   padding: 0;
   /* margin-left: -10px; */
   margin: 0;
   width: 80px;
   position: relative;
   top: 3px;
-  left: 12px;
+  left: 14px;
 }
 
 #perform_caption {
