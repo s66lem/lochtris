@@ -513,3 +513,124 @@ a:hover {
   outline: 3.5px solid #5F646D;
   /* box-shadow: 2px 2px 5px rgba(100, 100, 100, 0.05); */
 }
+
+
+/* stats container */
+.Stats {
+  width: 80px;
+  padding: 4px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  display: inline-flex;
+}
+
+/* sec styles */
+.sQuestions, .sPattern, .sPPS, .sInputs, .sTime, .sPb {
+  align-self: stretch;
+  padding: 4px 1px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  display: flex;
+}
+
+/* section spec. padding */
+.sQuestions {
+  padding: 8px 2px 3px 6px;
+}
+.sPPS {
+  padding-top: 154px;
+}
+.sPb {
+  padding-top: 3px;
+}
+
+/* titles */
+[data-layer^="st"], .Inputs, .Stquestions, .Stpattern, .Stpps {
+  text-align: center;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  font-family: Arial;
+  font-weight: 400;
+  word-wrap: break-word;
+}
+
+.Stquestions, .Stpattern, .stPb {
+  font-size: 10px;
+  color: #888888;
+}
+.Stpps, .Inputs, .stTime {
+  font-size: 12px;
+  color: #DCDADA;
+}
+.stTime {
+  color: white;
+}
+.stPb {
+  color: #929292;
+}
+
+/* inner wrappers */
+.sInputsInner, .sPPSInner, .sPbInner {
+  justify-content: flex-end;
+  align-items: last baseline;
+  display: inline-flex;
+}
+
+/* main values */
+.svQuestions, .svPatterns, .svPPS, .svInputs, .svTime, .svPb {
+  text-align: center;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  font-family: Arial;
+  font-weight: 400;
+  word-wrap: break-word;
+}
+
+.svQuestions {
+  font-size: 32px;
+  color: #888888;
+}
+.svPatterns {
+  font-size: 18px;
+  color: #888888;
+}
+.svPPS, .svInputs {
+  font-size: 18px;
+  color: #DCDADA;
+}
+.svTime {
+  font-size: 16px;
+  color: white;
+}
+.svPb {
+  font-size: 14px;
+  color: #929292;
+}
+
+/* unit + decimals */
+.suPPS, .suInputs, .saInputs, .smTime, .smPb {
+  text-align: center;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  font-family: Arial;
+  font-weight: 400;
+  word-wrap: break-word;
+  font-size: 12px;
+}
+.saInputs {
+  font-size: 14px;
+}
+.suPPS, .suInputs, .saInputs {
+  color: #DCDADA;
+}
+.smTime {
+  color: white;
+}
+.smPb {
+  color: #929292;
+}

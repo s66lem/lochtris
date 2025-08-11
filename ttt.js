@@ -73,7 +73,18 @@ var manipulations = 0;                          // number of inputs after reachi
 var manipulationLimit = LOCK_DELAY_INPUTMAX;    // max inputs before locking
 var lowestY = 0;                              // tracks lowest y pos the mino has reached
 
-
+// stats vars
+var sPieces = 0;
+var sPPS = 0.00; // pieces per sec
+var sPPShi = 0.00;
+var sInputs = 0; // total inputs
+var sIPP = 0.00; // inputs per piece
+  // timer vars
+  var sStartTime = 0; // start time
+  var sEndTime = 0;   // end time
+  var sElapsedTime = 0; // elapsed time
+  var sTimer;   // timer ID
+  var tsIsRunning = false; // 
 /*----------------------------------------------------------------------------------------
  ☆★ Access settings for each problem ★☆
 
@@ -331,30 +342,6 @@ function LoadData(){
   window.KEY_CHARGE_DURATION = parseFloat(Load('DAS', 9.0));
   window.KEY_REPEAT_SPAN = parseFloat(Load('ARR', 3.0));
   window.SOFT_DROP_FACTOR = parseFloat(Load('SDF', 25));
-  /*
-  window.KEY_CHARGE_DURATION = parseFloat(Load('DAS', 9.0));
-  window.KEY_REPEAT_SPAN = parseFloat(Load('ARR', 3.0));
-  window.SOFT_DROP_FACTOR = parseFloat(Load('SDF', 10));
-  const dasSlider = document.getElementById('das_slider');
-  const arrSlider = document.getElementById('arr_slider');
-  const sdfSlider = document.getElementById('sdf_slider');
-  const dasValue = document.getElementById('das_value');
-  const arrValue = document.getElementById('arr_value');
-  const sdfValue = document.getElementById('sdf_value');
-  if (dasSlider) {
-  const invertedDas = parseFloat(dasSlider.max) - window.KEY_CHARGE_DURATION + parseFloat(dasSlider.min);
-  dasSlider.value = invertedDas;
-}
-if (dasValue) dasValue.textContent = window.KEY_CHARGE_DURATION.toFixed(1);
-
-if (arrSlider) {
-  const invertedArr = parseFloat(arrSlider.max) - window.KEY_REPEAT_SPAN + parseFloat(arrSlider.min);
-  arrSlider.value = invertedArr;
-}
-if (arrValue) arrValue.textContent = window.KEY_REPEAT_SPAN.toFixed(1);  
-if (sdfSlider) sdfSlider.value = window.SOFT_DROP_FACTOR;
-if (sdfValue) sdfValue.textContent = window.SOFT_DROP_FACTOR;
-*/
 }
 /*----------------------------------------------------------------------------------------
  ☆★ Intra-frame processing ★☆
@@ -380,6 +367,7 @@ function Main(){
 function SetupScene(scene){
   switch(scene){
   case 'select_section':
+    resetStats();
     gLyrSections.Show();
     RefreshProblemButtons();
     gCurUseGuideFlg = false;
@@ -391,17 +379,21 @@ function SetupScene(scene){
     PrepareProblem();
     Refresh();
     gLyrPerform.Show();
+    displayPB(gCurProblem);
     window.scroll(0, 0);    // Scroll to the top
 
     break;
   case 'perform_falling':
     break;
   case 'perform_failed':
+    pauseTimer();
     Refresh();
     Say('perform_hint', 'Press Any Key to Retry');
     Say('perform_caption', 'Fail…');
     break;
   case 'perform_cleared':
+    pauseTimer();
+    savePB(sElapsedTime);
     Refresh();
     gCurUseGuideFlg = false;
     var curProblemId = gCurProgmeIdList[gCurProblemId];
@@ -414,14 +406,11 @@ function SetupScene(scene){
     Say('perform_caption', 'Guide Mode');
     break;
   case 'preferences':
-    // Key settings display
+    // key settings display
     setupKeyButtons();
-    /* for(var i = 0; i < gKeys.length; i++){
-      document.getElementById(gSelectForms[i]).value = gKeys[i];
-    } */
     SetupSliderDisplays();
     gLyrPreferences.Show();
-    window.scroll(0, 0);    // Scroll to the top
+    window.scroll(0, 0);    // scroll to the top
 
     break;
   default:
@@ -507,6 +496,8 @@ function PrepareProblem(){
 
   DisplayCaption();
   RefreshHint();
+  getPB();
+  
   // Matrix preparation
 
   for(var i = 0; i < DEADLINE_HEIGHT; i++){
@@ -536,6 +527,7 @@ function PrepareProblem(){
   gTSpinType = 0;
   gRens = -1;
   gIsReadyToB2b = false;
+  displayPB(gCurProblem);
 }
 /*----------------------------------------------------------------------------------------
  ☆★ Display problem title ★☆
@@ -547,7 +539,141 @@ function DisplayCaption(){
   var caption = SectionTitle(gCurSectionId) + "       " +((gCurProblemId) + 1) + "/" + gCurProgmeIdList.length + "     ";
   caption += gCurProblem.caption;
   Say("perform_caption", caption);
+  DisplayProbInfo();
+
+
+
 }
+
+function DisplayProbInfo(){
+  var curProblemId = gCurProgmeIdList[gCurProblemId];
+
+  // displaying question #
+  const questionnum = document.getElementById("svQuestions");
+  questionnum.textContent = `${gCurProblemId + 1}/${gCurProgmeIdList.length}`;
+
+
+  // displaying pattern #
+  const patternnum = document.getElementById("svPatterns");
+  patternnum.textContent = gCurProblem.caption;
+}
+/*----------------------------------------------------------------------------------------
+ ☆★ Stats ★☆
+----------------------------------------------------------------------------------------*/
+function resetStats() {
+  sInputs = 0;
+  sPieces = 0;
+  sPPS = 0.00;
+  sIPP = 0.00;
+  sElapsedTime = 0;
+  tsIsRunning = false;
+}
+
+// inputs, inputs/piece
+function updateInputs() {
+  sInputs++;
+  const inputsDisplay = document.getElementById('svInputs');
+  inputsDisplay.textContent = `${sInputs},`;
+}
+function updateIPP() {
+  sPieces++;
+
+  const ipp = document.getElementById('saInputs');
+  sIPP = (Math.round((sInputs / sPieces)*100)/100).toFixed(2);
+  ipp.textContent = `${sIPP}`;
+}
+
+// pps
+function updatePPS() {
+  let elapsed = sElapsedTime / 1000;
+  if (elapsed <= 0) {
+    sPPS = "0.00";
+  } else {
+    sPPS = (sPieces / elapsed).toFixed(2);
+  }
+  const pps = document.getElementById('svPPS');
+  pps.textContent = `${sPPS}`;
+  if (sPPS > sPPShi) {
+    sPPShi = sPPS;
+    // pps record, idk if i want this later but imma leave it here for now
+  }
+}
+
+// timer functions
+function formatTime(ms, isMinSec) {
+  const totalSeconds = Math.floor(ms / 1000);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  const milliseconds = Math.floor(ms % 1000); // 3 decimal places for ms
+
+  if (isMinSec) {
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  } else {
+    return `.${milliseconds.toString().padStart(3, '0')}`;
+  }
+}
+function updateTimer() {
+  const currentTime = new Date().getTime();
+  const currentElapsedTime = (currentTime - sStartTime);
+  sElapsedTime = currentElapsedTime;
+  svTime.textContent = formatTime(currentElapsedTime, true);
+  smTime.textContent = formatTime(currentElapsedTime, false);
+}
+function startTimer() {
+  if (!tsIsRunning) {
+    tsIsRunning = true;
+    sStartTime = new Date().getTime() - sElapsedTime;
+    sTimer = setInterval(updateTimer, 1000);
+  }
+}
+function pauseTimer() {
+  // real talk idk if this is needed but im putting it here anyway because more lines = better code right
+  // ps: it was needed, more lines = better code confirmed real 
+  if (tsIsRunning) {
+    tsIsRunning = false;
+    clearInterval(sTimer);
+    // sElapsedTime += Date.now() - sStartTime;
+  }
+}
+function resetTimer() {
+ tsIsRunning = false;
+ clearInterval(sTimer);
+ sElapsedTime = 0;
+ svTime.textContent = '0:00';
+ smTime.textContent = '.000';
+}
+
+
+// personal best fncs
+function savePB(elapsedTime) {
+  const problem = gCurProblem;
+  if (problem.personalBest === null || elapsedTime < problem.personalBest) {
+    problem.personalBest = elapsedTime;
+    // Save to localStorage for persistence
+    localStorage.setItem('pb_' + problem.id, elapsedTime);
+  }
+}
+function getPB() {
+  const problem = gCurProblem;
+  const savedPB = localStorage.getItem('pb_' + problem.id);
+  if (savedPB !== null) {
+    problem.personalBest = parseInt(savedPB, 10);
+  }
+}
+function displayPB(problem) {
+  const pbMinSec = document.getElementById('svPb');
+  const pbMs = document.getElementById('svPbMs');
+    svPb.textContent = problem.personalBest !== (null || Infinity || NaN || undefined)
+      ? formatTime(problem.personalBest, true)
+      : '-:--';
+    smPb.textContent = problem.personalBest !== (null || Infinity || NaN || undefined)
+      ? formatTime(problem.personalBest, false)
+      : '.---';
+  console.log(`Displaying PB for problem ${problem.id}: ${problem.personalBest}`);
+  }
+
+
+
 /*----------------------------------------------------------------------------------------
  ☆★ Send the next ★☆
 
@@ -735,13 +861,19 @@ function ScenePerform(){
     gScene = 'select_section';
     return;
   }
-  if(IsPressed()) gScene = 'perform_falling';
+  if(IsPressed()) {
+    gScene = 'perform_falling';
+    resetStats();
+    startTimer();
+  }
 }
 /*----------------------------------------------------------------------------------------
  ☆★ Scene: Lessons ★☆
 ----------------------------------------------------------------------------------------*/
 
 function ScenePerformFalling() {
+updateTimer();
+updatePPS();
   if (gIsEditingSlider) return false;
   switch (gButton) {
     case 'back':
@@ -874,6 +1006,7 @@ function ScenePerformFalling() {
       
     }
     if (IsPressed(KeyHD())) {
+      updateInputs();
       HardDrop(); // Hard drop input should be checked at the end
     }
 
@@ -904,100 +1037,7 @@ function ScenePerformFalling() {
 
   Refresh();
 }
-/* function ScenePerformFalling(){
-  switch(gButton){
-  case 'back':
-    gScene = 'select_section';
-    return;
-  }
-  // Tech name displayed
 
-  if(gDfCount > 0){
-    gDfCount--;
-    // Returns display when count ends
-
-    if(gDfCount == 0) DisplayCaption();
-  }
-  // Line erasing
-
-  if(gLineClearCount > 0){
-    gLineClearCount--;
-    if(gLineClearCount == 0){
-      var caption = (gCurSectionId + 1) + "-" + (gCurProblemId + 1) + " ";
-      caption += gCurProblem.caption;
-      RemoveReservedLines()
-    }
-    // No other operations allowed
-
-    return;
-  }
-  // If you are not operating the minho
-
-  if(!gCurMino){
-    // Clear confirmation
-
-    if(ReqIsCleared()) gScene = 'perform_cleared';
-    // Send the next one. Fail without the next
-
-    else if(!Dequeue()){
-      gCurMino = null;
-      gScene = 'perform_failed';
-    }
-    // Lockout determination
-
-    if(AppearsToLockout()){
-      Lockout();
-      return;
-    }
-  // When operating the minho
-
-  }else{
-    // Key input forks
-
-    if(InputsHorizontalMove(true)){
-      if(PlaceTest(gCurDir, gCurMino, gCurX + 1, gCurY)){
-        gCurX++;
-        gTSpinType = 0;
-        if(IsLanding()){} gNdCount = NATURAL_DROP_SPAN;
-      }
-    }else if(InputsHorizontalMove(false)){
-      if(PlaceTest(gCurDir, gCurMino, gCurX - 1, gCurY)){
-        gCurX--;
-        gTSpinType = 0;
-        if(IsLanding()) gNdCount = NATURAL_DROP_SPAN;
-      }
-    }
-    if(InputsSoftDrop()) SoftDrop();
-    if(IsPressed(KeyRR())) RotateRight();
-    if(IsPressed(KeyRL())) RotateLeft();
-    if(IsPressed(KeyG()) && !(gCurProblem.useGuide || gCurUseGuideFlg)) {
-      gScene = 'perform_guide';
-    }
-    if(IsPressed(KeyH())) Hold();
-    if(IsPressed(KeyHD())) HardDrop();  // Hard drop input should be checked at the end
-    // Fall/landing treatment
-
-    if(--gNdCount <= 0){
-      gNdCount = NATURAL_DROP_SPAN;
-      if(!IsLanding()){
-        gCurY++;
-        gTSpinType = 0;
-        gLandingCount = NATURAL_DROP_SPAN;
-      }else{
-        // Guide array dump
-
-        if(DUMP_GUIDE_DATA){
-          console.log("G(%s, %d, %d, %d)", gCurMino, gCurDir, gCurX, gCurY-3);
-        }
-        // Landing
-
-        Land();
-      }
-    }
-  }
-
-  Refresh();
-}
 /*----------------------------------------------------------------------------------------
  ☆★ Give horizontal movement? ★☆
 
@@ -1005,11 +1045,15 @@ function ScenePerformFalling() {
  Returns true at intervals or specified repeat intervals.
 ----------------------------------------------------------------------------------------*/
 function InputsHorizontalMove(toRight){
+  
   if (gIsEditingSlider) return false;
   keyName = toRight ? KeyR() : KeyL();
   
   // 1st frame after pressing, always move
-  if(PressedDuration(keyName) == 1) return true;
+  if(PressedDuration(keyName) == 1) {
+    updateInputs();
+    return true;
+  }
   
   // b4 das
   if(PressedDuration(keyName) < window.KEY_CHARGE_DURATION) return false;
@@ -1024,7 +1068,10 @@ function InputsHorizontalMove(toRight){
 ----------------------------------------------------------------------------------------*/
 function InputsSoftDrop(){
   if (gIsEditingSlider) return false;
-  if(IsPressed(KeySD())) return true;
+  if(IsPressed(KeySD())) {
+    updateInputs();
+    return true;
+  }
   if(!IsHolded(KeySD())) return false;
 
   var softDropInterval = Math.max(1, Math.floor(NATURAL_DROP_SPAN / window.SOFT_DROP_FACTOR));
@@ -1162,6 +1209,7 @@ function IsLanding(){
  ☆★ Landing ★☆
 ----------------------------------------------------------------------------------------*/
 function Land(){
+  updateIPP();
   ResetLockDelay(); // reset lock delay state
   // Reflected in the field
   
@@ -1525,7 +1573,7 @@ function RotateLeft(){
 }
 
 function Rotate180() {
-
+  updateInputs();
   var from = gCurDir;
   var to = (gCurDir + 2) % 4;
   var rotRule = gCurMino.rotationRule;
@@ -1559,6 +1607,7 @@ function Rotate180() {
  If <toRight> is true, it rotates right, and if false, it rotates left.
 ----------------------------------------------------------------------------------------*/
 function Rotate(toRight) {
+  updateInputs();
   var newDir = (gCurDir + (toRight ? 1 : 3)) % 4;
   var rotRule = gCurMino.rotationRule;
   var newX, newY;
@@ -1791,6 +1840,7 @@ function ScenePerformCleared(){
     gScene = 'select_section';
     return;
   }
+  displayPB(gCurProblem);
   if(IsPressed()) AfterClear();
 }
 /*----------------------------------------------------------------------------------------

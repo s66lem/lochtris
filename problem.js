@@ -26,11 +26,11 @@ function ProblemWarmingUp(id){
     [0,0,0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0]];
     this.ingredients = [[],Z,T,S,J,O,L,I,I,O,J]; //Available mino The first element is the initial hold mino
-    this.caption = 'Tetris Part 1';
+    this.caption = '#0';
     this.hint = 'The first 7 moves are a typical template for ¥n, which aims for Perfect Clear\n. ';
     this.guides = [G(Z, 0, 6, 18), G(T, 3, 8, 17), G(S, 0, 7, 16), G(J, 0, 0, 18), G(O, 0, 0, 17), G(L, 2, 0, 15), G(I, 3, 2, 16), G(I, 0, 4, 15), G(O, 0, 3, 18), G(J, 2, 4, 17)]; //Guide When creating a guide, use the dump information of the installation mino (the installation mino is dumped in console.log using ttt.js)
     this.useGuide = true; //Use guide (true when using guides without pressing R)
-this.req = [];       //ノルマ( REQuired features )
+    this.req = [];       //ノルマ( REQuired features )
     this.req.push(0);    //  [0]: Single
     this.req.push(0);    //  [1]: Double
     this.req.push(0);    //  [2]: Triple
@@ -40,10 +40,11 @@ this.req = [];       //ノルマ( REQuired features )
     this.req.push(0);    //  [6]: Mini T-Spin Single
     this.req.push(0);    //  [7]: T-Spin Single
     this.req.push(0);    //  [8]: T-Spin Double
-this.req.push(0);    //  [9]: T-Spin Triple
+    this.req.push(0);    //  [9]: T-Spin Triple
     this.req.push(1);    //  [10]: Perfect Clear
     this.req.push(0);    //  [11]: Back-to-Back
     this.req.push(0);    //  [12]: vREN (Combo)
+    this.personalBest = Infinity;
     break;
 
     default:
@@ -69,7 +70,7 @@ this.req.push(0);    //  [9]: T-Spin Triple
     [1,1,1,1,1,1,1,1,1,0],
     [1,1,1,1,1,1,1,1,1,0]];
     this.ingredients = [[],I]; //Available mino The first element is the initial hold mino
-    this.caption = 'Tetris Part 1';
+    this.caption = '#0';
     this.hint = 'Just count to 4! (Make a Tetris)';
     this.guides = []; //Guide When creating a guide, use the dump information of the installation mino (the installation mino is dumped in console.log using ttt.js)
     this.useGuide = true; //Use guide (true when using guides without pressing R)
@@ -77,7 +78,7 @@ this.req.push(0);    //  [9]: T-Spin Triple
     this.req.push(0); //[0]: Single
     this.req.push(0); //[1]: Double
     this.req.push(0); //[2]: Triple
-this.req.push(1);    //  [3]: Tetris
+    this.req.push(1);    //  [3]: Tetris
     this.req.push(0);    //  [4]: T-Spin Mini ( 0 列)
     this.req.push(0);    //  [5]: T-Spin ( 0 列)
     this.req.push(0);    //  [6]: Mini T-Spin Single
@@ -86,7 +87,8 @@ this.req.push(1);    //  [3]: Tetris
     this.req.push(0);    //  [9]: T-Spin Triple
     this.req.push(0);    //  [10]: Perfect Clear
     this.req.push(0);    //  [11]: Back-to-Back
-this.req.push(0);    //  [12]: vREN (Combo)
+    this.req.push(0);    //  [12]: vREN (Combo)
+    this.personalBest = Infinity;
     break;
 
   }
@@ -97,10 +99,11 @@ this.req.push(0);    //  [12]: vREN (Combo)
 function Problem840(id){
   this.id = id;
   this.initialBlocks = INITIAL_PC_BLOCKS;
-  this.caption = 'No.'+ id;
+  this.caption = '#'+ id;
   this.hint = 'PC this bad boy.';
   this.useGuide = false;
   this.req = [0,0,0,0,0,0,0,0,0,0,1,0,0];
+  this.personalBest = Infinity;
 
   /* Copy the case statements here from column DB of the "Template Revised_Calculation" sheet in "Tetris_Perfect_Clear_Template_Success_Rate.xlsx" */
   switch(id){
@@ -839,7 +842,7 @@ function Problem840(id){
     [1,1,1,1,1,1,1,1,1,0],
     [1,1,1,1,1,1,1,1,1,0]];
     this.ingredients = [[],I];  // 使用可能ミノ 先頭要素は初期ホールドミノ
-    this.caption = 'Tetris Part 1';
+    this.caption = '#0';
     this.hint = 'At first, \nI just decided on TETRiS (4 rows removed).\n First, warm up here!';
     this.guides = [];    // ガイド 作成する際は設置ミノのダンプ情報を利用（ttt.jsにてconsole.logに設置ミノをダンプしている）
     this.useGuide = true;  // ガイド使用(Rを押さなくてもガイドを利用するときtrue)
@@ -866,10 +869,11 @@ function Problem840(id){
 function ProblemWithGuidance(id){
   this.id = id;
   this.initialBlocks = INITIAL_PC_BLOCKS;
-  this.caption = 'No.'+ id;
+  this.caption = '#'+ id;
   this.hint = 'Basic pattern [With guide] /n Please PC this bad boy. ';
   this.useGuide = true;
   this.req = [0,0,0,0,0,0,0,0,0,0,1,0,0];
+  this.personalBest = Infinity;
 
   switch(id){
     /* I 縦置き （ガイドあり）*/
@@ -941,6 +945,7 @@ function ProblemWithGuidance(id){
     this.hint = '最初は　TETRiS (４列消し)を¥nひたすら決めるだけ。まずは¥nここで　ウォーミングアップ！';
     this.guides = [];    // ガイド 作成する際は設置ミノのダンプ情報を利用（ttt.jsにてconsole.logに設置ミノをダンプしている）
     this.useGuide = true;  // ガイド使用(Rを押さなくてもガイドを利用するときtrue)
+    this.personalBest = Infinity;
     this.req = [];       // ノルマ( REQuired features )
     this.req.push(0);    //   [0]: Single
     this.req.push(0);    //   [1]: Double
@@ -964,10 +969,11 @@ function ProblemWithGuidance(id){
 function ProblemOtherwise(id){
   this.id = id;
   this.initialBlocks = INITIAL_PC_BLOCKS;
-  this.caption = 'No.'+ id;
+  this.caption = '#'+ id;
   this.hint = 'Please PC this bad boy. ';
   this.useGuide = true;
   this.req = [0,0,0,0,0,0,0,0,0,0,1,0,0];
+  this.personalBest = Infinity;
 
   switch(id){
     case    1:    this.ingredients = [[],I,I,J,T];    this.guides = [G(I, 3, 2, 16),G(I, 3, 3, 16),G(J, 1, 4, 17),G(T, 2, 5, 17)];    break;
@@ -1039,6 +1045,7 @@ function ProblemOtherwise(id){
     this.req.push(0);    //   [10]: Perfect Clear
     this.req.push(0);    //   [11]: Back-to-Back
     this.req.push(0);    //   [12]: vREN (Combo)
+    this.personalBest = Infinity;
     break;
   }
 
@@ -1047,10 +1054,11 @@ function ProblemOtherwise(id){
 function Problem840_Mirror(id){
   this.id = id;
   this.initialBlocks = INITIAL_PC_BLOCKS_MIRROR;
-  this.caption = 'No.'+ id;
+  this.caption = '#'+ id;
   this.hint = 'Please PC this bad boy.';
   this.useGuide = false;
   this.req = [0,0,0,0,0,0,0,0,0,0,1,0,0];
+  this.personalBest = Infinity;
 
   /*The case statement here is "Tetris_Parfait Template Success Rate.xlsx" sheet "For Template Revised_Mirror_Calculation" */
   switch(id){
@@ -1807,6 +1815,7 @@ function Problem840_Mirror(id){
     this.req.push(0);    //   [10]: Perfect Clear
     this.req.push(0);    //   [11]: Back-to-Back
     this.req.push(0);    //   [12]: vREN (Combo)
+    this.personalBest = Infinity;
     break;
   }
 
