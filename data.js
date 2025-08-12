@@ -53,11 +53,12 @@ var DEFAULT_ARR = 3;
 var DEFAULT_SDF = 25; // Soft drop speed
 
 
-var DUMP_GUIDE_DATA = true;            // For guide array dump
+var DUMP_GUIDE_DATA = false;            // For guide array dump
 
 
 var SECTION_NUM = 21;            // For guide array dump
 
+console.log('feel free to look around the code,\ni pinky promise i\'m not stealing your data, \ni hate javascript too much to even try to figure out how to do that \nsincerely,\ns6lem');
 
 /*----------------------------------------------------------------------------------------
 ☆★ Matrix array [y][x] ★☆

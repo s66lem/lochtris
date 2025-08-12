@@ -1,6 +1,9 @@
 /*========================================================================================
  □■ ttt.js ■□
 ========================================================================================*/
+// user settings
+var usExplodeOnFail; // explode pieces on fail
+var usTextOverlay; // show text overlay
 /*----------------------------------------------------------------------------------------
  ☆★ Global variable list ★☆
 ----------------------------------------------------------------------------------------*/
@@ -85,6 +88,11 @@ var sIPP = 0.00; // inputs per piece
   var sElapsedTime = 0; // elapsed time
   var sTimer;   // timer ID
   var tsIsRunning = false; // 
+
+  var sClearedProblems = []; // for loading cleared % and avg time to complete
+
+
+
 /*----------------------------------------------------------------------------------------
  ☆★ Access settings for each problem ★☆
 
@@ -108,142 +116,10 @@ function Setup(){
   gPrevScene = '';
   gScene = 'select_section';
   LoadData();
+  loadClearedProblems();
+  updateSectionTitles();
 }
 
-function SetupSliderDisplays() {
-  const dasSlider = document.getElementById('das_slider');
-  const arrSlider = document.getElementById('arr_slider');
-  const sdfSlider = document.getElementById('sdf_slider');
-  const dasValue = document.getElementById('das_value');
-  const arrValue = document.getElementById('arr_value');
-  const sdfValue = document.getElementById('sdf_value');
-
-
-  if (dasSlider) {
-    const invertedDas = parseFloat(dasSlider.max) - window.KEY_CHARGE_DURATION + parseFloat(dasSlider.min);
-    dasSlider.value = invertedDas;
-  }
-  if (arrSlider) {
-    const invertedArr = parseFloat(arrSlider.max) - window.KEY_REPEAT_SPAN + parseFloat(arrSlider.min);
-    arrSlider.value = invertedArr;
-  }
-  if (sdfSlider) {
-    sdfSlider.value = window.SOFT_DROP_FACTOR;
-  }
-
-  if (dasSlider && dasValue) {
-    dasSlider.oninput = function() {
-      const invertedValue = parseFloat(this.max) - parseFloat(this.value) + parseFloat(this.min);
-      dasValue.innerHTML = `<span class="slider-value-number">${invertedValue.toFixed(1)}</span>`;
-    };
-    dasValue.innerHTML = `<span class="slider-value-number">${window.KEY_CHARGE_DURATION.toFixed(1)}</span>`;
-  }
-
-  if (arrSlider && arrValue) {
-    arrSlider.oninput = function() {
-      const invertedValue = parseFloat(this.max) - parseFloat(this.value) + parseFloat(this.min);
-      arrValue.innerHTML = `<span class="slider-value-number">${invertedValue.toFixed(1)}</span>`;
-    };
-    arrValue.innerHTML = `<span class="slider-value-number">${window.KEY_REPEAT_SPAN.toFixed(1)}</span>`;
-  }
-
-  if (sdfSlider && sdfValue) {
-    sdfSlider.oninput = function() {
-      sdfValue.innerHTML = `<span class="slider-value-number">${this.value}</span>`;
-    };
-    sdfValue.innerHTML = `<span class="slider-value-number">${window.SOFT_DROP_FACTOR}</span>`;
-  }
-  
-  makeSliderValueEditable('arr_slider', 'arr_value', 0.0, 5.0, 0.1);
-  makeSliderValueEditable('das_slider', 'das_value', 1.0, 20.0, 0.1);
-  makeSliderValueEditable('sdf_slider', 'sdf_value', 5, 40, 1);
-}
-
-function makeSliderValueEditable(sliderId, valueId, min, max, step) {
-  const slider = document.getElementById(sliderId);
-  const valueSpan = document.getElementById(valueId);
-
-  if (!slider || !valueSpan) return;
-
-  valueSpan.addEventListener('click', function() {
-    // Prevent multiple inputs
-    if (valueSpan.querySelector('input')) return;
-    
-    // Set flag to disable global keyboard handling
-    gIsEditingSlider = true;
-    
-    // Get current value without any unit
-    const currentValue = valueSpan.querySelector('.slider-value-number').textContent.trim();
-    
-    // Create input field
-    const input = document.createElement('input');
-    input.type = 'number';
-    input.value = currentValue;
-    input.min = min;
-    input.max = max;
-    input.step = step;
-    input.className = 'slider-value-edit-input';
-    input.style.width = '50px';
-    
-    // Store original content for restoration if needed
-    const originalContent = valueSpan.innerHTML;
-    
-    // Clear and append input
-    valueSpan.innerHTML = '';
-    valueSpan.appendChild(input);
-    
-    // Set focus AFTER appending to DOM
-    setTimeout(() => {
-      input.focus();
-      input.select();
-    }, 50); // Longer delay to ensure DOM update
-    
-    // Save original slider handler and disable it
-    const originalHandler = slider.oninput;
-    slider.oninput = null;
-    
-    function finishEdit(apply) {
-      // Re-enable keyboard handling
-      gIsEditingSlider = false;
-      
-      // Restore original handler
-      slider.oninput = originalHandler;
-      
-      if (apply && !isNaN(input.value)) {
-        // Get and validate value
-        let v = Math.max(min, Math.min(max, parseFloat(input.value)));
-        v = Math.round(v / step) * step;
-        
-        // Update slider (handle inverted values for DAS/ARR)
-        if (sliderId === 'arr_slider' || sliderId === 'das_slider') {
-          slider.value = (parseFloat(slider.max) - v + parseFloat(slider.min)).toFixed(1);
-        } else {
-          slider.value = v;
-        }
-        
-        // Trigger slider's oninput to update display
-        slider.dispatchEvent(new Event('input'));
-      } else {
-        // Restore original content if invalid or canceled
-        valueSpan.innerHTML = originalContent;
-      }
-    }
-    
-    // Handle events
-    input.addEventListener('blur', () => finishEdit(true));
-    input.addEventListener('keydown', function(e) {
-      e.stopPropagation(); // Prevent game handlers from catching keys
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        finishEdit(true);
-      } else if (e.key === 'Escape') {
-        e.preventDefault();
-        finishEdit(false);
-      }
-    });
-    input.addEventListener('click', e => e.stopPropagation());
-  });
-}
 
 /*----------------------------------------------------------------------------------------
  ☆★ Layer initialization ★☆
@@ -314,6 +190,143 @@ function setupKeyButtons() {
     };
   });
 }
+// sliders
+
+function SetupSliderDisplays() {
+  const dasSlider = document.getElementById('das_slider');
+  const arrSlider = document.getElementById('arr_slider');
+  const sdfSlider = document.getElementById('sdf_slider');
+  const dasValue = document.getElementById('das_value');
+  const arrValue = document.getElementById('arr_value');
+  const sdfValue = document.getElementById('sdf_value');
+
+
+  if (dasSlider) {
+    const invertedDas = parseFloat(dasSlider.max) - window.KEY_CHARGE_DURATION + parseFloat(dasSlider.min);
+    dasSlider.value = invertedDas;
+  }
+  if (arrSlider) {
+    const invertedArr = parseFloat(arrSlider.max) - window.KEY_REPEAT_SPAN + parseFloat(arrSlider.min);
+    arrSlider.value = invertedArr;
+  }
+  if (sdfSlider) {
+    sdfSlider.value = window.SOFT_DROP_FACTOR;
+  }
+
+  if (dasSlider && dasValue) {
+    dasSlider.oninput = function() {
+      const invertedValue = parseFloat(this.max) - parseFloat(this.value) + parseFloat(this.min);
+      dasValue.innerHTML = `<span class="slider-value-number">${invertedValue.toFixed(1)}</span>`;
+    };
+    dasValue.innerHTML = `<span class="slider-value-number">${window.KEY_CHARGE_DURATION.toFixed(1)}</span>`;
+  }
+
+  if (arrSlider && arrValue) {
+    arrSlider.oninput = function() {
+      const invertedValue = parseFloat(this.max) - parseFloat(this.value) + parseFloat(this.min);
+      arrValue.innerHTML = `<span class="slider-value-number">${invertedValue.toFixed(1)}</span>`;
+    };
+    arrValue.innerHTML = `<span class="slider-value-number">${window.KEY_REPEAT_SPAN.toFixed(1)}</span>`;
+  }
+
+  if (sdfSlider && sdfValue) {
+    sdfSlider.oninput = function() {
+      sdfValue.innerHTML = `<span class="slider-value-number">${this.value}</span>`;
+    };
+    sdfValue.innerHTML = `<span class="slider-value-number">${window.SOFT_DROP_FACTOR}</span>`;
+  }
+  
+  makeSliderValueEditable('arr_slider', 'arr_value', 0.0, 5.0, 0.1);
+  makeSliderValueEditable('das_slider', 'das_value', 1.0, 20.0, 0.1);
+  makeSliderValueEditable('sdf_slider', 'sdf_value', 5, 40, 1);
+}
+
+function makeSliderValueEditable(sliderId, valueId, min, max, step) {
+  const slider = document.getElementById(sliderId);
+  const valueSpan = document.getElementById(valueId);
+
+  if (!slider || !valueSpan) return;
+
+  valueSpan.addEventListener('click', function() {
+    if (valueSpan.querySelector('input')) return;
+    
+    gIsEditingSlider = true;
+    
+    const currentValue = valueSpan.querySelector('.slider-value-number').textContent.trim();
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.value = currentValue;
+    input.min = min;
+    input.max = max;
+    input.step = step;
+    input.className = 'slider-value-edit-input';
+    input.style.width = '50px';
+    
+    const originalContent = valueSpan.innerHTML;
+  
+    valueSpan.innerHTML = '';
+    valueSpan.appendChild(input);
+    
+    setTimeout(() => {
+      input.focus();
+      input.select();
+    }, 50);
+    const originalHandler = slider.oninput;
+    slider.oninput = null;
+    
+    function finishEdit(apply) {
+      gIsEditingSlider = false;
+      slider.oninput = originalHandler;
+      
+      if (apply && !isNaN(input.value)) {
+        let v = Math.max(min, Math.min(max, parseFloat(input.value)));
+        v = Math.round(v / step) * step;
+        if (sliderId === 'arr_slider' || sliderId === 'das_slider') {
+          slider.value = (parseFloat(slider.max) - v + parseFloat(slider.min)).toFixed(1);
+        } else {
+          slider.value = v;
+        }
+        slider.dispatchEvent(new Event('input'));
+      } else {
+        valueSpan.innerHTML = originalContent;
+      }
+    }
+    
+    // Handle events
+    input.addEventListener('blur', () => finishEdit(true));
+    input.addEventListener('keydown', function(e) {
+      e.stopPropagation(); // Prevent game handlers from catching keys
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        finishEdit(true);
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        finishEdit(false);
+      }
+    });
+    input.addEventListener('click', e => e.stopPropagation());
+  });
+}
+
+function setupCheckboxes() {
+  const explosionCheckbox = document.getElementById('cb_explosion_effects');
+    if (explosionCheckbox) {
+      explosionCheckbox.checked = usExplodeOnFail;
+      explosionCheckbox.addEventListener('change', function() {
+        usExplodeOnFail = this.checked;
+        Save('Explosions', usExplodeOnFail ? '1' : '0'); 
+      });
+    }
+  const textOverlayCheckbox = document.getElementById('cb_text_overlay');
+  if (textOverlayCheckbox) {
+    textOverlayCheckbox.checked = usTextOverlay;
+    textOverlayCheckbox.addEventListener('change', function() {
+      usTextOverlay = this.checked;
+      Save('TextOverlay', usTextOverlay ? '1' : '0');
+    });
+  }
+}
+
 /*----------------------------------------------------------------------------------------
  ☆★ Load ★☆
 
@@ -342,6 +355,9 @@ function LoadData(){
   window.KEY_CHARGE_DURATION = parseFloat(Load('DAS', 9.0));
   window.KEY_REPEAT_SPAN = parseFloat(Load('ARR', 3.0));
   window.SOFT_DROP_FACTOR = parseFloat(Load('SDF', 25));
+  usExplodeOnFail = Load('Explosions', '0');
+  usTextOverlay = Load('TextOverlay', '1');
+  
 }
 /*----------------------------------------------------------------------------------------
  ☆★ Intra-frame processing ★☆
@@ -381,15 +397,21 @@ function SetupScene(scene){
     gLyrPerform.Show();
     displayPB(gCurProblem);
     window.scroll(0, 0);    // Scroll to the top
+    setOverlay('', '', false);
 
     break;
   case 'perform_falling':
+    setOverlay('', '', false);
     break;
   case 'perform_failed':
     pauseTimer();
     Refresh();
     Say('perform_hint', 'Press Any Key to Retry');
     Say('perform_caption', 'Fail…');
+    setOverlay('Fail', 'press any key to retry', true);
+    if (usExplodeOnFail) {
+      requestAnimationFrame(() => ensureAnimReady(() => explodePlacedCells()));
+    }
     break;
   case 'perform_cleared':
     pauseTimer();
@@ -398,17 +420,19 @@ function SetupScene(scene){
     gCurUseGuideFlg = false;
     var curProblemId = gCurProgmeIdList[gCurProblemId];
     Say('perform_caption', 'Clear!');
+    setOverlay('Clear!', 'press any key to continue', true);
     break;
   case 'perform_guide':
     Refresh();
     gCurUseGuideFlg = true;
-    Say('perform_hint', 'Press Any Key to Start');
+    Say('perform_hint', 'press any key to start');
     Say('perform_caption', 'Guide Mode');
     break;
   case 'preferences':
     // key settings display
     setupKeyButtons();
     SetupSliderDisplays();
+    setupCheckboxes();
     gLyrPreferences.Show();
     window.scroll(0, 0);    // scroll to the top
 
@@ -446,6 +470,28 @@ function TerminateScene(scene){
     break;
   }
 }
+
+/*----------------------------------------------------------------------------------------------
+ ☆★ fun caption overlay thing while i procrastinate implementing the section overall stats ★☆
+----------------------------------------------------------------------------------------------*/
+  function setOverlay(title, subtitle, show = true) {
+  if (!usTextOverlay) return;
+  const el = document.getElementById('gb-overlay');
+  if (!el) return;
+  el.textContent = title;
+  el.style.display = show ? 'flex' : 'none';
+  if (title.includes('Fail')) {
+  el.style.color = '#ff3232';
+  }
+
+  const subEl = document.getElementById('gb-overlaysub');
+  if (subEl) {
+    subEl.textContent = subtitle;
+    subEl.style.display = show ? 'block' : 'none';
+  }
+}
+
+
 /*----------------------------------------------------------------------------------------
  ☆★ Scene processing ★☆
 ----------------------------------------------------------------------------------------*/
@@ -756,6 +802,145 @@ function RefreshHeaderClearedStatus() {
   }
 }
 /*----------------------------------------------------------------------------------------
+ ☆★ I HATE JAVASCRIPT DUMB STUPID PIECE OF SHIT ★☆
+----------------------------------------------------------------------------------------*/
+
+function getSectionPlaylist(sectionID) {
+  return;
+  switch(sectionID) {
+    case 1: return    getProblemIdList(WARMING_UP);
+    case 2: return    getProblemIdList(GUIDANCE_VERTICAL);
+    case 3: return    getProblemIdList(PROB840_VERTICAL);
+    case 4: return    getProblemIdList(GUIDANCE_HORIZONTAL_1);
+    case 5: return    getProblemIdList(PROB840_HORIZONTAL_1);
+    case 6: return    getProblemIdList(GUIDANCE_HORIZONTAL_LAYDOWN);
+    case 7: return    getProblemIdList(PROB840_HORIZONTAL_LAYDOWN);
+    case 8: return    getProblemIdList(GUIDANCE_HORIZONTAL_IILO);
+    case 9: return    getProblemIdList(PROB840_HORIZONTAL_IILO);
+    case 10: return   getProblemIdList(GUIDANCE_HORIZONTAL_3);
+    case 11: return   getProblemIdList(PROB840_HORIZONTAL_3);
+    case 12: return   getProblemIdList(PROB840_HORIZONTAL_1)
+                      .concat(getProblemIdList(PROB840_HORIZONTAL_LAYDOWN))
+                      .concat(getProblemIdList(PROB840_HORIZONTAL_IILO))
+                      .concat(getProblemIdList(PROB840_HORIZONTAL_3));
+    case 13: return   getProblemIdList(GUIDANCE_LSIO);
+    case 14: return   getProblemIdList(PROB840_LSIO);
+    case 15: return   getProblemIdList(PROB840);
+    case 16: return   getProblemIdList(PROB840)
+                      .concat(getProblemIdList(PROB840_MIRROR));
+    case 17: return   getProblemIdList(GUIDANCE_OTHER_WISE);
+    case 18: return   getProblemIdList(PROB840_VERTICAL);
+    case 19: return   getProblemIdList(PROB840_HORIZONTAL_1)
+                      .concat(getProblemIdList(PROB840_HORIZONTAL_LAYDOWN))
+                      .concat(getProblemIdList(PROB840_HORIZONTAL_IILO))
+                      .concat(getProblemIdList(PROB840_HORIZONTAL_3));
+    case 20: return   getProblemIdList(PROB840);
+    case 21: return   getProblemIdList(PROB840_MIRROR);
+    default: return [];
+  }
+}
+
+
+
+function normalizeProblemId(id) {
+  return; // fuck you javascript
+  if (typeof id === 'number' && Number.isFinite(id)) return id;
+  if (typeof id === 'object' && id) return getProblemStorageId(id);
+  if (typeof id === 'string') {
+    // Extract first number (handles "G42", "42", etc.)
+    const m = id.match(/\d+/);
+    if (m) return parseInt(m[0], 10);
+  }
+  return null;
+}
+
+
+function getProblemById(id) {
+  return; // stupid dumb piece of shit
+  const key = normalizeProblemId(id);
+  if (key == null) return null;
+
+  const direct = gProblems[key];
+  if (direct) return direct;
+
+  if (Array.isArray(gProblems)) {
+    for (const prob of gProblems) {
+      if (!prob) continue;
+      const sid = getProblemStorageId(prob);
+      if (sid === key || prob.id === key) return prob;
+    }
+  } else {
+    for (const k in gProblems) {
+      const prob = gProblems[k];
+      if (!prob) continue;
+      const sid = getProblemStorageId(prob);
+      if (sid === key || prob.id === key) return prob;
+    }
+  }
+  return null;
+}
+
+function getProblemStorageId(p) {
+  if (typeof p === 'object') {
+    // Prefer a numeric/source id if present, else fallback to id
+    return (p.storageId);
+  }
+  return p.storageId;
+}
+ 
+function markCleared(problem) {
+  return; // this is a fucking mess and i hate it
+  const storageId = getProblemStorageId(problem);
+  problem.cleared = true;
+  localStorage.setItem('cleared_' + storageId, 'true');
+}
+
+function loadClearedProblems() {
+  return; // this is a fucking mess and i hate it2
+  for (let sectionID = 1; sectionID <= SECTION_NUM; sectionID++) {
+    const playlist = getSectionPlaylist(sectionID);
+    for (let i = 0; i < playlist.length; i++) {
+      const problem = playlist[i];
+      if (problem) {
+        const isCleared = localStorage.getItem('cleared_' + getProblemStorageId(problem)) === 'true';
+        if (isCleared) {
+          problem.cleared = true;
+        }
+      }
+    }
+  }
+  updateSectionTitles(); 
+}
+
+function getClearedProblems(sectionID) {
+  return;
+  const playlist = getSectionPlaylist(sectionID);
+  if (!playlist || playlist.length === 0) return 'Nonexistant';
+
+  const cleared = [];
+  for (const p of playlist) {
+    const storageId = getProblemStorageId(p);
+    console.log(`${getProblemById(storageId)}: ${localStorage.getItem('cleared_' + storageId)} storage: ${storageId}`);
+    if (localStorage.getItem('cleared_' + storageId) === 'true' || p.cleared) {
+      cleared.push(storageId);
+    }
+  }
+  return cleared.join(', ');
+}
+
+function updateSectionTitles() {
+  return; // OH MY GOD I HATE JAVASCRIPT IT SHOULD NOT BE THIS FUCKING HARD TO RETURN ALL THE FUCKING CLEARED PROBLEMS IN A SECTION
+  for (let i = 1; i <= SECTION_NUM; i++) {
+    const section = document.getElementById(`section${i}`);
+    if (section) {
+      section.title = `Cleared Problems: ${getClearedProblems(i)}`;
+    }
+  }
+}
+
+// M updateSectionTitles();
+
+/*----------------------------------------------------------------------------------------
  ☆★ Scene: Select section ★☆
 ----------------------------------------------------------------------------------------*/
 function SceneSelectSection(){
@@ -855,6 +1040,7 @@ function SceneSelectSection(){
  ☆★ Scene: Lesson starts ★☆
 ----------------------------------------------------------------------------------------*/
 function ScenePerform(){
+  cleanExplosion();
   switch(gButton){
   case 'back':
     gScene = 'select_section';
@@ -1707,6 +1893,7 @@ function RefreshMatrix(){
  ☆★ Reflected blocks installed ★☆
 ----------------------------------------------------------------------------------------*/
 function RefreshPlacedMino(){
+  cleanExplosion();
   for(var i = DEADLINE_HEIGHT; i < MATRIX_HEIGHT; i++){
     for(var j = 0; j < MATRIX_WIDTH; j++){
       SetImage("m" + (i - DEADLINE_HEIGHT) + "_" + j, gBlocks[gMatrix[i][j]].image);
@@ -1816,7 +2003,9 @@ function ScenePerformFailed(){
     gScene = 'select_section';
     return;
   }
-  if(IsPressed()) gScene = 'perform';
+  if(IsPressed()) {
+    gScene = 'perform';
+  }
 }
 /*----------------------------------------------------------------------------------------
  ☆★ Scene: Guide mode ★☆
@@ -1839,6 +2028,7 @@ function ScenePerformCleared(){
     return;
   }
   displayPB(gCurProblem);
+  markCleared(gCurProblem);
   if(IsPressed()) AfterClear();
 }
 /*----------------------------------------------------------------------------------------
@@ -1853,6 +2043,7 @@ function AfterClear(){
     Save('Prg' + gCurSectionId, '1');
     RefreshProblemButtons();
     RefreshHeaderClearedStatus();
+    updateSectionTitles();
   }
   else{
     gCurProblemId++;
@@ -1903,6 +2094,10 @@ function SavePreferences() {
     alert("Duplicate keys.");
     return false;
   }
+  const explosionCheckbox = document.getElementById('cb_explosion_effects');
+  if (explosionCheckbox) usExplodeOnFail = explosionCheckbox.checked;
+  const textOverlayCheckbox = document.getElementById('cb_text_overlay');
+  if (textOverlayCheckbox) usTextOverlay = textOverlayCheckbox.checked;
   // Save keys from buttons
   const buttonIds = [
     'key_left_btn', 'key_right_btn', 'key_softdrop_btn', 'key_harddrop_btn',
@@ -1933,6 +2128,8 @@ function SavePreferences() {
   Save('DAS', window.KEY_CHARGE_DURATION);
   Save('ARR', window.KEY_REPEAT_SPAN);
   Save('SDF', window.SOFT_DROP_FACTOR);
+  Save('Explosions', usExplodeOnFail ? '1' : '0');
+  Save('TextOverlay', usTextOverlay ? '1' : '0');
 
   return true;
 }

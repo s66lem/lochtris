@@ -396,8 +396,9 @@ function ShowImage(imageId){
  The address of the image specified by <imageId> is set to <src>. If the address does not change, then nothing will be done.
 ----------------------------------------------------------------------------------------*/
 function SetImage(imageId, src){
-  if(document.getElementById(imageId).src != src){
-    document.getElementById(imageId).src = src;
+  const element = document.getElementById(imageId);
+  if (element && element.src != src) {
+    element.src = src;
   }
 }
 /*----------------------------------------------------------------------------------------

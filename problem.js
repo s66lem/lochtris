@@ -30,6 +30,9 @@ function ProblemWarmingUp(id){
     this.hint = 'The first 7 moves are a typical template for ¥n, which aims for Perfect Clear\n. ';
     this.guides = [G(Z, 0, 6, 18), G(T, 3, 8, 17), G(S, 0, 7, 16), G(J, 0, 0, 18), G(O, 0, 0, 17), G(L, 2, 0, 15), G(I, 3, 2, 16), G(I, 0, 4, 15), G(O, 0, 3, 18), G(J, 2, 4, 17)]; //Guide When creating a guide, use the dump information of the installation mino (the installation mino is dumped in console.log using ttt.js)
     this.useGuide = true; //Use guide (true when using guides without pressing R)
+    this.id = id;
+    this.storageId = 'W' + id; // storage key
+    this.cleared = false; // is problem cleared?
     this.req = [];       //ノルマ( REQuired features )
     this.req.push(0);    //  [0]: Single
     this.req.push(0);    //  [1]: Double
@@ -98,6 +101,8 @@ function ProblemWarmingUp(id){
 }
 function Problem840(id){
   this.id = id;
+  this.storageId = id; // storage key
+  this.cleared = false; // is problem cleared?
   this.initialBlocks = INITIAL_PC_BLOCKS;
   this.caption = '#'+ id;
   this.hint = 'PC this bad boy.';
@@ -868,6 +873,8 @@ function Problem840(id){
 
 function ProblemWithGuidance(id){
   this.id = id;
+  this.storageId = 'G' + id; // storage key
+  this.cleared = false; // is problem cleared?
   this.initialBlocks = INITIAL_PC_BLOCKS;
   this.caption = '#'+ id;
   this.hint = 'Basic pattern [With guide] /n Please PC this bad boy. ';
@@ -968,6 +975,8 @@ function ProblemWithGuidance(id){
 
 function ProblemOtherwise(id){
   this.id = id;
+  this.storageId = 'P' + id; // storage key
+  this.cleared = false; // is problem cleared?
   this.initialBlocks = INITIAL_PC_BLOCKS;
   this.caption = '#'+ id;
   this.hint = 'Please PC this bad boy. ';
@@ -1053,6 +1062,8 @@ function ProblemOtherwise(id){
 }
 function Problem840_Mirror(id){
   this.id = id;
+  this.storageId = 'M' + id; // storage key
+  this.cleared = false; // is problem cleared?
   this.initialBlocks = INITIAL_PC_BLOCKS_MIRROR;
   this.caption = '#'+ id;
   this.hint = 'Please PC this bad boy.';

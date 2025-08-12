@@ -1,54 +1,56 @@
 <html>
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <title>Lochtris</title>
-  <!--Load external css -->
-  <link href="ttt.css" rel="stylesheet" type="text/css">
-  <!--Please refer to each js file for detailed operation -->
-  <script type="text/javascript" src="jsgmod.js"></script>
-  <script type="text/javascript" src="data.js"></script>
-  <script type="text/javascript" src="problemData.js"></script>
-  <script type="text/javascript" src="problem.js"></script>
-  <script type="text/javascript" src="ttt.js"></script>
-  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
-  <!--
-  ■Note
-  ・(Nothing in particular)
--->
-</head>
-<body onLoad="Execute()">
-  <form name="fMain">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Lochtris</title>
+    <!--Load external css -->
+    <link href="ttt.css" rel="stylesheet" type="text/css">
+    <!--Please refer to each js file for detailed operation -->
+    <script type="text/javascript" src="jsgmod.js"></script>
+    <script type="text/javascript" src="data.js"></script>
+    <script type="text/javascript" src="problemData.js"></script>
+    <script type="text/javascript" src="problem.js"></script>
+    <script type="text/javascript" src="ttt.js"></script>
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+      <script src="anim.js"></script>
+    <!--
+    ■Note
+    ・(Nothing in particular)
+  -->
+  </head>
+  <body onLoad="Execute()">
+    <form name="fMain">
 
-    <div id="list_sections" class="layer">
-      <p id="title" class="center">
-        Lochtris
-      </p>
-      <p class="subtitle">
-          <b><i>Originally created by <a href=https://github.com/sakuramochi84>Chotia</a>, Translated & Refreshed by s6lem. </i></b>
-      </p>
+      <div id="list_sections" class="layer">
+        <p id="title" class="center">
+          Lochtris
+        </p>
+        <p class="subtitle">
+            <b><i>Originally created by <a href=https://github.com/sakuramochi84>Chotia</a>, Translated & Refreshed by s6lem. </i></b>
+        </p>
 
-      <p>
-        <br>
-        <p id="header2">
-        Want to be a PCO master? You’ve come to the right place.
-        </p>
-        <p id="subheader">
-          711/840 bag combos are perfectly clearable.
-        </p>
-      </p>
-      <p>
-        
+        <p>
+          <br>
           <p id="header2">
-          Can't figure out the solve? Press 'R' for the guide!
+          Want to be a PCO master? You’ve come to the right place.
           </p>
           <p id="subheader">
-            For success rates per pattern, please refer to <a href="TetrisPerfectClear.xlsx">this</a>
+            711/840 bag combos are perfectly clearable.
           </p>
-      </p>
-      <hr style="height: 0px; border: none; margin: -5px;">
-      <p>
-<input type="button" value="key settings" onClick="gButton='preferences'">
+        </p>
+        <p>
+
+            <p id="header2">
+            Can't figure out the solve? Press 'R' for the guide!
+            </p>
+            <p id="subheader">
+              For success rates per pattern, please refer to <a href="TetrisPerfectClear.xlsx">this</a>
+            </p>
+        </p>
+        <hr style="height: 0px; border: none; margin: -5px;">
+        <p>
+  <input type="button" value="key settings" onClick="gButton='preferences'">
       </p>
       <p id="subheader">
         <i>Minos stuttering/moving too quickly? Try reloading!</i>
@@ -249,6 +251,8 @@ combos for a perfect clear, <br>
 
     <td style="vertical-align: top; width: 240px">
       <div id="gb-wrapper">  
+        <div id="gb-overlay" aria-hidden="true">Overlay text</div>
+        <div id="gb-overlaysub" aria-hidden="true">Subtext</div>
         <div id="gb">
           <img src="img/b0.png" id="m0_0"><img src="img/b0.png" id="m0_1"><img src="img/b0.png" id="m0_2"
           ><img src="img/b0.png" id="m0_3"><img src="img/b0.png" id="m0_4"><img src="img/b0.png" id="m0_5"
@@ -362,6 +366,7 @@ combos for a perfect clear, <br>
 
 
       <div id="preferences" class="layer prefs-container">
+        <div class="prefs-title">Keybinds</div>
         <div class="key-setting-row"><span>Move Left</span><button id="key_left_btn" type="button">ARROWLEFT</button></div>
         <div class="key-setting-row"><span>Move Right</span><button id="key_right_btn" type="button">ARROWRIGHT</button></div>
         <div class="key-setting-row"><span>Soft Drop</span><button id="key_softdrop_btn" type="button">ARROWDOWN</button></div>
@@ -371,8 +376,9 @@ combos for a perfect clear, <br>
         <div class="key-setting-row"><span>Rotate 180</span><button id="key_rot_180_btn" type="button">SHIFT</button></div>
         <div class="key-setting-row"><span>Hold</span><button id="key_hold_btn" type="button">C</button></div>
         <div class="key-setting-row"><span>See Guide</span><button id="key_guide_btn" type="button">G</button></div>
-        <p>
-         <div class="slider-setting-row">
+      <p>
+        <div class="prefs-title">Handling</div>
+          <div class="slider-setting-row">
           <label for="arr_slider" class="slider-label" style="margin-right:10px;" title="Automatic Repeat Rate: # of Frames between repeated movement after DAS.">ARR</label>
           <input type="range" class="slider" id="arr_slider" min="0.0" max="5.0" value="3.0" step="0.1" />
           <span class="slider-value-label">
@@ -393,7 +399,11 @@ combos for a perfect clear, <br>
             <span class="slider-value" id="sdf_value">10</span>x
           </span>
         </div>
-        </p>
+      </p>
+        <div class="prefs-title">Display</div>
+        <div class="display-row"><span>Explosion Effects</span><input type="checkbox" id="cb_explosion_effects"/></div>
+        <div class="display-row"><span>Text Overlay</span><input type="checkbox" id="cb_text_overlay" checked/></div>
+      </p>
         <p>
           <input type="button" value="Apply" class="prefs-appcan" onClick="gButton='ok'">
           <input type="button" value="Cancel" class="prefs-appcan" onClick="gButton='cancel'">
@@ -402,6 +412,6 @@ combos for a perfect clear, <br>
       </div>
 
     </form>
-
   </body>
-  </html>
+</html>
+
