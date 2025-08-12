@@ -1230,7 +1230,6 @@ updatePPS();
  Returns true at intervals or specified repeat intervals.
 ----------------------------------------------------------------------------------------*/
 function InputsHorizontalMove(toRight){
-  
   if (gIsEditingSlider) return false;
   keyName = toRight ? KeyR() : KeyL();
   
@@ -1243,8 +1242,14 @@ function InputsHorizontalMove(toRight){
   // b4 das
   if(PressedDuration(keyName) < window.KEY_CHARGE_DURATION) return false;
   
-  // after das, move every arr frames
-  return (PressedDuration(keyName) - window.KEY_CHARGE_DURATION) % window.KEY_REPEAT_SPAN == 0;
+  // Special handling for very low ARR values
+  if (window.KEY_REPEAT_SPAN <= 1) {
+    return true; // Move every frame when ARR is 1 or less
+  }
+  
+  // after das, move every arr frames (use Math.round for more consistent behavior)
+  let framesAfterDAS = PressedDuration(keyName) - window.KEY_CHARGE_DURATION;
+  return framesAfterDAS % Math.round(window.KEY_REPEAT_SPAN) === 0;
 }
 /*----------------------------------------------------------------------------------------
  ☆★ Soft Drop Run? ★☆
