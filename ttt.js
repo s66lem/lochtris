@@ -1941,13 +1941,12 @@ function RefreshGhostAndGuide(){
 
   if(gCurProblem.useGuide || gCurUseGuideFlg){
     for(var i = 0; i < guideBlks.length; i++){
-      DisplayBlock(guideBlks[i][0], guideBlks[i][1], g.mino.guideBlockId, true);
+      DisplayBlock(guideBlks[i][0], guideBlks[i][1], 40 + g.mino.id, true);
     }
 
-    // Drawing of common parts
-
+    // Drawing of common parts (ghost + guide overlaps)
     for(var i = 0; i < ghostGuideBlks.length; i++){
-      DisplayBlock(ghostGuideBlks[i][0], ghostGuideBlks[i][1], String(g.mino.ghostGuideBlockId) + String(gCurMino.id), true);
+      DisplayBlock(ghostGuideBlks[i][0], ghostGuideBlks[i][1], 50 + g.mino.id, true);
     }
   }
 }

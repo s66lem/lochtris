@@ -97,24 +97,13 @@ function Block(id){
 
     this.passable = true;
     break;
-    // Each installed block
 
-    case 21: case 22: case 23: case 24: case 25: case 26: case 27:
-    this.passable = false;
-    break;
     // Each other block
 
     case 11: case 12: case 13: case 14: case 15: case 16: case 17:
-    case 31: case 32: case 33: case 34: case 35: case 36: case 37:
+    case 31: 
     case 41: case 42: case 43: case 44: case 45: case 46: case 47:
     case 51: case 52: case 53: case 54: case 55: case 56: case 57:
-    case 511: case 512: case 513: case 514: case 515: case 516: case 517:
-    case 521: case 522: case 523: case 524: case 525: case 526: case 527:
-    case 531: case 532: case 533: case 534: case 535: case 536: case 537:
-    case 541: case 542: case 543: case 544: case 545: case 546: case 547:
-    case 551: case 552: case 553: case 554: case 555: case 556: case 557:
-    case 561: case 562: case 563: case 564: case 565: case 566: case 567:
-    case 571: case 572: case 573: case 574: case 575: case 576: case 577:
     this.passable = false;
     break;
     // If other numbers (non-existent blocks) do not cache images
@@ -135,7 +124,7 @@ function Block(id){
 var gBlocks = [];
 //for(var i = 0; i <= 57; i++) gBlocks.push(new Block(i));
 
-for(var i = 0; i <= 577; i++) gBlocks.push(new Block(i));
+for(var i = 0; i <= 57; i++) gBlocks.push(new Block(i));
 function BlkEmpty(){return gBlocks[0] }
 function BlkVanishing(){return gBlocks[2] }
 
@@ -318,11 +307,11 @@ function IMino(){
   [0, 1, 0, 0],
   [0, 1, 0, 0],
   [0, 1, 0, 0]]];
-  this.activeBlockId = 11;
-  this.placedBlockId = 21;
-  this.ghostBlockId  = 31;
-  this.guideBlockId  = 41;
-  this.ghostGuideBlockId = 51;
+  this.activeBlockId = 11;            // falling
+  this.placedBlockId = 11;            // placed
+  this.ghostBlockId  = 31;            // ghost 
+  this.guideBlockId  = 41;            // guide on black bg
+  this.ghostGuideBlockId = 51;        // guide on ghost bg
   this.rotationRule = gRotationRuleI;
   return this;
 }
@@ -351,8 +340,8 @@ function TMino(){
   [0, 1, 0, 0],
   [0, 0, 0, 0]]];
   this.activeBlockId = 12;
-  this.placedBlockId = 22;
-  this.ghostBlockId  = 32;
+  this.placedBlockId = 12;
+  this.ghostBlockId  = 31;
   this.guideBlockId  = 42;
   this.ghostGuideBlockId = 52;
   this.rotationRule = gRotationRuleGeneral;
@@ -383,8 +372,8 @@ function JMino(){
   [1, 1, 0, 0],
   [0, 0, 0, 0]]];
   this.activeBlockId = 13;
-  this.placedBlockId = 23;
-  this.ghostBlockId  = 33;
+  this.placedBlockId = 13;
+  this.ghostBlockId  = 31;
   this.guideBlockId  = 43;
   this.ghostGuideBlockId = 53;
   this.rotationRule = gRotationRuleGeneral;
@@ -415,8 +404,8 @@ function LMino(){
   [0, 1, 0, 0],
   [0, 0, 0, 0]]];
   this.activeBlockId = 14;
-  this.placedBlockId = 24;
-  this.ghostBlockId  = 34;
+  this.placedBlockId = 14;
+  this.ghostBlockId  = 31;
   this.guideBlockId  = 44;
   this.ghostGuideBlockId = 54;
   this.rotationRule = gRotationRuleGeneral;
@@ -447,8 +436,8 @@ function ZMino(){
   [1, 0, 0, 0],
   [0, 0, 0, 0]]];
   this.activeBlockId = 15;
-  this.placedBlockId = 25;
-  this.ghostBlockId  = 35;
+  this.placedBlockId = 15;
+  this.ghostBlockId  = 31;
   this.guideBlockId  = 45;
   this.ghostGuideBlockId = 55;
   this.rotationRule = gRotationRuleGeneral;
@@ -479,8 +468,8 @@ function SMino(){
   [0, 1, 0, 0],
   [0, 0, 0, 0]]];
   this.activeBlockId = 16;
-  this.placedBlockId = 26;
-  this.ghostBlockId  = 36;
+  this.placedBlockId = 16;
+  this.ghostBlockId  = 31;
   this.guideBlockId  = 46;
   this.ghostGuideBlockId = 56;
   this.rotationRule = gRotationRuleGeneral;
@@ -511,8 +500,8 @@ function OMino(){
   [0, 0, 0, 0],
   [0, 0, 0, 0]]];
   this.activeBlockId = 17;
-  this.placedBlockId = 27;
-  this.ghostBlockId  = 37;
+  this.placedBlockId = 17;
+  this.ghostBlockId  = 31;
   this.guideBlockId  = 47;
   this.ghostGuideBlockId = 57;
   this.rotationRule = gRotationRuleGeneral;  // It's not necessary but for convenience
