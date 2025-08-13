@@ -9,6 +9,7 @@
     <script type="text/javascript" src="data.js"></script>
     <script type="text/javascript" src="problemData.js"></script>
     <script type="text/javascript" src="problem.js"></script>
+    <script type="text/javascript" src="gameboard.js"></script>
     <script type="text/javascript" src="ttt.js"></script>
     <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
@@ -179,15 +180,16 @@ combos for a perfect clear, <br>
       <p>
         <input type="text" id="perform_caption" class="center" style="width: 560px;"><br>
       </p>
-      <table>
-        <!-- HOLD -->
-        <td style="vertical-align: top; padding-left: 38px;">
+      <table style="margin: 0 auto;">
+        <tr>
+        <!-- HOLD and STATS -->
+        <td id="gb_right"style="vertical-align: top; width: 120px; text-align: center;">
           <p style="margin: 0; padding: 0;">
-            <div id="hold">
+            <div id="hold" style="outline: 3px solid #888; background: #111; width: 80px; height: 60px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
               <img src="img/b3.png" id="hold_display" width="80" height="60" style="display: block;">
             </div>
 
-<div id="stats" class="Stats"></div>
+<div id="stats" class="Stats">
   <div id="sQuestions" class="sQuestions">
     <div id="stQuestions" class="Stquestions">QUESTION</div>
     <div id="svQuestions" class="Svquestions">1/20</div>
@@ -228,100 +230,24 @@ combos for a perfect clear, <br>
 </div>
         </td>
 
-    <td style="vertical-align: top; width: 240px">
+    <!-- GAMEBOARD (centered) -->
+    <td style="vertical-align: top; width: 240px; text-align: center;">
       <div id="gb-wrapper">  
         <div id="gb-overlay" aria-hidden="true">Overlay text</div>
         <div id="gb-overlaysub" aria-hidden="true">Subtext</div>
-        <div id="gb">
-          <img src="img/b0.png" id="m0_0"><img src="img/b0.png" id="m0_1"><img src="img/b0.png" id="m0_2"
-          ><img src="img/b0.png" id="m0_3"><img src="img/b0.png" id="m0_4"><img src="img/b0.png" id="m0_5"
-          ><img src="img/b0.png" id="m0_6"><img src="img/b0.png" id="m0_7"><img src="img/b0.png" id="m0_8"
-          ><img src="img/b0.png" id="m0_9"><br>
-          <img src="img/b0.png" id="m1_0"><img src="img/b0.png" id="m1_1"><img src="img/b0.png" id="m1_2"
-          ><img src="img/b0.png" id="m1_3"><img src="img/b0.png" id="m1_4"><img src="img/b0.png" id="m1_5"
-          ><img src="img/b0.png" id="m1_6"><img src="img/b0.png" id="m1_7"><img src="img/b0.png" id="m1_8"
-          ><img src="img/b0.png" id="m1_9"><br>
-          <img src="img/b0.png" id="m2_0"><img src="img/b0.png" id="m2_1"><img src="img/b0.png" id="m2_2"
-          ><img src="img/b0.png" id="m2_3"><img src="img/b0.png" id="m2_4"><img src="img/b0.png" id="m2_5"
-          ><img src="img/b0.png" id="m2_6"><img src="img/b0.png" id="m2_7"><img src="img/b0.png" id="m2_8"
-          ><img src="img/b0.png" id="m2_9"><br>
-          <img src="img/b0.png" id="m3_0"><img src="img/b0.png" id="m3_1"><img src="img/b0.png" id="m3_2"
-          ><img src="img/b0.png" id="m3_3"><img src="img/b0.png" id="m3_4"><img src="img/b0.png" id="m3_5"
-          ><img src="img/b0.png" id="m3_6"><img src="img/b0.png" id="m3_7"><img src="img/b0.png" id="m3_8"
-          ><img src="img/b0.png" id="m3_9"><br>
-          <img src="img/b0.png" id="m4_0"><img src="img/b0.png" id="m4_1"><img src="img/b0.png" id="m4_2"
-          ><img src="img/b0.png" id="m4_3"><img src="img/b0.png" id="m4_4"><img src="img/b0.png" id="m4_5"
-          ><img src="img/b0.png" id="m4_6"><img src="img/b0.png" id="m4_7"><img src="img/b0.png" id="m4_8"
-          ><img src="img/b0.png" id="m4_9"><br>
-          <img src="img/b0.png" id="m5_0"><img src="img/b0.png" id="m5_1"><img src="img/b0.png" id="m5_2"
-          ><img src="img/b0.png" id="m5_3"><img src="img/b0.png" id="m5_4"><img src="img/b0.png" id="m5_5"
-          ><img src="img/b0.png" id="m5_6"><img src="img/b0.png" id="m5_7"><img src="img/b0.png" id="m5_8"
-          ><img src="img/b0.png" id="m5_9"><br>
-          <img src="img/b0.png" id="m6_0"><img src="img/b0.png" id="m6_1"><img src="img/b0.png" id="m6_2"
-          ><img src="img/b0.png" id="m6_3"><img src="img/b0.png" id="m6_4"><img src="img/b0.png" id="m6_5"
-          ><img src="img/b0.png" id="m6_6"><img src="img/b0.png" id="m6_7"><img src="img/b0.png" id="m6_8"
-          ><img src="img/b0.png" id="m6_9"><br>
-          <img src="img/b0.png" id="m7_0"><img src="img/b0.png" id="m7_1"><img src="img/b0.png" id="m7_2"
-          ><img src="img/b0.png" id="m7_3"><img src="img/b0.png" id="m7_4"><img src="img/b0.png" id="m7_5"
-          ><img src="img/b0.png" id="m7_6"><img src="img/b0.png" id="m7_7"><img src="img/b0.png" id="m7_8"
-          ><img src="img/b0.png" id="m7_9"><br>
-          <img src="img/b0.png" id="m8_0"><img src="img/b0.png" id="m8_1"><img src="img/b0.png" id="m8_2"
-          ><img src="img/b0.png" id="m8_3"><img src="img/b0.png" id="m8_4"><img src="img/b0.png" id="m8_5"
-          ><img src="img/b0.png" id="m8_6"><img src="img/b0.png" id="m8_7"><img src="img/b0.png" id="m8_8"
-          ><img src="img/b0.png" id="m8_9"><br>
-          <img src="img/b0.png" id="m9_0"><img src="img/b0.png" id="m9_1"><img src="img/b0.png" id="m9_2"
-          ><img src="img/b0.png" id="m9_3"><img src="img/b0.png" id="m9_4"><img src="img/b0.png" id="m9_5"
-          ><img src="img/b0.png" id="m9_6"><img src="img/b0.png" id="m9_7"><img src="img/b0.png" id="m9_8"
-          ><img src="img/b0.png" id="m9_9"><br>
-          <img src="img/b0.png" id="m10_0"><img src="img/b0.png" id="m10_1"><img src="img/b0.png" id="m10_2"
-          ><img src="img/b0.png" id="m10_3"><img src="img/b0.png" id="m10_4"><img src="img/b0.png" id="m10_5"
-          ><img src="img/b0.png" id="m10_6"><img src="img/b0.png" id="m10_7"><img src="img/b0.png" id="m10_8"
-          ><img src="img/b0.png" id="m10_9"><br>
-          <img src="img/b0.png" id="m11_0"><img src="img/b0.png" id="m11_1"><img src="img/b0.png" id="m11_2"
-          ><img src="img/b0.png" id="m11_3"><img src="img/b0.png" id="m11_4"><img src="img/b0.png" id="m11_5"
-          ><img src="img/b0.png" id="m11_6"><img src="img/b0.png" id="m11_7"><img src="img/b0.png" id="m11_8"
-          ><img src="img/b0.png" id="m11_9"><br>
-          <img src="img/b0.png" id="m12_0"><img src="img/b0.png" id="m12_1"><img src="img/b0.png" id="m12_2"
-          ><img src="img/b0.png" id="m12_3"><img src="img/b0.png" id="m12_4"><img src="img/b0.png" id="m12_5"
-          ><img src="img/b0.png" id="m12_6"><img src="img/b0.png" id="m12_7"><img src="img/b0.png" id="m12_8"
-          ><img src="img/b0.png" id="m12_9"><br>
-          <img src="img/b0.png" id="m13_0"><img src="img/b0.png" id="m13_1"><img src="img/b0.png" id="m13_2"
-          ><img src="img/b0.png" id="m13_3"><img src="img/b0.png" id="m13_4"><img src="img/b0.png" id="m13_5"
-          ><img src="img/b0.png" id="m13_6"><img src="img/b0.png" id="m13_7"><img src="img/b0.png" id="m13_8"
-          ><img src="img/b0.png" id="m13_9"><br>
-          <img src="img/b0.png" id="m14_0"><img src="img/b0.png" id="m14_1"><img src="img/b0.png" id="m14_2"
-          ><img src="img/b0.png" id="m14_3"><img src="img/b0.png" id="m14_4"><img src="img/b0.png" id="m14_5"
-          ><img src="img/b0.png" id="m14_6"><img src="img/b0.png" id="m14_7"><img src="img/b0.png" id="m14_8"
-          ><img src="img/b0.png" id="m14_9"><br>
-          <img src="img/b0.png" id="m15_0"><img src="img/b0.png" id="m15_1"><img src="img/b0.png" id="m15_2"
-          ><img src="img/b0.png" id="m15_3"><img src="img/b0.png" id="m15_4"><img src="img/b0.png" id="m15_5"
-          ><img src="img/b0.png" id="m15_6"><img src="img/b0.png" id="m15_7"><img src="img/b0.png" id="m15_8"
-          ><img src="img/b0.png" id="m15_9"><br>
-          <img src="img/b0.png" id="m16_0"><img src="img/b0.png" id="m16_1"><img src="img/b0.png" id="m16_2"
-          ><img src="img/b0.png" id="m16_3"><img src="img/b0.png" id="m16_4"><img src="img/b0.png" id="m16_5"
-          ><img src="img/b0.png" id="m16_6"><img src="img/b0.png" id="m16_7"><img src="img/b0.png" id="m16_8"
-          ><img src="img/b0.png" id="m16_9"><br>
-          <img src="img/b0.png" id="m17_0"><img src="img/b0.png" id="m17_1"><img src="img/b0.png" id="m17_2"
-          ><img src="img/b0.png" id="m17_3"><img src="img/b0.png" id="m17_4"><img src="img/b0.png" id="m17_5"
-          ><img src="img/b0.png" id="m17_6"><img src="img/b0.png" id="m17_7"><img src="img/b0.png" id="m17_8"
-          ><img src="img/b0.png" id="m17_9"><br>
-          <img src="img/b0.png" id="m18_0"><img src="img/b0.png" id="m18_1"><img src="img/b0.png" id="m18_2"
-          ><img src="img/b0.png" id="m18_3"><img src="img/b0.png" id="m18_4"><img src="img/b0.png" id="m18_5"
-          ><img src="img/b0.png" id="m18_6"><img src="img/b0.png" id="m18_7"><img src="img/b0.png" id="m18_8"
-          ><img src="img/b0.png" id="m18_9"><br>
-          <img src="img/b0.png" id="m19_0"><img src="img/b0.png" id="m19_1"><img src="img/b0.png" id="m19_2"
-          ><img src="img/b0.png" id="m19_3"><img src="img/b0.png" id="m19_4"><img src="img/b0.png" id="m19_5"
-          ><img src="img/b0.png" id="m19_6"><img src="img/b0.png" id="m19_7"><img src="img/b0.png" id="m19_8"
-          ><img src="img/b0.png" id="m19_9"><br>
+        <div id="gb" style="outline: 3px solid #888; background: #111; width: 240px; height: 480px; margin: 0 auto;">
+          <canvas id="gameboard-canvas" width="240" height="480" style="display: block; background: #000;"></canvas>
         </div>
       </div>
-        <div id="pip-grid" style="display: flex;  gap: 6.43px; margin-top: 10px;"></div>
-        <div id="lock_timer_container" style="width: 239.98px; height: 2px; background-color: #444; margin-top: 10px; ">
-        <div id="lock_timer_bar" style="width: 239.98px; height: 2px; background-color: #888;"></div>
+        <div id="pip-grid"></div>
+        <div id="lock_timer_container" style="width: 240px; height: 2px; background-color: #444; margin-top: 10px;">
+        <div id="lock_timer_bar" style="width: 240px; height: 2px; background-color: #888;"></div>
+        </div>
     </td>
 
-        <td id="next" style="padding-left: 10px; vertical-align: top;">
-          <div id="next-container">
+        <!-- NEXT QUEUE -->
+        <td id="gb_left" style="vertical-align: top; width: 90px; text-align: center;">
+          <div id="next-container" style="outline: 3px solid #888; background: #111; width: 80px; height: 300px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;">
              <img src="img/b3.png" id="next_display_0" width="80" height="60">
              <img src="img/b3.png" id="next_display_1" width="80" height="60">
              <img src="img/b3.png" id="next_display_2" width="80" height="60">
@@ -329,15 +255,15 @@ combos for a perfect clear, <br>
              <img src="img/b3.png" id="next_display_4" width="80" height="60">
            </div>
         </td>
-          <td style="width: 10%; vertical-align: top; padding-left: 10px;">
+        
+          <!-- MAIN MENU BUTTON -->
+          <td style="vertical-align: top; width: 180px; text-align: center;">
             <p>
             <input id="main_menu_btn" type="button" value="Main Menu" onClick="gButton='back'" style="width: 160px; height: 30px;"><br>
             <textarea type="text" id="perform_hint" style="width: 288px; height: 96px; background-color: #2a2c3000; color: #ffffff00; border: none; resize: none; display: none;" ></textarea>
           </p>
           </td>
-          
-
-          <td style="width: 10%"></td>
+        </tr>
         </table>
         
 </div>

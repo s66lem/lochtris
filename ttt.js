@@ -112,6 +112,17 @@ for(var i = 0; i < SECTION_NUM; i++){
 ----------------------------------------------------------------------------------------*/
 function Setup(){
   SetupLayers();
+  
+  // Initialize canvas gameboard with a longer delay to ensure DOM is ready
+  setTimeout(() => {
+    if (typeof InitializeCanvas === 'function') {
+      console.log("Starting canvas initialization from Setup...");
+      InitializeCanvas();
+    } else {
+      console.error("InitializeCanvas function not available");
+    }
+  }, 500);
+  
   gButton = '';
   gPrevScene = '';
   gScene = 'select_section';

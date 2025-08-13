@@ -396,6 +396,16 @@ function ShowImage(imageId){
  The address of the image specified by <imageId> is set to <src>. If the address does not change, then nothing will be done.
 ----------------------------------------------------------------------------------------*/
 function SetImage(imageId, src){
+  // Check if this is a gameboard cell (format: m{row}_{col})
+  if (imageId.match(/^m\d+_\d+$/)) {
+    // Use canvas rendering for gameboard cells
+    if (typeof SetImageCanvas === 'function') {
+      SetImageCanvas(imageId, src);
+      return;
+    }
+  }
+  
+  // Fallback to original image element method for other elements
   const element = document.getElementById(imageId);
   if (element && element.src != src) {
     element.src = src;
