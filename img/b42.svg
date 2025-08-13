@@ -1,0 +1,24 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_64_585)">
+<rect width="24" height="24" fill="black"/>
+<foreignObject x="0.2" y="0.2" width="23.6" height="23.6"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(0.85px);clip-path:url(#bgblur_1_64_585_clip_path);height:100%;width:100%"></div></foreignObject><g filter="url(#filter0_d_64_585)" data-figma-bg-blur-radius="1.7">
+<path d="M21 19.707L19.707 21H21V22H3C2.48232 22 2.05621 21.6067 2.00488 21.1025C2.00145 21.0688 2 21.0346 2 21V3C2 2.44772 2.44772 2 3 2H21C21.0346 2 21.0688 2.00145 21.1025 2.00488C21.6067 2.05621 22 2.48232 22 3V21C22 21.0346 21.9985 21.0688 21.9951 21.1025C21.9472 21.573 21.573 21.9472 21.1025 21.9951C21.0688 21.9985 21.0346 22 21 22V19.707ZM15.707 21H18.293L21 18.293V15.707L15.707 21ZM11.707 21H14.293L21 14.293V11.707L11.707 21ZM7.70703 21H10.293L21 10.293V7.70703L7.70703 21ZM3.70703 21H6.29297L21 6.29297V3.70703L3.70703 21ZM3 17.707V20.293L20.293 3H17.707L3 17.707ZM3 13.707V16.293L16.293 3H13.707L3 13.707ZM3 9.70703V12.293L12.293 3H9.70703L3 9.70703ZM3 5.70703V8.29297L8.29297 3H5.70703L3 5.70703ZM3 4.29297L4.29297 3H3V4.29297Z" fill="#FF00FF"/>
+</g>
+</g>
+<defs>
+<filter id="filter0_d_64_585" x="0.2" y="0.2" width="23.6" height="23.6" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset/>
+<feGaussianBlur stdDeviation="0.9"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_64_585"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_64_585" result="shape"/>
+</filter>
+<clipPath id="bgblur_1_64_585_clip_path" transform="translate(-0.2 -0.2)"><path d="M21 19.707L19.707 21H21V22H3C2.48232 22 2.05621 21.6067 2.00488 21.1025C2.00145 21.0688 2 21.0346 2 21V3C2 2.44772 2.44772 2 3 2H21C21.0346 2 21.0688 2.00145 21.1025 2.00488C21.6067 2.05621 22 2.48232 22 3V21C22 21.0346 21.9985 21.0688 21.9951 21.1025C21.9472 21.573 21.573 21.9472 21.1025 21.9951C21.0688 21.9985 21.0346 22 21 22V19.707ZM15.707 21H18.293L21 18.293V15.707L15.707 21ZM11.707 21H14.293L21 14.293V11.707L11.707 21ZM7.70703 21H10.293L21 10.293V7.70703L7.70703 21ZM3.70703 21H6.29297L21 6.29297V3.70703L3.70703 21ZM3 17.707V20.293L20.293 3H17.707L3 17.707ZM3 13.707V16.293L16.293 3H13.707L3 13.707ZM3 9.70703V12.293L12.293 3H9.70703L3 9.70703ZM3 5.70703V8.29297L8.29297 3H5.70703L3 5.70703ZM3 4.29297L4.29297 3H3V4.29297Z"/>
+</clipPath><clipPath id="clip0_64_585">
+<rect width="24" height="24" fill="white"/>
+</clipPath>
+</defs>
+</svg>

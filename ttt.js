@@ -76,20 +76,9 @@ var manipulations = 0;                          // number of inputs after reachi
 var manipulationLimit = LOCK_DELAY_INPUTMAX;    // max inputs before locking
 var lowestY = 0;                              // tracks lowest y pos the mino has reached
 
-// stats vars
-var sPieces = 0;
-var sPPS = 0.00; // pieces per sec
-var sPPShi = 0.00;
-var sInputs = 0; // total inputs
-var sIPP = 0.00; // inputs per piece
-  // timer vars
-  var sStartTime = 0; // start time
-  var sEndTime = 0;   // end time
-  var sElapsedTime = 0; // elapsed time
-  var sTimer;   // timer ID
-  var tsIsRunning = false; // 
 
-  var sClearedProblems = []; // for loading cleared % and avg time to complete
+
+var sClearedProblems = []; // for loading cleared % and avg time to complete
 
 
 
@@ -614,121 +603,6 @@ function DisplayProbInfo(){
   const patternnum = document.getElementById("svPatterns");
   patternnum.textContent = gCurProblem.caption;
 }
-/*----------------------------------------------------------------------------------------
- ☆★ Stats ★☆
-----------------------------------------------------------------------------------------*/
-function resetStats() {
-  sInputs = 0;
-  sPieces = 0;
-  sPPS = 0.00;
-  sIPP = 0.00;
-  sElapsedTime = 0;
-  tsIsRunning = false;
-}
-
-// inputs, inputs/piece
-function updateInputs() {
-  sInputs++;
-  const inputsDisplay = document.getElementById('svInputs');
-  inputsDisplay.textContent = `${sInputs},`;
-}
-function updateIPP() {
-  sPieces++;
-
-  const ipp = document.getElementById('saInputs');
-  sIPP = (Math.round((sInputs / sPieces)*100)/100).toFixed(2);
-  ipp.textContent = `${sIPP}`;
-}
-
-// pps
-function updatePPS() {
-  let elapsed = sElapsedTime / 1000;
-  if (elapsed <= 0) {
-    sPPS = "0.00";
-  } else {
-    sPPS = (sPieces / elapsed).toFixed(2);
-  }
-  const pps = document.getElementById('svPPS');
-  pps.textContent = `${sPPS}`;
-  if (sPPS > sPPShi) {
-    sPPShi = sPPS;
-    // pps record, idk if i want this later but imma leave it here for now
-  }
-}
-
-// timer functions
-function formatTime(ms, isMinSec) {
-  const totalSeconds = Math.floor(ms / 1000);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-  const milliseconds = Math.floor(ms % 1000); // 3 decimal places for ms
-
-  if (isMinSec) {
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  } else {
-    return `.${milliseconds.toString().padStart(3, '0')}`;
-  }
-}
-function updateTimer() {
-  const currentTime = new Date().getTime();
-  const currentElapsedTime = (currentTime - sStartTime);
-  sElapsedTime = currentElapsedTime;
-  svTime.textContent = formatTime(currentElapsedTime, true);
-  smTime.textContent = formatTime(currentElapsedTime, false);
-}
-function startTimer() {
-  if (!tsIsRunning) {
-    tsIsRunning = true;
-    sStartTime = new Date().getTime() - sElapsedTime;
-    sTimer = setInterval(updateTimer, 1000);
-  }
-}
-function pauseTimer() {
-  // real talk idk if this is needed but im putting it here anyway because more lines = better code right
-  // ps: it was needed, more lines = better code confirmed real 
-  if (tsIsRunning) {
-    tsIsRunning = false;
-    clearInterval(sTimer);
-    // sElapsedTime += Date.now() - sStartTime;
-  }
-}
-function resetTimer() {
- tsIsRunning = false;
- clearInterval(sTimer);
- sElapsedTime = 0;
- svTime.textContent = '0:00';
- smTime.textContent = '.000';
-}
-
-
-// personal best fncs
-function savePB(elapsedTime) {
-  const problem = gCurProblem;
-  if (problem.personalBest === null || elapsedTime < problem.personalBest) {
-    problem.personalBest = elapsedTime;
-    // Save to localStorage for persistence
-    localStorage.setItem('pb_' + problem.id, elapsedTime);
-  }
-}
-function getPB() {
-  const problem = gCurProblem;
-  const savedPB = localStorage.getItem('pb_' + problem.id);
-  if (savedPB !== null) {
-    problem.personalBest = parseInt(savedPB, 10);
-  }
-}
-function displayPB(problem) {
-  const pbMinSec = document.getElementById('svPb');
-  const pbMs = document.getElementById('svPbMs');
-    svPb.textContent = problem.personalBest !== (null || Infinity || NaN || undefined)
-      ? formatTime(problem.personalBest, true)
-      : '-:--';
-    smPb.textContent = problem.personalBest !== (null || Infinity || NaN || undefined)
-      ? formatTime(problem.personalBest, false)
-      : '.---';
-  }
-
-
 
 /*----------------------------------------------------------------------------------------
  ☆★ Send the next ★☆
@@ -1070,6 +944,7 @@ function ScenePerform(){
 function ScenePerformFalling() {
 updateTimer();
 updatePPS();
+fpsCounter.update();
   if (gIsEditingSlider) return false;
   switch (gButton) {
     case 'back':
@@ -1978,16 +1853,16 @@ function RefreshQueue(){
     if(nextDisplay && mino && mino.id >= 1 && mino.id <= 7){
       nextDisplay.src = GetPreviewImage(mino);
     } else if(nextDisplay) {
-      nextDisplay.src = "img/b3.png";
+      nextDisplay.src = "img/b3.svg";
     }
     i++;
   }
 
-  // Fill remaining empty next slots with b3.png
+  // Fill remaining empty next slots with b3.svg
   while(i < NEXT_MINOS){
     var nextDisplay = document.getElementById("next_display_" + i);
     if(nextDisplay) {
-      nextDisplay.src = "img/b3.png";
+      nextDisplay.src = "img/b3.svg";
     }
     i++;
   }
@@ -2006,7 +1881,7 @@ function RefreshHold(){
   if(mino){
     holdDisplay.src = GetPreviewImage(mino);
   } else {
-    holdDisplay.src = "img/b3.png";
+    holdDisplay.src = "img/b3.svg";
   }
 }
 /*----------------------------------------------------------------------------------------

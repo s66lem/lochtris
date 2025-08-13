@@ -20,7 +20,7 @@ function cleanExplosion() {
   
   const allImages = gb.querySelectorAll('img');
   allImages.forEach(img => {
-    if (img.src && img.src.includes('b0.png')) {
+    if (img.src && img.src.includes('b0.svg')) {
       // if it has a matrix id (m0_0, m1_5, etc), reset  styling
       if (img.id && img.id.match(/^m\d+_\d+$/)) {
         img.style.position = '';
@@ -67,14 +67,14 @@ function explodePlacedCells(options = {}) {
   imgs.forEach((img, index) => {
     const src = img.getAttribute('src') || '';
     
-    if (src.includes('b0.png')) {
+    if (src.includes('b0.svg')) {
       return;
     }
     
     explodedCount++;
 
     const backup = document.createElement('img');
-    backup.src = 'img/b0.png';
+    backup.src = 'img/b0.svg';
     backup.id = img.id; // Keep the original ID
     backup.style.position = 'absolute';
     backup.style.width = '24px';

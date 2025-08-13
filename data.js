@@ -113,7 +113,7 @@ function Block(id){
     return;
   }
 
-  this.image = 'img/b' + id + '.png';  // image. 24 x 24 pixels
+  this.image = 'img/b' + id + '.svg';  // image. 24 x 24 pixels
 
   this.cache = new Image();
   this.cache.src = this.image;
@@ -132,33 +132,51 @@ function BlkVanishing(){return gBlocks[2] }
 ☆★ Object: Preview Images ★☆
 ----------------------------------------------------------------------------------------*/
 function PreviewImg(id){
-  switch(id){
-    case 1: this.image = 'img/imino.png'; break;  // I piece
-    case 2: this.image = 'img/tmino.png'; break;  // T piece  
-    case 3: this.image = 'img/jmino.png'; break;  // J piece (was case J)
-    case 4: this.image = 'img/lmino.png'; break;  // L piece (was case L)
-    case 5: this.image = 'img/zmino.png'; break;  // Z piece (was case Z)
-    case 6: this.image = 'img/smino.png'; break;  // S piece (was case S)
-    case 7: this.image = 'img/omino.png'; break;  // O piece (was case O)
-    default: this.image = 'img/b3.png'; break;    // Default/blank
-  }
-  
-  this.cache = new Image();
-  this.cache.src = this.image;
+    switch(id){
+        case 1: this.image = 'img/imino.svg'; break;
+        case 2: this.image = 'img/tmino.svg'; break;
+        case 3: this.image = 'img/jmino.svg'; break;
+        case 4: this.image = 'img/lmino.svg'; break;
+        case 5: this.image = 'img/zmino.svg'; break;
+        case 6: this.image = 'img/smino.svg'; break;
+        case 7: this.image = 'img/omino.svg'; break;
+        default: this.image = 'img/b3.svg'; break;
+    }
+    
+    // pre-rasterize preview imgs
+    this.canvas = document.createElement('canvas');
+    this.canvas.width = 80;
+    this.canvas.height = 60;
+    this.ctx = this.canvas.getContext('2d');
+    
+    this.cache = new Image();
+    this.cache.onload = () => {
+        // rasterize to canvas
+        this.ctx.clearRect(0, 0, 80, 60);
+        this.ctx.drawImage(this.cache, 0, 0, 80, 60);
+    };
+    this.cache.src = this.image;
 }
 function GetPreviewImage(mino) {
-  if (!mino) return "img/b3.png";
-  
-  switch(mino.id) {
-    case 1: return "img/imino.png";  // I piece
-    case 2: return "img/tmino.png";  // T piece  
-    case 3: return "img/jmino.png";  // J piece
-    case 4: return "img/lmino.png";  // L piece
-    case 5: return "img/zmino.png";  // Z piece
-    case 6: return "img/smino.png";  // S piece
-    case 7: return "img/omino.png";  // O piece
-    default: return "img/b3.png";    // Default/blank
-  }
+    if (!mino) return "img/b3.svg";
+    
+    const previewImg = gPreviewImg[mino.id];
+    if (previewImg && previewImg.canvas) {
+        // Return data URL of pre-rasterized canvas
+        return previewImg.canvas.toDataURL();
+    }
+    
+    // Fallback
+    switch(mino.id) {
+        case 1: return "img/imino.svg";
+        case 2: return "img/tmino.svg";
+        case 3: return "img/jmino.svg";
+        case 4: return "img/lmino.svg";
+        case 5: return "img/zmino.svg";
+        case 6: return "img/smino.svg";
+        case 7: return "img/omino.svg";
+        default: return "img/b3.svg";
+    }
 }
 
 var gPreviewImg = [];

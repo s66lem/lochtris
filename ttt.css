@@ -438,6 +438,13 @@ a:hover {
   color:#A8F2FF;
   text-decoration: underline;
 }
+
+
+/* grid */
+/* grid */
+/* grid */
+
+
 .manip-pip {
   width: 10px;
   height: 10px;
@@ -489,6 +496,16 @@ a:hover {
   z-index: 1;
 }
 
+/* svg optimization*/
+img[src$=".svg"] {
+    image-rendering: optimizeSpeed;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    shape-rendering: optimizeSpeed;
+    will-change: transform; 
+}
+
 #gameboard-canvas {
   display: block;
   margin: 0;
@@ -509,6 +526,12 @@ a:hover {
   z-index: 0;
   box-sizing: border-box;
   background: #000;
+  will-change: contents;
+  image-rendering: pixelated;
+}
+#next-container img, #hold img {
+    will-change: src;
+    image-rendering: optimizeSpeed;
 }
 
 #next-container {

@@ -1,8 +1,5 @@
 /*========================================================================================
 □■ gameboard.js ■□
-
-Canvas-based gameboard rendering system for TTPC
-Replaces the individual <img> elements with a single canvas for better performance
 ========================================================================================*/
 
 // Canvas globals
@@ -10,9 +7,9 @@ let gameboardCanvas = null;
 let gameboardCtx = null;
 let canvasBlockImages = {};
 let canvasIsReady = false;
-const BLOCK_SIZE = 24; // Each block is 24x24 pixels
-const CANVAS_WIDTH = 240;  // 10 blocks * 24px
-const CANVAS_HEIGHT = 480; // 20 blocks * 24px
+const BLOCK_SIZE = 512; // (px)
+const CANVAS_WIDTH = BLOCK_SIZE * 10;  
+const CANVAS_HEIGHT = BLOCK_SIZE * 20; 
 
 // Image loading promises for proper initialization
 const imagePromises = [];
@@ -36,7 +33,6 @@ function InitializeCanvas() {
         if (!gameboardCanvas) {
             console.log("No existing canvas found, creating one...");
             
-            // Try to find gb-wrapper since gb might not exist
             const gbWrapper = document.getElementById('gb-wrapper');
             if (!gbWrapper) {
                 console.error("gb-wrapper not found!");
@@ -158,7 +154,6 @@ window.ClearCanvas = ClearCanvas;
 function LoadCanvasImages() {
     console.log("Loading canvas block images...");
     
-    // List of all block image IDs used in the game
     const blockIds = [
         0, 1, 2, 3, 11, 12, 13, 14, 15, 16, 17, 31,
         41, 42, 43, 44, 45, 46, 47, 51, 52, 53, 54, 55, 56, 57
@@ -167,33 +162,41 @@ function LoadCanvasImages() {
     let loadedCount = 0;
     const totalImages = blockIds.length;
     
-    blockIds.forEach(id => {
-        const img = new Image();
-        
-        img.onload = () => {
-            canvasBlockImages[id] = img;
-            loadedCount++;
-            console.log(`Loaded image ${id} (${loadedCount}/${totalImages})`);
+    const imagePromises = blockIds.map(id => {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
             
-            if (loadedCount === totalImages) {
-                canvasIsReady = true;
-                console.log("All canvas images loaded successfully!");
-                ClearCanvas(); // Initialize with empty blocks
-            }
-        };
-        
-        img.onerror = (e) => {
-            console.error(`Failed to load image: img/b${id}.png`, e);
-            // Still count as "loaded" to prevent hanging
-            loadedCount++;
-            if (loadedCount === totalImages) {
-                canvasIsReady = true;
-                console.log("Canvas loading completed (with some errors)");
-                ClearCanvas();
-            }
-        };
-        
-        img.src = `img/b${id}.png`;
+            // force rasterization by setting explicit dimensions
+            img.width = BLOCK_SIZE;
+            img.height = BLOCK_SIZE;
+            
+            img.onload = () => {
+                // pre-render svg to canvas 
+                const canvas = document.createElement('canvas');
+                canvas.width = BLOCK_SIZE;
+                canvas.height = BLOCK_SIZE;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, BLOCK_SIZE, BLOCK_SIZE);
+                
+                canvasBlockImages[id] = canvas; // store canvas instead of image
+                loadedCount++;
+                console.log(`Loaded and rasterized image ${id} (${loadedCount}/${totalImages})`);
+                resolve();
+            };
+            
+            img.onerror = reject;
+            img.src = `img/b${id}.svg`;
+        });
+    });
+    
+    Promise.all(imagePromises).then(() => {
+        canvasIsReady = true;
+        console.log("All canvas images loaded and optimized!");
+        ClearCanvas();
+    }).catch(error => {
+        console.error("Error loading images:", error);
+        canvasIsReady = true; 
+        ClearCanvas();
     });
 }
 
@@ -209,7 +212,7 @@ function ClearCanvas() {
     console.log("Clearing canvas...");
     
     // First, clear the entire canvas with a background color similar to empty blocks
-    gameboardCtx.fillStyle = '#1a1a1a'; // Dark background similar to b0.png
+    gameboardCtx.fillStyle = '#1a1a1a'; // Dark background similar to b0.svg
     gameboardCtx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     
     if (!canvasIsReady) {
@@ -232,7 +235,7 @@ function ClearCanvas() {
         return;
     }
     
-    // Fill with empty blocks (b0.png)
+    // Fill with empty blocks (b0.svg)
     const emptyBlockImg = canvasBlockImages[0];
     if (!emptyBlockImg) {
         console.error("Empty block image not loaded");
@@ -259,42 +262,24 @@ function ClearCanvas() {
 ☆★ Draw Block at Canvas Position ★☆
 ----------------------------------------------------------------------------------------*/
 function DrawCanvasBlock(col, row, blockId) {
-    if (!canvasIsReady || !gameboardCtx) return;
+    if (!gameboardCtx || !canvasIsReady) return;
     
-    // Skip if blockId is 0 and we're ignoring zeros (handled by caller)
-    if (blockId === 0) {
-        // Always draw empty blocks to clear the cell
-        const emptyBlockImg = canvasBlockImages[0];
-        if (emptyBlockImg) {
-            gameboardCtx.drawImage(
-                emptyBlockImg,
-                col * BLOCK_SIZE,
-                row * BLOCK_SIZE,
-                BLOCK_SIZE,
-                BLOCK_SIZE
-            );
-        }
+    const blockCanvas = canvasBlockImages[blockId];
+    if (!blockCanvas) {
+        console.warn(`Block image ${blockId} not loaded`);
         return;
     }
     
-    const blockImg = canvasBlockImages[blockId];
-    if (!blockImg) {
-        console.warn(`Block image not found for ID: ${blockId}`);
-        return;
-    }
-    
+    // Draw pre-rasterized canvas (much faster than SVG)
     gameboardCtx.drawImage(
-        blockImg,
+        blockCanvas,
         col * BLOCK_SIZE,
-        row * BLOCK_SIZE,
-        BLOCK_SIZE,
-        BLOCK_SIZE
+        row * BLOCK_SIZE
     );
 }
 
 /*----------------------------------------------------------------------------------------
 ☆★ Canvas-Compatible SetImage Function ★☆
-This replaces the original SetImage function for canvas rendering
 ----------------------------------------------------------------------------------------*/
 function SetImageCanvas(imageId, src) {
     if (!canvasIsReady) return;
@@ -307,7 +292,7 @@ function SetImageCanvas(imageId, src) {
     const col = parseInt(match[2], 10);
     
     // Extract block ID from source path
-    const srcMatch = src.match(/b(\d+)\.png$/);
+    const srcMatch = src.match(/b(\d+)\.svg$/);
     if (!srcMatch) return;
     
     const blockId = parseInt(srcMatch[1], 10);
@@ -347,13 +332,13 @@ function TestCanvasRendering() {
     }
     
     // Draw some test blocks
-    DrawCanvasBlock(0, 0, 11); // Red I-block
-    DrawCanvasBlock(1, 0, 12); // Yellow T-block
-    DrawCanvasBlock(2, 0, 13); // Blue J-block
-    DrawCanvasBlock(0, 1, 14); // Orange L-block
-    DrawCanvasBlock(1, 1, 15); // Green Z-block
-    DrawCanvasBlock(2, 1, 16); // Purple S-block
-    DrawCanvasBlock(0, 2, 17); // Cyan O-block
+    DrawCanvasBlock(0, 0, 11); // Red I
+    DrawCanvasBlock(1, 0, 12); // Yellow T
+    DrawCanvasBlock(2, 0, 13); // Blue J
+    DrawCanvasBlock(0, 1, 14); // Orange L
+    DrawCanvasBlock(1, 1, 15); // Green Z
+    DrawCanvasBlock(2, 1, 16); // Purple S
+    DrawCanvasBlock(0, 2, 17); // Cyan O
     
     console.log("Test blocks rendered");
 }
