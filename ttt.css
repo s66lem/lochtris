@@ -77,13 +77,14 @@ textarea{
 /*Layer */
 .layer{
   visibility: hidden;
-  position: absolute;
+  position: fixed;
   left: 50%; top: 15px;
   transform: translateX(-50%);
-  width: 720px; height: 640px;
+  width: 780px; height: 780px;
   border-radius: 20px;
   padding: 8px 12px;
   box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1);
+  z-index: 999;
 }
 /*Centered */
 .center{
@@ -156,8 +157,10 @@ text-align: center;
 
 
 #list_sections{
-  background-color: #363941;
-  height: 1720px;
+  background-color: #26272c44;
+  backdrop-filter: blur(10px);
+  outline: 5px solid #b4b4b441;
+  height: fit-content;
   text-align: center;
   
 }
@@ -166,12 +169,16 @@ text-align: center;
   text-align: center;
 }
 #perform{
-  background-color: #363941;
+  background-color: #26272c44;
+  backdrop-filter: blur(20px);
+  outline: 5px solid #b4b4b441;
   text-align: center;
   
 }
 #preferences{
-  background-color: #363941;
+  background-color: #26272c44;
+  backdrop-filter: blur(10px);
+  outline: 5px solid #b4b4b441;
   text-align: center;
   align-items: center;
 }
@@ -190,7 +197,7 @@ text-align: center;
 .prefs-container button {
   border: none;
   /* border-bottom: 1px solid #444; */
-  background: #2B2D31;
+  background: #2b2d3141;
   color: #fff;
   width: 180px;
   margin-bottom: 5px;
@@ -342,7 +349,7 @@ text-align: center;
   margin-bottom: 15px;
   gap: 10px;
   justify-content: space-between;
-  background:#2A2C30;
+  background: #2b2d3141;
   min-height: 30px;
 }
 .slider {
@@ -351,7 +358,7 @@ text-align: center;
   width: 600px;
   margin: 0;
   height: 8px;
-  background: #444;
+  background: #7a7a7a;
   fill: black;
   cursor: pointer;
   border-radius: 5px;
@@ -417,7 +424,7 @@ text-align: center;
   appearance: none;
   width: 16px;
   height: 18px;
-  background: #888;
+  background: #b4b4b4;
   border-radius: 40%;
   cursor: pointer;
 }
@@ -451,6 +458,18 @@ a:hover {
 html {
     font-size: var(--block-size); 
 }
+
+/* hide scrollbar */
+html, body {
+  -ms-overflow-style: none; /* internet explorer + edge */
+  scrollbar-width: none; /* firefox */
+}
+
+body::-webkit-scrollbar { /* chrome, safari, opera */
+  width: 0;
+  height: 0;
+}
+
 
 
 #pip-grid {
@@ -666,9 +685,9 @@ stats
   display: flex;
   padding: 0.3125rem 0.25rem 0 0.25rem;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: flex-end;
-  flex: 0 1 auto;
+  flex: 1 0 0;
   align-self: stretch;
   margin-top: 0;
 }
@@ -678,7 +697,7 @@ stats
   display: flex;
   width: 4rem;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: flex-start !important;
   align-items: flex-end;
   flex: 1 0 0;
 }
@@ -688,7 +707,7 @@ stats
   width: 4rem;
   /* align-self: stretch; */
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: flex-end !important;
   align-items: flex-end;
   flex: 1 0 0;
 }
@@ -734,7 +753,7 @@ stats
 
 .Stquestions, .Stpattern, .stPb {
   font-size: 0.417rem;
-  color: #888888;
+  color: #aaaaaa;
 }
 .Stpps, .Inputs, .stTime {
   font-size: 0.5rem;
@@ -767,11 +786,11 @@ stats
 
 .svQuestions {
   font-size: calc((4/3) * 1rem);
-  color: #888888;
+  color: #aaaaaa;
 }
 .svPatterns {
   font-size: 0.75rem;
-  color: #888888;
+  color: #aaaaaa;
 }
 .svPPS, .svInputs {
   font-size: 0.75rem;
@@ -970,7 +989,7 @@ checkbox styling
   height: 24px;
   -webkit-appearance: none;
   appearance: none;
-  background: #444;
+  background: #636363;
   border-radius: 12px;
   outline: none;
   cursor: pointer;
@@ -1064,4 +1083,165 @@ checkbox styling
   transition: all 0.2s ease;
   /* box-shadow: 0 0 20px rgba(0,255,255,0.25); */
   z-index: 2;
+}
+
+
+
+
+
+
+
+/* bg anim */
+body {
+  width: 100%;
+  height: 100vh;
+  min-height: 100vh;
+  height: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-image: linear-gradient(0deg, #022244, #58c8da);
+  background-repeat: no-repeat;  
+  background-size: cover;        
+  background-attachment: fixed;  
+  margin: 0;
+}
+
+.ocean {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  height: auto;
+}
+
+
+
+.ocean::after, 
+.ocean::before {
+  background-color: white;
+  width: 120%;
+  height: 120px;
+  position: absolute;
+  content: '';
+  top: -80px;
+  left: -10%;
+  border-radius: 100%;
+  animation: waves 10s ease infinite;
+  opacity: 0.2;
+}
+
+.ocean::before {
+  top: -60px;
+  animation-delay: 5s;
+  opacity: 0.1;
+  left: -5%;
+}
+
+    @keyframes waves {
+      0%, 100% {transform: rotate(-2deg);}
+      50% {transform: rotate(2deg);}
+    }
+
+.bubbles {
+  width: 100%;
+  min-height: 100vh;
+  height: auto;
+  animation: bubbles 10s linear infinite;
+}
+
+    @keyframes bubbles {
+      0%, 100% {transform: rotate(-5deg);}
+      50% {transform: rotate(5deg);}
+    }
+
+.bubbles span {
+  width: 50px;
+  height: 50px;
+  border-radius: 100%;
+  position: absolute;
+  background-color: white;
+  bottom: -10%;
+  animation: bubble 10s ease-in-out infinite;
+}
+
+    @keyframes bubble {
+      0% {bottom: -10%; opacity: 0;}
+      100% {bottom: 100%;}
+    }
+
+.bubbles span:nth-child(1) {
+  width: 50px;
+  height: 50px;
+  opacity: 0.5;
+  left: 10%;
+  animation-delay: 3s;
+  animation-duration: 10s;
+  opacity: 0.2;
+}
+
+.bubbles span:nth-child(2) {
+  width: 30px;
+  height: 30px;
+  opacity: 0.5;
+  left: 40%;
+  animation-delay: 1s;
+  animation-duration: 5s;
+  opacity: 0.1;
+}
+
+.bubbles span:nth-child(3) {
+  width: 10px;
+  height: 10px;
+  opacity: 0.5;
+  left: 30%;
+  animation-delay: 5s;
+  animation-duration: 20s;
+  opacity: 0.3;
+}
+
+.bubbles span:nth-child(4) {
+  width: 35px;
+  height: 35px;
+  opacity: 0.5;
+  left: 40%;
+  animation-delay: 8s;
+  animation-duration: 8s;
+  opacity: 0.2;
+}
+
+.bubbles span:nth-child(5) {
+  width: 45px;
+  height: 45px;
+  opacity: 0.5;
+  left: 60%;
+  animation-delay: 10s;
+  animation-duration: 15s;
+  opacity: 0.1;
+}
+
+.bubbles span:nth-child(6) {
+  width: 40px;
+  height: 40px;
+  opacity: 0.5;
+  left: 80%;
+  animation-delay: 3s;
+  animation-duration: 30s;
+  opacity: 0.4;
+}
+
+.bubbles span:nth-child(7) {
+  width: 15px;
+  height: 15px;
+  opacity: 0.5;
+  left: 90%;
+  animation-duration: 25s;
+  opacity: 0.3;
+}
+
+.bubbles span:nth-child(8) {
+  width: 20px;
+  height: 20px;
+  opacity: 0.5;
+  left: 50%;
+  animation-duration: 10s;
+  opacity: 0.2;
 }

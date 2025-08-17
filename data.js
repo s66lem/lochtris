@@ -14,7 +14,7 @@ var SOFT_DROP_SPAN = 1;              // <Frame> Time to proceed to 1 square with
 
 var NATURAL_DROP_SPAN = 50;          // <Frame> Time to advance to 1 square when natural falls
 
-var LINE_CLEAR_DURATION = 15;        // <Frame> Line Erase Performance Time
+var LINE_CLEAR_DURATION = 1;        // <Frame> Line Erase Performance Time
 
 var DISPLAY_FEATURES_DURATION = 45;  // <Frame> Display time for the triggered move
 
@@ -77,7 +77,7 @@ for(var i = 0; i < MATRIX_HEIGHT; i++){
 ----------------------------------------------------------------------------------------*/
 function Block(id){
   this.id = id;
-  this.toVanish = (id == 2);           // Blocks reserved for erasure?
+  this.toVanish = (id == 2);           // blocks being erased
 
 
   switch(id){

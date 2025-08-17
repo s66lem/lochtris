@@ -582,8 +582,8 @@ function DisplayCaption(){
   var curProblemId = gCurProgmeIdList[gCurProblemId];
 //  var caption = " " + String(Number(gCurProblemId) + 1) + "/" + gCurProgmeIdList.length + "  ";
 
-  var caption = SectionTitle(gCurSectionId) + "       " +((gCurProblemId) + 1) + "/" + gCurProgmeIdList.length + "     ";
-  caption += gCurProblem.caption;
+  var caption = SectionTitle(gCurSectionId);
+  // caption += gCurProblem.caption;
   Say("perform_caption", caption);
   DisplayProbInfo();
 

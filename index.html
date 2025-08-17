@@ -16,12 +16,20 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
       <script src="anim.js"></script>
-    <!--
-    ■Note
-    ・(Nothing in particular)
-  -->
   </head>
   <body onLoad="Execute()">
+    <div class="ocean">
+      <div class="bubbles">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
     <form name="fMain">
 
       <div id="list_sections" class="layer">
@@ -142,7 +150,7 @@ combos for a perfect clear, <br>
         ■ Contributors <br>
         <a href="https://form1ssl.fc2.com/form/?id=685FCA71E208118a">Chotia</a><br>
       </p>
-      <p>
+      <!-- <p>
         ■Reference sites and topics<br>
 <a href="http://taninkona.web.fc2.com/ttt/">Tetris Trainer Trevian</a><br>
         <a href="https://docs.google.com/spreadsheets/d/1bVY3t_X96xRmUL0qdgB9tViSIGenu6RMKX4RW7qWg8Y/edit#gid=376091749">Tetris PC Template Success Rate</a><br>
@@ -158,7 +166,7 @@ combos for a perfect clear, <br>
       <a href="https://youtube.com/playlist?list=PLYU_jykh138wCGC-omwpyqHxkVeJAiUWD&si=av2YPlND9prTeZBd">Complete Guide to TETR.IO (KezDaBez)</a><br>
       <br>
       <br>
-      </p>
+      </p> -->
     </div>
     <div id="list_problems" class="layer">
       <!-- <p>
@@ -181,7 +189,7 @@ combos for a perfect clear, <br>
       <p>
         <input type="text" id="perform_caption" class="center" style="width: 560px;"><br>
       </p>
-      <table style="margin: 0 auto;">
+      <table id="gb_total" style="margin: 0 auto;">
         <tr>
         <!-- HOLD and STATS -->
         <td id="gb_left">
@@ -234,7 +242,7 @@ combos for a perfect clear, <br>
         </td>
 
     <!-- GAMEBOARD -->
-    <td id="gb_center">
+      <td id="gb_center">
       <div id="gb-wrapper">  
         <div id="gb-overlay" aria-hidden="true">Overlay text</div>
         <div id="gb-overlaysub" aria-hidden="true">Subtext</div>
@@ -246,7 +254,7 @@ combos for a perfect clear, <br>
         <div id="lock_timer_container" style=" height: 2px; background-color: #444; margin-top: 10px;">
           <div id="lock_timer_bar" ></div>
         </div>
-    </td>
+      </td>
 
         <!-- NEXT QUEUE -->
         <td id="gb_right">
@@ -311,7 +319,7 @@ combos for a perfect clear, <br>
         </div>
       </p>
         <div class="prefs-title">Display</div>
-        <div class="display-row"><span>Explosion Effects</span><input type="checkbox" id="cb_explosion_effects"/></div>
+        <div class="display-row"><span>Explosion Effects (broken, lol)</span><input type="checkbox" id="cb_explosion_effects"/></div>
         <div class="display-row"><span>Text Overlay</span><input type="checkbox" id="cb_text_overlay" checked/></div>
       </p>
         <p>
