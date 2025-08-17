@@ -686,7 +686,7 @@ stats
 .sgStatistics {
   display: flex;
   width: 4rem;
-  align-self: stretch;
+  /* align-self: stretch; */
   flex-direction: column;
   justify-content: flex-end;
   align-items: flex-end;
