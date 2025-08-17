@@ -184,79 +184,81 @@ combos for a perfect clear, <br>
       <table style="margin: 0 auto;">
         <tr>
         <!-- HOLD and STATS -->
-        <td id="gb_right"style="vertical-align: top; width: 120px; text-align: center;">
-          <p style="margin: 0; padding: 0;">
-            <div id="hold" style="outline: 3px solid #888; background: #111; width: 80px; height: 60px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
-              <img src="img/b3.png" id="hold_display" width="80" height="60" style="display: block;">
+        <td id="gb_left">
+            <div id="hold" >
+              <img src="img/b3.png" id="hold_display" style="display: block;">
             </div>
-
-<div id="stats" class="Stats">
-  <div id="sQuestions" class="sQuestions">
-    <div id="stQuestions" class="Stquestions">QUESTION</div>
-    <div id="svQuestions" class="Svquestions">1/20</div>
-  </div>
-  <div id="sPattern" class="sPattern">
-    <div id="stPattern" class="stPattern">PATTERN</div>
-    <div id="svPatterns" class="svPatterns">0</div>
-  </div>
-  <div id="sPPS" class="sPPS">
-    <div id="stPPS" class="stPPS">PPS</div>
-    <div id="sPPSInner" class="sPPSInner">
-      <div id="svPPS" class="svPPS">0.00</div>
-      <div id="suPPS" class="suPPS">/s</div>
-    </div>
-  </div>
-  <div id="sInputs" class="sInputs">
-    <div id="Inputs" class="Inputs">INPUTS</div>
-    <div id="sInputsInner" class="sInputsInner">
-      <div id="svInputs" class="svInputs">0,</div>
-      <div id="saInputs" class="saInputs" style="padding-left: 3px;">0.00</div>
-      <div id="suInputs" class="suInputs">/p</div>
-    </div>
-  </div>
-  <div id="sTime" class="sTime">
-    <div id="stTime" class="stTime">TIME</div>
-    <div id="sInputsInner" class="sInputsInner">
-      <div id="svTime" class="svTime">0:00</div>
-      <div id="smTime" class="smTime">.000</div>
-    </div>
-  </div>
-  <div id="sPb" class="sPb">
-    <div id="stPb" class="stPb">PB</div>
-    <div id="sPbInner" class="sPbInner">
-      <div id="svPb" class="svPb">0:00</div>
-      <div id="smPb" class="smPb">.000</div>
-    </div>
-  </div>
-</div>
+          <div id="stats" class="Stats">
+            <div id="sgInformation" class="sgInformation">
+              <div id="sQuestions" class="sQuestions">
+                <div id="stQuestions" class="Stquestions">QUESTION</div>
+                <div id="svQuestions" class="Svquestions">1/20</div>
+              </div>
+              <div id="sPattern" class="sPattern">
+                <div id="stPattern" class="stPattern">PATTERN</div>
+                <div id="svPatterns" class="svPatterns">0</div>
+              </div>
+            </div>
+            <div id="sgStatistics" class="sgStatistics">
+              <div id="sPPS" class="sPPS">
+                <div id="stPPS" class="stPPS">PPS</div>
+                <div id="sPPSInner" class="sPPSInner">
+                  <div id="svPPS" class="svPPS">0.00</div>
+                  <div id="suPPS" class="suPPS">/s</div>
+                </div>
+              </div>
+              <div id="sInputs" class="sInputs">
+                <div id="Inputs" class="Inputs">INPUTS</div>
+                <div id="sInputsInner" class="sInputsInner">
+                  <div id="svInputs" class="svInputs">0,</div>
+                  <div id="saInputs" class="saInputs" style="padding-left: 3px;">0.00</div>
+                  <div id="suInputs" class="suInputs">/p</div>
+                </div>
+              </div>
+              <div id="sTime" class="sTime">
+                <div id="stTime" class="stTime">TIME</div>
+                <div id="sInputsInner" class="sInputsInner">
+                  <div id="svTime" class="svTime">0:00</div>
+                  <div id="smTime" class="smTime">.000</div>
+                </div>
+              </div>
+              <div id="sPb" class="sPb">
+                <div id="stPb" class="stPb">PB</div>
+                <div id="sPbInner" class="sPbInner">
+                  <div id="svPb" class="svPb">0:00</div>
+                  <div id="smPb" class="smPb">.000</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </td>
 
-    <!-- GAMEBOARD (centered) -->
-    <td style="vertical-align: top; width: 240px; text-align: center;">
+    <!-- GAMEBOARD -->
+    <td id="gb_center">
       <div id="gb-wrapper">  
         <div id="gb-overlay" aria-hidden="true">Overlay text</div>
         <div id="gb-overlaysub" aria-hidden="true">Subtext</div>
-        <div id="gb" style="outline: 3px solid #888; background: #111; width: 240px; height: 480px; margin: 0 auto;">
-          <canvas id="gameboard-canvas" width="240" height="480" style="display: block; background: #000;"></canvas>
+        <div id="gb">
+          <canvas id="gameboard-canvas" style="display: block; background: #000;"></canvas>
         </div>
       </div>
         <div id="pip-grid"></div>
-        <div id="lock_timer_container" style="width: 240px; height: 2px; background-color: #444; margin-top: 10px;">
-        <div id="lock_timer_bar" style="width: 240px; height: 2px; background-color: #888;"></div>
+        <div id="lock_timer_container" style=" height: 2px; background-color: #444; margin-top: 10px;">
+          <div id="lock_timer_bar" ></div>
         </div>
     </td>
 
         <!-- NEXT QUEUE -->
-        <td id="gb_left" style="vertical-align: top; width: 90px; text-align: center;">
-          <div id="next-container" style="outline: 3px solid #888; background: #111; width: 80px; height: 300px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;">
-             <img src="img/b3.png" id="next_display_0" width="80" height="60">
-             <img src="img/b3.png" id="next_display_1" width="80" height="60">
-             <img src="img/b3.png" id="next_display_2" width="80" height="60">
-             <img src="img/b3.png" id="next_display_3" width="80" height="60">
-             <img src="img/b3.png" id="next_display_4" width="80" height="60">
+        <td id="gb_right">
+          <div id="next-container">
+             <img src="img/b3.svg" id="next_display_0">
+             <img src="img/b3.svg" id="next_display_1">
+             <img src="img/b3.svg" id="next_display_2">
+             <img src="img/b3.svg" id="next_display_3">
+             <img src="img/b3.svg" id="next_display_4">
            </div>
-           <div id="fps" class="fps" style="margin-top: 10px; color: #666; font-size: 12px; text-align: center;">
-             <span id="fps_value">60</span> FPS
+           <div id="fps" class="fps">
+             <span id="fps_value">60</span>FPS
         </td>
         
           <!-- MAIN MENU BUTTON -->
