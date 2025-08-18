@@ -96,7 +96,6 @@ function spawnHarddropParticles(cells, color = '#fff', opts = {}) {
   const cellW = crect.width / cols;
   const cellH = crect.height / rows;
 
-  // Prefer runtime hidden rows detection if available
   const hiddenRows = (Array.isArray(window.gField) && window.gField.length > 0)
     ? Math.max(0, window.gField.length - rows)
     : (typeof window.HIDDEN_ROW_COUNT !== 'undefined' ? window.HIDDEN_ROW_COUNT : 4);
@@ -120,7 +119,7 @@ function spawnHarddropParticles(cells, color = '#fff', opts = {}) {
   const totalToSpawn = Math.max(1, Math.min(cfg.count, Math.max(1, Math.floor(cfg.count))));
   for (let i = 0; i < totalToSpawn; i++) {
     if (available.length === 0) {
-      // if we exhausted all cells, allow reusing random ones
+      // if all cells exhausted, allow reusing random ones
       picks.push(candidates[Math.floor(Math.random() * candidates.length)]);
     } else {
       const idx = Math.floor(Math.random() * available.length);
@@ -157,7 +156,7 @@ function spawnHarddropParticles(cells, color = '#fff', opts = {}) {
     });
   }
 
-  // For each picked cell, spawn cluster (usually 1) and offset from center by random angle+radius
+  // for each picked cell, spawn cluster (usually 1) and offset from center by random angle+radius
   for (const p of picks) {
     const baseCx = crect.left - containerRect.left + (p.col + 0.5) * cellW;
     const baseCy = crect.top - containerRect.top + (p.row + 1) * cellH; // bottom of cell
@@ -189,7 +188,7 @@ function _hdStartLoop() {
         _hdParticles.splice(i, 1);
         continue;
       }
-      // euler integration
+      // euler integration (fuck you euler)
       p.vy += gravity * (dt / 16.67);
       const dx = p.vx * (dt / 16.67);
       const dy = p.vy * (dt / 16.67);
@@ -225,7 +224,7 @@ function _hdStartLoop() {
 
 
 /*----------------------------------------------------------------------------------------
- block explosions
+ block explosions (broken xD)
  copyright below
 -----------------------------------------------------------------------------------------*/
 
@@ -254,7 +253,7 @@ function cleanExplosion() {
         img.style.height = '';
         img.style.zIndex = '';
       } else {
-        // remove orphaned backup images without proper IDs
+        // remove orphaned backup images without proper ids
         img.remove();
       }
     }
