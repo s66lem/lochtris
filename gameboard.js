@@ -18,17 +18,15 @@ const imagePromises = [];
 ☆★ Initialize Canvas Gameboard ★☆
 ----------------------------------------------------------------------------------------*/
 function InitializeCanvas() {
-    console.log("Initializing canvas gameboard...");
-    console.log("Current document ready state:", document.readyState);
+
     
     // Function to actually initialize the canvas
     function doInitialization() {
-        console.log("Attempting canvas initialization...");
         
         // Try to find the existing canvas first
         gameboardCanvas = document.getElementById('gameboard-canvas') || 
                          document.getElementById('game-canvas');
-        console.log("Canvas element:", gameboardCanvas);
+
         
         if (!gameboardCanvas) {
             console.log("No existing canvas found, creating one...");
@@ -42,7 +40,6 @@ function InitializeCanvas() {
             // Create or find the gb container
             let gbContainer = document.getElementById('gb');
             if (!gbContainer) {
-                console.log("Creating gb container...");
                 gbContainer = document.createElement('div');
                 gbContainer.id = 'gb';
                 gbWrapper.appendChild(gbContainer);
@@ -57,16 +54,15 @@ function InitializeCanvas() {
             // Remove any existing canvas with old ID
             const oldCanvas = document.getElementById('game-canvas');
             if (oldCanvas) {
-                console.log("Removing old canvas...");
                 oldCanvas.remove();
             }
             
             gbContainer.appendChild(gameboardCanvas);
-            console.log("Canvas created and added to DOM");
+            
         }
         
         gameboardCtx = gameboardCanvas.getContext('2d');
-        console.log("Canvas context:", gameboardCtx);
+       
         
         if (!gameboardCtx) {
             console.error("Could not get 2D context!");
@@ -86,7 +82,6 @@ function InitializeCanvas() {
         gameboardCanvas.style.border = 'none';
         gameboardCanvas.style.outline = 'none';
         
-        console.log(`Canvas dimensions set to ${CANVAS_WIDTH}x${CANVAS_HEIGHT}`);
         
         // Disable image smoothing for pixel-perfect rendering
         gameboardCtx.imageSmoothingEnabled = false;
@@ -103,7 +98,6 @@ function InitializeCanvas() {
         // Clear with a test color first
         ClearCanvas();
         
-        console.log("Canvas initialized, loading images...");
         LoadCanvasImages();
         
         return true;
@@ -152,7 +146,6 @@ window.ClearCanvas = ClearCanvas;
 ☆★ Load All Block Images ★☆
 ----------------------------------------------------------------------------------------*/
 function LoadCanvasImages() {
-    console.log("Loading canvas block images...");
     
     const blockIds = [
         0, 1, 2, 3, 11, 12, 13, 14, 15, 16, 17, 31,
@@ -180,7 +173,7 @@ function LoadCanvasImages() {
                 
                 canvasBlockImages[id] = canvas; // store canvas instead of image
                 loadedCount++;
-                console.log(`Loaded and rasterized image ${id} (${loadedCount}/${totalImages})`);
+                
                 resolve();
             };
             
@@ -191,7 +184,7 @@ function LoadCanvasImages() {
     
     Promise.all(imagePromises).then(() => {
         canvasIsReady = true;
-        console.log("All canvas images loaded and optimized!");
+        
         ClearCanvas();
     }).catch(error => {
         console.error("Error loading images:", error);
@@ -209,14 +202,12 @@ function ClearCanvas() {
         return;
     }
     
-    console.log("Clearing canvas...");
     
     // First, clear the entire canvas with a background color similar to empty blocks
     gameboardCtx.fillStyle = '#1a1a1a'; // Dark background similar to b0.svg
     gameboardCtx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     
     if (!canvasIsReady) {
-        console.log("Canvas images not ready, showing placeholder grid");
         // Draw a simple grid pattern as fallback
         gameboardCtx.strokeStyle = '#333';
         gameboardCtx.lineWidth = 1;
@@ -242,7 +233,6 @@ function ClearCanvas() {
         return;
     }
     
-    console.log("Drawing empty blocks...");
     for (let row = 0; row < 20; row++) {
         for (let col = 0; col < 10; col++) {
             gameboardCtx.drawImage(
@@ -255,7 +245,6 @@ function ClearCanvas() {
         }
     }
     
-    console.log("Canvas cleared and filled with empty blocks");
 }
 
 /*----------------------------------------------------------------------------------------

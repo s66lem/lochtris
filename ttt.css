@@ -960,6 +960,23 @@ td[style*="width: 240px"] {
   left: 0; right: 0;
   margin: auto;
 }
+/* harddrop particles */
+.hd-particle {
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform, opacity;
+  pointer-events: none;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.35);
+  transform-origin: center;
+  z-index: 999; /* above board images */
+  transition: opacity 200ms linear;
+  width: 6px;
+  height: 6px;
+  background: #fff;
+}
+#gb_total, #perform {
+  will-change: transform;
+}
 
 .pixellate-lock img {
   visibility: visible !important;

@@ -105,7 +105,6 @@ function Setup(){
   // Initialize canvas gameboard with a longer delay to ensure DOM is ready
   setTimeout(() => {
     if (typeof InitializeCanvas === 'function') {
-      console.log("Starting canvas initialization from Setup...");
       InitializeCanvas();
     } else {
       console.error("InitializeCanvas function not available");
@@ -1008,8 +1007,12 @@ fpsCounter.update();
   }
 
     // Key input forks
+    if (!IsHolded(KeyL()) && !IsHolded(KeyR())) {
+      if (typeof UIClearHoldOffset === 'function') UIClearHoldOffset();
+    }
     if (InputsHorizontalMove(true)) {
       if (PlaceTest(gCurDir, gCurMino, gCurX + 1, gCurY)) {
+        if (typeof UIClearHoldOffset === 'function') UIClearHoldOffset();
         gCurX++;
         let curLowestBlockY = GetLowestBlockY(gCurMino, gCurDir, gCurY);
         if (curLowestBlockY >= lowestY) {
@@ -1019,9 +1022,20 @@ fpsCounter.update();
           UpdateManipulationIndicators();
         }
         if (IsLanding()) gNdCount = NATURAL_DROP_SPAN;
+      } else {
+        // can't move right — if piece is touching right wall and key held, push UI right
+        try {
+          const pos = MinoToBlockPositions(gCurDir, gCurMino, gCurX, gCurY);
+          let maxCol = -Infinity;
+          for (let p of pos) if (p[0] > maxCol) maxCol = p[0];
+          if (maxCol >= MATRIX_WIDTH - 1 && IsHolded(KeyR())) {
+            if (typeof UISetHoldOffset === 'function') UISetHoldOffset(1); // tweak px
+          }
+        } catch (e) { /* ignore */ }
       }
     } else if (InputsHorizontalMove(false)) {
       if (PlaceTest(gCurDir, gCurMino, gCurX - 1, gCurY)) {
+        if (typeof UIClearHoldOffset === 'function') UIClearHoldOffset();
         gCurX--;
         let curLowestBlockY = GetLowestBlockY(gCurMino, gCurDir, gCurY);
         if (curLowestBlockY >= lowestY) {
@@ -1031,6 +1045,16 @@ fpsCounter.update();
           UpdateManipulationIndicators();
         }
         if (IsLanding()) gNdCount = NATURAL_DROP_SPAN;
+      } else {
+        // can't move left — if piece is touching left wall and key held, push UI left
+        try {
+          const pos = MinoToBlockPositions(gCurDir, gCurMino, gCurX, gCurY);
+          let minCol = Infinity;
+          for (let p of pos) if (p[0] < minCol) minCol = p[0];
+          if (minCol <= 0 && IsHolded(KeyL())) {
+            if (typeof UISetHoldOffset === 'function') UISetHoldOffset(-1); // tweak px
+          }
+        } catch (e) { /* ignore */ }
       }
     }
     if (InputsSoftDrop()) {
@@ -1426,11 +1450,61 @@ function HarddropDiffY(){
  ☆★ Hard Drop ★☆
 ----------------------------------------------------------------------------------------*/
 function HardDrop(){
+  
   var dY = HarddropDiffY();
   if(dY > 0) gTSpinType = 0;
-  gCurY += dY;
+
+  // resolve piece color (prefer gBlocks mapping, fallback to palette) 
+  var pieceColor = '#ffffff';
+  if (gCurMino) {
+    try {
+      if (typeof gCurMino.placedBlockId !== 'undefined' && window.gBlocks) {
+        var blk = gBlocks[gCurMino.placedBlockId];
+        if (blk && blk.color) pieceColor = blk.color;
+      }
+    } catch(e){}
+    if (pieceColor === '#ffffff' && typeof gCurMino.id !== 'undefined') {
+      var palette = {
+        1: '#32B484', // I
+        2: '#6553BB', // J
+        3: '#C17342', // L
+        4: '#C3AC49', // O
+        5: '#92C044', // S
+        6: '#A53E9B', // T
+        7: '#C24047'  // Z
+      };
+      if (palette[gCurMino.id]) pieceColor = palette[gCurMino.id];
+    }
+  }
+
+  // spawn particles along the drop path (one small burst per row passed)
+  var oldY = gCurY;
+  var newY = gCurY + dY;
+  if (gCurMino && dY > 0) {
+    for (var yy = oldY + 1; yy <= newY; yy++) {
+      var pathCells = MinoToBlockPositions(gCurDir, gCurMino, gCurX, yy);
+      // smaller, shorter-lived particles while travelling
+      spawnHarddropParticles(pathCells.map(p => ({col: p[0], row: p[1]})), pieceColor, { count: 2, life: 180, spread: 40, force: 120, sizeMin: 2, sizeMax: 4 });
+    }
+  }
+
+  gCurY = newY;
   gNdCount = 0;
   gLandingCount = 0;
+
+  // compute landed cells (array of {col,row})
+  var landedCells = [];
+  if (gCurMino) {
+    var pos = MinoToBlockPositions(gCurDir, gCurMino, gCurX, gCurY);
+    for (var i = 0; i < pos.length; i++) {
+      landedCells.push({ col: pos[i][0], row: pos[i][1] });
+    }
+  }
+
+  // spawn final landing burst
+  spawnHarddropParticles(landedCells, pieceColor, { count: 6, life: 300, spread: 80, force: 260, sizeMin: 3, sizeMax: 6 });
+
+  UIPush(2, 200);
 }
 /*----------------------------------------------------------------------------------------
  ☆★ Soft Drop ★☆
@@ -1442,6 +1516,28 @@ function SoftDrop(){
     if (!IsLanding()) {
       gCurY++;
       gTSpinType = 0;
+
+      // spawn subtle particles as piece moves down a single step
+      if (gCurMino) {
+        // resolve color quickly
+        var sdColor = '#ffffff';
+        try {
+          if (typeof gCurMino.placedBlockId !== 'undefined' && window.gBlocks) {
+            var sb = gBlocks[gCurMino.placedBlockId];
+            if (sb && sb.color) sdColor = sb.color;
+          }
+        } catch(e){}
+        if (sdColor === '#ffffff' && typeof gCurMino.id !== 'undefined') {
+          var spalette = {
+            1: '#32B484',2: '#6553BB',3: '#C17342',4: '#C3AC49',
+            5: '#92C044',6: '#A53E9B',7: '#C24047'
+          };
+          if (spalette[gCurMino.id]) sdColor = spalette[gCurMino.id];
+        }
+
+        var stepCells = MinoToBlockPositions(gCurDir, gCurMino, gCurX, gCurY);
+        spawnHarddropParticles(stepCells.map(p => ({col: p[0], row: p[1]})), sdColor, { count: 1, life: 140, spread: 30, force: 90 });
+      }
     }
   }
   

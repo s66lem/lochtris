@@ -331,6 +331,7 @@ function IMino(){
   this.guideBlockId  = 41;            // guide on black bg
   this.ghostGuideBlockId = 51;        // guide on ghost bg
   this.rotationRule = gRotationRuleI;
+  this.palette = '#32B484'; // I mino color
   return this;
 }
 //----------------------------------------------------------------------------------------
@@ -363,6 +364,7 @@ function TMino(){
   this.guideBlockId  = 42;
   this.ghostGuideBlockId = 52;
   this.rotationRule = gRotationRuleGeneral;
+  this.palette = '#A53E9B';
   return this;
 }
 //----------------------------------------------------------------------------------------
@@ -395,6 +397,7 @@ function JMino(){
   this.guideBlockId  = 43;
   this.ghostGuideBlockId = 53;
   this.rotationRule = gRotationRuleGeneral;
+  this.palette = '#6553BB';
   return this;
 }
 //----------------------------------------------------------------------------------------
@@ -427,6 +430,7 @@ function LMino(){
   this.guideBlockId  = 44;
   this.ghostGuideBlockId = 54;
   this.rotationRule = gRotationRuleGeneral;
+  this.palette = '#C3AC49';
   return this;
 }
 //----------------------------------------------------------------------------------------
@@ -459,6 +463,7 @@ function ZMino(){
   this.guideBlockId  = 45;
   this.ghostGuideBlockId = 55;
   this.rotationRule = gRotationRuleGeneral;
+  this.palette = '#C24047';
   return this;
 }
 //----------------------------------------------------------------------------------------
@@ -491,6 +496,7 @@ function SMino(){
   this.guideBlockId  = 46;
   this.ghostGuideBlockId = 56;
   this.rotationRule = gRotationRuleGeneral;
+  this.palette = '#92C044';
   return this;
 }
 //----------------------------------------------------------------------------------------
@@ -523,6 +529,7 @@ function OMino(){
   this.guideBlockId  = 47;
   this.ghostGuideBlockId = 57;
   this.rotationRule = gRotationRuleGeneral;  // It's not necessary but for convenience
+  this.palette = '#C3AC49';
 
   return this;
 }

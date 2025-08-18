@@ -1,5 +1,231 @@
 /*----------------------------------------------------------------------------------------
- Block Explosions
+  ui pushing
+-----------------------------------------------------------------------------------------*/
+var _uiPushRAF = null;
+var _uiPushState = null;
+var _uiHoldOffset = 0; // persistent horizontal offset while holding against wall
+
+function UISetHoldOffset(px, durationMs = 200){
+  easing = 'cubic-bezier(0.2,0.8,0.2,1)'
+  _uiHoldOffset = px || 0;
+  var el = document.getElementById('gb_total') || document.getElementById('perform') || document.body;
+  if(!el) return;
+  // combine with any transient translateY from UIPush (use 0 if not present)
+  var curY = (_uiPushState && typeof _uiPushState._currentY !== 'undefined') ? _uiPushState._currentY : 0;
+
+  // apply a smooth transform transition for the requested duration
+  // set transition only for transform and remove it after the duration to avoid interfering with other animations
+  el.style.transition = 'transform ' + Math.max(0, durationMs) + 'ms ' + easing;
+  el.style.transform = 'translateX(' + _uiHoldOffset + 'px) translateY(' + curY.toFixed(2) + 'px)';
+
+  // clear the transition after it's finished (small buffer)
+  clearTimeout(el._uiHoldOffsetTimeout);
+  el._uiHoldOffsetTimeout = setTimeout(function(){
+    // only clear if this function set the transition (avoid stomping other code)
+    try {
+      if (el && el.style && el._uiHoldOffsetTimeout) {
+        el.style.transition = '';
+        el._uiHoldOffsetTimeout = null;
+      }
+    } catch(e){}
+  }, Math.max(0, durationMs) + 20);
+}
+
+function UIClearHoldOffset(){
+  _uiHoldOffset = 0;
+  var el = document.getElementById('gb_total') || document.getElementById('perform') || document.body;
+  if(!el) return;
+  var curY = (_uiPushState && _uiPushState._currentY) ? _uiPushState._currentY : 0;
+  el.style.transform = curY ? 'translateY(' + curY.toFixed(2) + 'px)' : '';
+}
+
+var _uiPushRAF = null;
+var _uiPushState = null;
+function UIPush(amplitudePx, durationMs){
+  var el = document.getElementById('gb_total') || document.getElementById('perform') || document.body;
+  if(!el) return;
+  // cancel existing
+  if(_uiPushRAF){
+    cancelAnimationFrame(_uiPushRAF);
+    _uiPushRAF = null;
+  }
+  var start = performance.now();
+  _uiPushState = { el: el, amp: amplitudePx || 8, dur: durationMs || 200, start: start };
+  function loop(now){
+    var s = _uiPushState;
+    if(!s) return;
+    var t = (now - s.start) / s.dur;
+    if(t >= 1){
+      s.el.style.transform = '';
+      _uiPushState = null;
+      _uiPushRAF = null;
+      return;
+    }
+    // single smooth down-and-up using sine (0->1)
+    var ease = Math.sin(Math.PI * t); // 0..1..0
+    var y = s.amp * ease;
+    s.el.style.transform = 'translateY(' + y.toFixed(2) + 'px)';
+    _uiPushRAF = requestAnimationFrame(loop);
+  }
+  _uiPushRAF = requestAnimationFrame(loop);
+}
+
+
+/*----------------------------------------------------------------------------------------
+  harddrop particles
+-----------------------------------------------------------------------------------------*/
+_hdParticles = [];
+_hdParticlesRAF = null;
+
+function spawnHarddropParticles(cells, color = '#fff', opts = {}) {
+  // cells: {col,row} or [{col,row}, ...] in grid coords (0..9, 0..19)
+  // opts: {count, life, spread, force, cluster}
+  color = gCurMino.palette;
+  const cfg = Object.assign({ count: 6, life: 400, spread: 80, force: 220, sizeMin: 2, sizeMax: 4, cluster: 1 }, opts);
+  if (!cells) return;
+  if (!Array.isArray(cells)) cells = [cells];
+
+  const canvas = document.getElementById('gameboard-canvas');
+  const container = document.getElementById('gb') || (canvas && canvas.parentElement);
+  if (!canvas || !container) return;
+  if (getComputedStyle(container).position === 'static') container.style.position = 'relative';
+
+  const crect = canvas.getBoundingClientRect();
+  const containerRect = container.getBoundingClientRect();
+  const cols = 10, rows = 20;
+  const cellW = crect.width / cols;
+  const cellH = crect.height / rows;
+
+  // Prefer runtime hidden rows detection if available
+  const hiddenRows = (Array.isArray(window.gField) && window.gField.length > 0)
+    ? Math.max(0, window.gField.length - rows)
+    : (typeof window.HIDDEN_ROW_COUNT !== 'undefined' ? window.HIDDEN_ROW_COUNT : 4);
+
+
+  const candidates = [];
+  for (const c of cells) {
+    if (typeof c.col !== 'number' || typeof c.row !== 'number') continue;
+    // convert to visible row
+    let visRow = c.row - hiddenRows;
+    if (visRow < 0) visRow = 0;
+    // clamp to visible matrix rows
+    if (visRow >= rows) visRow = rows - 1;
+    candidates.push({ col: c.col, row: visRow });
+  }
+  if (candidates.length === 0) return;
+
+  // choose up to cfg.count distinct candidate slots (sample without replacement)
+  const picks = [];
+  const available = candidates.slice();
+  const totalToSpawn = Math.max(1, Math.min(cfg.count, Math.max(1, Math.floor(cfg.count))));
+  for (let i = 0; i < totalToSpawn; i++) {
+    if (available.length === 0) {
+      // if we exhausted all cells, allow reusing random ones
+      picks.push(candidates[Math.floor(Math.random() * candidates.length)]);
+    } else {
+      const idx = Math.floor(Math.random() * available.length);
+      picks.push(available.splice(idx, 1)[0]);
+    }
+  }
+
+  // helper to create a single particle at a (px,py) where px/py are relative to container
+  function createParticleAt(px, py) {
+    const el = document.createElement('div');
+    el.className = 'hd-particle';
+    const size = Math.round(cfg.sizeMin + Math.random() * (cfg.sizeMax - cfg.sizeMin));
+    el.style.width = size + 'px';
+    el.style.height = size + 'px';
+    el.style.background = color || '#fff';
+    el.style.opacity = '1';
+    el.style.pointerEvents = 'none';
+    el.style.position = 'absolute';
+    // place center at px,py
+    el.style.left = (px - size / 2) + 'px';
+    el.style.top = (py - size / 2) + 'px';
+    container.appendChild(el);
+
+    const vx = (Math.random() * 2 - 1) * (cfg.spread / 120);
+    const vy = - (Math.random() * 0.9 + 0.6) * (cfg.force / 60);
+    _hdParticles.push({
+      el,
+      vx,
+      vy,
+      life: cfg.life,
+      age: 0,
+      start: performance.now(),
+      size
+    });
+  }
+
+  // For each picked cell, spawn cluster (usually 1) and offset from center by random angle+radius
+  for (const p of picks) {
+    const baseCx = crect.left - containerRect.left + (p.col + 0.5) * cellW;
+    const baseCy = crect.top - containerRect.top + (p.row + 1) * cellH; // bottom of cell
+
+    for (let k = 0; k < cfg.cluster; k++) {
+      // offset so particle is NOT at exact center - radial offset inside cell
+      const angle = Math.random() * Math.PI * 2;
+      const minR = Math.min(cellW, cellH) * 0.12; // avoid dead center
+      const maxR = Math.min(cellW, cellH) * 0.42;
+      const radius = minR + Math.random() * (maxR - minR);
+      const dx = Math.cos(angle) * radius;
+      const dy = Math.sin(angle) * radius * 0.6; // slight vertical bias
+      createParticleAt(baseCx + dx, baseCy + dy);
+    }
+  }
+
+  if (!_hdParticlesRAF) _hdStartLoop();
+}
+
+function _hdStartLoop() {
+  const gravity = 0.5; // px per frame^2 approx
+  function loop(now) {
+    for (let i = _hdParticles.length - 1; i >= 0; i--) {
+      const p = _hdParticles[i];
+      const dt = 16.67; // approx ms per frame
+      p.age = now - p.start;
+      if (p.age >= p.life) {
+        p.el.remove();
+        _hdParticles.splice(i, 1);
+        continue;
+      }
+      // euler integration
+      p.vy += gravity * (dt / 16.67);
+      const dx = p.vx * (dt / 16.67);
+      const dy = p.vy * (dt / 16.67);
+      // update pos using transform for better perf
+      const prev = p._pos || { x: parseFloat(p.el.style.left), y: parseFloat(p.el.style.top) };
+      const nx = prev.x + dx;
+      const ny = prev.y + dy;
+      p._pos = { x: nx, y: ny };
+      p.el.style.transform = `translate(${nx - parseFloat(p.el.style.left)}px, ${ny - parseFloat(p.el.style.top)}px)`;
+      // fade out near end
+      const t = p.age / p.life;
+      p.el.style.opacity = String(1 - t);
+      // slight scale pop
+      p.el.style.transform += ` scale(${1 - t * 0.25})`;
+    }
+
+    if (_hdParticles.length > 0) {
+      _hdParticlesRAF = requestAnimationFrame(loop);
+    } else {
+      _hdParticlesRAF = null;
+    }
+  }
+  _hdParticlesRAF = requestAnimationFrame(loop);
+}
+
+
+
+
+
+
+
+
+
+
+/*----------------------------------------------------------------------------------------
+ block explosions
  copyright below
 -----------------------------------------------------------------------------------------*/
 
