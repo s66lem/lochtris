@@ -430,7 +430,7 @@ function LMino(){
   this.guideBlockId  = 44;
   this.ghostGuideBlockId = 54;
   this.rotationRule = gRotationRuleGeneral;
-  this.palette = '#C3AC49';
+  this.palette = '#C17342';
   return this;
 }
 //----------------------------------------------------------------------------------------

@@ -29,6 +29,12 @@
         <span></span>
         <span></span>
         <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
       </div>
     </div>
     <form name="fMain">
@@ -46,7 +52,9 @@
           <p id="header2" style="font-size: 1.2em;">
           Lochtris is a simple, yet modern PCO training tool.
           </p>
+          <p id="header2" style="font-size: 1.1em; color: red; font-style: italic;">
           please note that firefox is not currently supported, and will be very laggy
+          </p>
         </p>
         <p>
 
@@ -59,7 +67,12 @@
         </p>
         <hr style="height: 0px; border: none; margin: -5px;">
         <p>
-  <input type="button" value="key settings" onClick="gButton='preferences'">
+      <div class="bubble-wrapper">
+        <div class="bubble v2">
+          <input type="button" class="bubble-input" onClick="gButton='preferences'" aria-label="preferences">
+          <span class="bubble-text" data-text="preferences">preferences</span>
+        </div>
+      </div>
       </p>
       <!-- <p id="subheader">
         <i>Minos stuttering/moving too quickly? Try reloading!</i>
@@ -69,34 +82,88 @@
         <p class="section-group" id="group1">
           Introduction
         </p>
-        <input type="button" id="section1" value="[1] Creating the Template (w/ Guide)" onClick="gButton='section1'"><br>
+        <div class="bubble-wrapper">
+          <div id="bsection1" class="bubble v2">
+            <input type="button" id="section1" class="bubble-input" onClick="gButton='section1'" aria-label="[1] Creating the Template (w/ Guide)">
+            <span class="bubble-text" data-text="[1] Creating the Template (w/ Guide)">[1] Creating the Template (w/ Guide)</span>
+          </div>
+        </div>
       </p>
       <p>
         <p class="section-group" id="group2">
         Vertical I-Mino Placement [61%]
         </p>
-        <input type="button" id="section2"  value="[2] Vertical I-Mino, 14 patterns (w/ Guide)" onClick="gButton='section2'"><br>
-        <input type="button" id="section3"  value="[3] Vertical I-Mino, 20q" onClick="gButton='section3'"><br>
+        <div class="bubble-wrapper">
+          <div id="bsection2" class="bubble v2">
+            <input type="button" id="section2" class="bubble-input" onClick="gButton='section2'" aria-label="[2] Vertical I-Mino, 14 patterns (w/ Guide)">
+            <span class="bubble-text" data-text="[2] Vertical I-Mino, 14 patterns (w/ Guide)">[2] Vertical I-Mino, 14 patterns (w/ Guide)</span>
+          </div>
+        </div>
+        <div class="bubble-wrapper">
+          <div id="bsection3" class="bubble v2">
+            <input type="button" id="section3" class="bubble-input" onClick="gButton='section3'" aria-label="[3] Vertical I-Mino, 20q">
+            <span class="bubble-text" data-text="[3] Vertical I-Mino, 20q">[3] Vertical I-Mino, 20q</span>
+          </div>
+        </div>
       </p>
 
       <p>
       <p class="section-group" id="group3">
         Horizontal I-Mino Placement [84%]
       </p>
-        <input type="button" id="section4"  value="[4] I-Mino 1st Layer, 6 patterns (w/ Guide)" onClick="gButton='section4'"><br>
+        <div class="bubble-wrapper">
+          <div id="bsection4" class="bubble v2">
+            <input type="button" id="section4" class="bubble-input" onClick="gButton='section4'" aria-label="[4] I-Mino 1st Layer, 6 patterns (w/ Guide)">
+            <span class="bubble-text" data-text="[4] I-Mino 1st Layer, 6 patterns (w/ Guide)">[4] I-Mino 1st Layer, 6 patterns (w/ Guide)</span>
+          </div>
+        </div>
+        <div class="bubble-wrapper">
+          <div id="bsection5" class="bubble v2">
+            <input type="button" id="section5" class="bubble-input" onClick="gButton='section5'" aria-label="[5] I-Mino 1st Layer, 20q">
+            <span class="bubble-text" data-text="[5] I-Mino 1st Layer, 20q">[5] I-Mino 1st Layer, 20q</span>
+          </div>
+        </div>
+        <div class="bubble-wrapper">
+          <div id="bsection6" class="bubble v2">
+            <input type="button" id="section6" class="bubble-input" onClick="gButton='section6'" aria-label="[6] I-Mino 3rd Layer, Flat Placement, 4 patterns (w/ Guide)">
+            <span class="bubble-text" data-text="[6] I-Mino 3rd Layer, Flat Placement, 4 patterns (w/ Guide)">[6] I-Mino 3rd Layer, Flat Placement, 4 patterns (w/ Guide)</span>
+          </div>
+        </div>
 
-        <input type="button" id="section5"  value="[5] I-Mino 1st Layer, 20q" onClick="gButton='section5'"><br>
+        <div class="bubble-wrapper">
+          <div id="bsection7" class="bubble v2">
+            <input type="button" id="section7" class="bubble-input" onClick="gButton='section7'" aria-label="[7] I-Mino 3rd Layer, Flat Placement, 20q">
+            <span class="bubble-text" data-text="[7] I-Mino 3rd Layer, Flat Placement, 20q">[7] I-Mino 3rd Layer, Flat Placement, 20q</span>
+          </div>
+        </div>
 
-        <input type="button" id="section6"  value="[6] I-Mino 3rd Layer, Flat Placement, 4 patterns (w/ Guide)" onClick="gButton='section6'"><br>
+        <div class="bubble-wrapper">
+          <div class="bubble v2">
+            <input id="bsection8" type="button" id="section8" class="bubble-input" onClick="gButton='section8'" aria-label="[8] IILO, 2 patterns (w/ Guide)">
+            <span class="bubble-text" data-text="[8] IILO, 2 patterns (w/ Guide)">[8] IILO, 2 patterns (w/ Guide)</span>
+          </div>
+        </div>
 
-        <input type="button" id="section7"  value="[7] I-Mino 3rd Layer, Flat Placement, 20q" onClick="gButton='section7'"><br>
+        <div class="bubble-wrapper">
+          <div id="bsection9" class="bubble v2">
+            <input type="button" id="section9" class="bubble-input" onClick="gButton='section9'" aria-label="[9] IILO, 10q">
+            <span class="bubble-text" data-text="[9] IILO, 10q">[9] IILO, 10q</span>
+          </div>
+        </div>
 
-        <input type="button" id="section8"  value="[8] IILO, 2 patterns (w/ Guide)" onClick="gButton='section8'"><br>
+        <div class="bubble-wrapper">
+          <div id="bsection10" class="bubble v2">
+            <input type="button" id="section10" class="bubble-input" onClick="gButton='section10'" aria-label="[10] 3rd Layer I-Mino, 3 patterns (w/ Guide)">
+            <span class="bubble-text" data-text="[10] 3rd Layer I-Mino, 3 patterns (w/ Guide)">[10] 3rd Layer I-Mino, 3 patterns (w/ Guide)</span>
+          </div>
+        </div>
 
-        <input type="button" id="section9"  value="[9] IILO, 10q" onClick="gButton='section9'"><br>
-
-        <input type="button" id="section10"  value="[10] 3rd Layer I-Mino, 3 patterns (w/ Guide)" onClick="gButton='section10'"><br>
-        <input type="button" id="section11"  value="[11] 3rd Layer I-Mino, 20q" onclick="gButton='section11'"><br>
+        <div class="bubble-wrapper">
+          <div id="bsection11" class="bubble v2">
+            <input type="button" id="section11" class="bubble-input" onClick="gButton='section11'" aria-label="[11] 3rd Layer I-Mino, 20q">
+            <span class="bubble-text" data-text="[11] 3rd Layer I-Mino, 20q">[11] 3rd Layer I-Mino, 20q</span>
+          </div>
+        </div>
 
       </p>
 
@@ -104,21 +171,35 @@
         <p class="section-group" id="group4"> 
           Horizontal I-Mino Summary
         </p>
-        <input type="button" id="section12"  value="[12] Midterm Test 20q" onClick="gButton='section12'"><br>
+        <div class="bubble-wrapper">
+          <div id="bsection12" class="bubble v2">
+            <input type="button" id="section12" class="bubble-input" onClick="gButton='section12'" aria-label="[12] Midterm Test 20q">
+            <span class="bubble-text" data-text="[12] Midterm Test 20q">[12] Midterm Test 20q</span>
+          </div>
+        </div>
       </p>
 
       <p>
-        If you can remember this much, you’ll have memorized 710 of the 711 </br> possible
-combos for a perfect clear, <br>
+        If you can remember this much, you’ll have memorized 710 of the 711 </br> possible combos for a perfect clear, <br>
           If you have the energy, try learning the last combo, LSIO types. <br>
       </p>
       <p>
         <p class="section-group" id="group5">
         LSIO type [84.6%]
         </p>
-        <input type="button" id="section13"  value="[13] LSIO type 1 pattern (w/ Guide)" onClick="gButton='section13'"><br>
+        <div class="bubble-wrapper">
+          <div id="bsection13" class="bubble v2">
+            <input type="button" id="section13" class="bubble-input" onClick="gButton='section13'" aria-label="[13] LSIO type 1 pattern (w/ Guide)">
+            <span class="bubble-text" data-text="[13] LSIO type 1 pattern (w/ Guide)">[13] LSIO type 1 pattern (w/ Guide)</span>
+          </div>
+        </div>
 
-        <input type="button" id="section14"  value="[14] LSIO type 12q" onClick="gButton='section14'"><br>
+        <div class="bubble-wrapper">
+          <div id="bsection14" class="bubble v2">
+            <input type="button" id="section14" class="bubble-input" onClick="gButton='section14'" aria-label="[14] LSIO type 12q">
+            <span class="bubble-text" data-text="[14] LSIO type 12q">[14] LSIO type 12q</span>
+          </div>
+        </div>
 
       </p>
 
@@ -127,36 +208,72 @@ combos for a perfect clear, <br>
           Summary
         </p>
 
-        <input type="button" id="section15"  value="[15] Final Exam, 30q" onClick="gButton='section15'"><br>
+        <div class="bubble-wrapper">
+          <div id="bsection15" class="bubble v2">
+            <input type="button" id="section15" class="bubble-input" onClick="gButton='section15'" aria-label="[15] Final Exam, 30q">
+            <span class="bubble-text" data-text="[15] Final Exam, 30q">[15] Final Exam, 30q</span>
+          </div>
+        </div>
 
-        <input type="button" id="section16"  value="[16] Graduation test (+mirror q's) 100q" onClick="gButton='section16'"><br>
+        <div class="bubble-wrapper">
+          <div id="bsection16" class="bubble v2">
+            <input type="button" id="section16" class="bubble-input" onClick="gButton='section16'" aria-label="[16] Graduation test (+mirror q's) 100q">
+            <span class="bubble-text" data-text="[16] Graduation test (+mirror q's) 100q">[16] Graduation test (+mirror q's) 100q</span>
+          </div>
+        </div>
       </p>
       <p>
         <p class="section-group" id="group7">
           Bonus
         </p>
-        <input type="button" id="section17"  value="[17] Skimming Patterns" onClick="gButton='section17'"><br>
+        <div class="bubble-wrapper">
+          <div id="bsection17" class="bubble v2">
+            <input type="button" id="section17" class="bubble-input" onClick="gButton='section17'" aria-label="[17] Skimming Patterns">
+            <span class="bubble-text" data-text="[17] Skimming Patterns">[17] Skimming Patterns</span>
+          </div>
+        </div>
 
-        <input type="button" id="section18"  value="[18] Vertical I-Mino, 514q" onClick="gButton='section18'"><br>
+        <div class="bubble-wrapper">
+          <div id="bsection18" class="bubble v2">
+            <input type="button" id="section18" class="bubble-input" onClick="gButton='section18'" aria-label="[18] Vertical I-Mino, 514q">
+            <span class="bubble-text" data-text="[18] Vertical I-Mino, 514q">[18] Vertical I-Mino, 514q</span>
+          </div>
+        </div>
 
-        <input type="button" id="section19"  value="[19] Horizontal I-Mino, 196q" onClick="gButton='section19'"><br>
-        <input type="button" id="section20"  value="[20] All 711q" onclick="gButton='section20'"><br>
+        <div class="bubble-wrapper">
+          <div id="bsection19" class="bubble v2">
+            <input type="button" id="section19" class="bubble-input" onClick="gButton='section19'" aria-label="[19] Horizontal I-Mino, 196q">
+            <span class="bubble-text" data-text="[19] Horizontal I-Mino, 196q">[19] Horizontal I-Mino, 196q</span>
+          </div>
+        </div>
 
-        <input type="button" id="section21"  value="[21] 711q mirror (Not Checked)" onclick="gButton='section21'"><br>
+        <div class="bubble-wrapper">
+          <div id="bsection20" class="bubble v2">
+            <input type="button" id="section20" class="bubble-input" onClick="gButton='section20'" aria-label="[20] All 711q">
+            <span class="bubble-text" data-text="[20] All 711q">[20] All 711q</span>
+          </div>
+        </div>
+
+        <div class="bubble-wrapper">
+          <div id="bsection21" class="bubble v2">
+            <input type="button" id="section21" class="bubble-input" onClick="gButton='section21'" aria-label="[21] 711q mirror (Not Checked)">
+            <span class="bubble-text" data-text="[21] 711q mirror (Not Checked)">[21] 711q mirror (Not Checked)</span>
+          </div>
+        </div>
       </p>
-
+      
       <p>
         ■ Contributors <br>
         <a href="https://form1ssl.fc2.com/form/?id=685FCA71E208118a">Chotia</a><br>
       </p>
       <!-- <p>
         ■Reference sites and topics<br>
-<a href="http://taninkona.web.fc2.com/ttt/">Tetris Trainer Trevian</a><br>
+        <a href="http://taninkona.web.fc2.com/ttt/">Tetris Trainer Trevian</a><br>
         <a href="https://docs.google.com/spreadsheets/d/1bVY3t_X96xRmUL0qdgB9tViSIGenu6RMKX4RW7qWg8Y/edit#gid=376091749">Tetris PC Template Success Rate</a><br>
         <a href="http://waka.nu/tetris/">Kitakeya Honpo</a><br>
         <a href="http://harddrop.com/wiki/Main_Page">Hard Drop Wiki</a><br>
         <a href="http://www46.atwiki.jp/tojkazuto/">Tetris Strategy and Tournament Information Collection</a><br>
-<a href="http://www59.atwiki.jp/tetple/pages/1.html">Tetristemplate technique summary</a><br>
+        <a href="http://www59.atwiki.jp/tetple/pages/1.html">Tetristemplate technique summary</a><br>
       </p>
       <p>
       ■Play Tetris for free! <br>
@@ -183,7 +300,6 @@ combos for a perfect clear, <br>
         <input type="button" value="最初の画面に戻る" onClick="gButton='back'">
       </p> -->
     </div>
-
     <div id="perform" class="layer center">
       <p>
         <input type="text" id="perform_caption" class="center" style="width: 560px;"><br>
@@ -318,8 +434,8 @@ combos for a perfect clear, <br>
         </div>
       </p>
         <div class="prefs-title">Display</div>
-        <div class="display-row"><span>Explosion Effects (broken, lol)</span><input type="checkbox" id="cb_explosion_effects"/></div>
-        <div class="display-row"><span>Text Overlay</span><input type="checkbox" id="cb_text_overlay" checked/></div>
+        <div class="display-row, cb"><span>Explosion Effects (broken, lol)</span><input type="checkbox" id="cb_explosion_effects"/></div>
+        <div class="display-row, cb"><span>Text Overlay</span><input type="checkbox" id="cb_text_overlay" checked/></div>
       </p>
         <p>
           <input type="button" value="Apply" class="prefs-appcan" onClick="gButton='ok'">

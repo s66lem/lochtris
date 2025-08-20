@@ -12,7 +12,7 @@
 }
 
 /*Basic Settings */
-body, input, select{
+body, select{
   font-family: "Arial", sans-serif;
   font-size: 16px;
   
@@ -23,9 +23,199 @@ body, input, select{
   
 }
 
+:root {
+  --bubbleTiming: cubic-bezier(0.5, 0.15, 0.25, 1.75);
+  --shadow-base-offset: .5rem;          /* matches v2 ::after top/left offset */
+  --shadow-hover-shift: 0.35rem;       /* matches v2 ::after hover translate */
+  --shadow-active-shift-x: 0.4rem;     /* matches v2 ::after active translate X */
+  --shadow-active-shift-y: 0.45rem;    /* matches v2 ::after active translate Y */
+  --text-shadow-blur: 0.05rem;         /* text shadow blur radius */
+  --bubble-hover-scale: 1.06;
+  --bubble-active-scale: 1.02;
+  --shadow-hover-counterscale: calc(1 / var(--bubble-hover-scale));
+  --shadow-active-counterscale: calc(1 / var(--bubble-active-scale));
+  --text-hover-scale: 1.015;
+  --text-active-scale: 1.02;
+  --text-hover-counterscale: calc(1 / var(--text-hover-scale));
+  --text-active-counterscale: calc(1 / var(--text-active-scale));
+  --reflect-inset: 0.rem;      /* how far inside from the pill edge */
+  --reflect-thickness: 0.15rem;  /* thickness of the glossy stroke */
+  --reflect-arc-start: 312deg; /* where the arc begins around the circle */
+  --reflect-arc-sweep: 40deg;  /* how wide the arc is (reduce to make span smaller) */
+}
+.bubble-wrapper {
+  padding: 15px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.bubble {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  min-width: auto;
+  height: 1.25rem;
+  padding: 0 .85rem;
+  border-radius: 1.5rem;
+  transform-style: preserve-3d;
+  transition: transform 0.2s var(--bubbleTiming), box-shadow 0.2s var(--bubbleTiming), width 0.2s var(--bubbleTiming), height 0.2s var(--bubbleTiming);
+  will-change: transform;
+  z-index: 0;
+  animation: float 4s ease-in-out infinite;
+ /* clip reflection to the pill shape */
+  /* stronger outer drop-shadow + darker insets */
+
+  box-shadow: 0.14rem 0.14rem 0.6rem rgba(0,0,0,0.55),
+    0 -0.06rem 0.1rem rgba(255,255,255,0.92) inset,
+    0 -0.15rem 0.4rem rgba(177, 222, 248, 0.95) inset,
+    0 0.05rem 0.05rem rgba(177, 222, 248, 0.95) inset,
+    0.05rem 0 0.1rem rgba(255,255,255,0.95) inset,
+    -0.05rem 0 0.1rem rgba(255,255,255,0.95) inset,
+    0 0.1rem 0.4rem rgba(177, 222, 248, 0.95) inset; 
+}
+
+.bubble-text {
+  color: white;
+  font-size: 0.5rem;
+  user-select: none;
+  pointer-events: none;
+  transition: transform 0.1s var(--bubbleTiming);
+  position: relative; /* ensure text is above the reflection */
+  z-index: 1;
+  /* bubble handles scaling; we'll move shadow to ::before */
+}
+
+/* Replace text-shadow animation with a transform-driven shadow layer so it matches bubble/::after exactly */
+.bubble .bubble-text::before {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(0,0,0,0.3);
+  filter: blur(var(--text-shadow-blur));
+  transform: scale(1) translate(var(--shadow-base-offset), var(--shadow-base-offset));
+  transition: transform 0.1s var(--bubbleTiming);
+  z-index: 0; /* sits under the real text (z-index:1) */
+  pointer-events: none;
+}
+
+.bubble .bubble-text { text-shadow: none; }
+.bubble:hover .bubble-text { text-shadow: none; transform: scale(var(--text-hover-scale)); }
+.bubble:active .bubble-text { text-shadow: none; transform: scale(var(--text-active-scale)); }
+
+/* shadow movement */
+.bubble:hover .bubble-text::before {
+  transform: scale(var(--shadow-hover-counterscale)) scale(var(--text-hover-counterscale)) translate(
+    calc(var(--shadow-base-offset) + var(--shadow-hover-shift)),
+    calc(var(--shadow-base-offset) + var(--shadow-hover-shift))
+  );
+}
+.bubble:active .bubble-text::before {
+  transform: scale(var(--shadow-active-counterscale)) scale(var(--text-active-counterscale)) translate(
+    calc(var(--shadow-base-offset) + var(--shadow-active-shift-x)),
+    calc(var(--shadow-base-offset) + var(--shadow-active-shift-y))
+  );
+}
+
+/* Shared reflection highlight */
+/* Reflection placement override: center on left cap, robust to padding/width */
+.bubble:before {
+  content: "";
+  position: absolute;
+  height: 100%;           /* match bubble height */
+  aspect-ratio: 1 / 1;    /* keep it a perfect circle */
+  left: 0;                /* anchor at the left padding edge */
+  top: 0;                 /* anchor at top */
+  transform: translate(10%, 10%); /* center on cap and lift slightly */
+  border-radius: 50%;
+  /* arc in the upper-left quadrant */
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    transparent 0 calc(var(--reflect-arc-start)),
+    rgba(255,255,255,0.95) var(--reflect-arc-start) calc(var(--reflect-arc-start) + var(--reflect-arc-sweep)),
+    transparent calc(var(--reflect-arc-start) + var(--reflect-arc-sweep)) 360deg
+  );
+  /* thin ring mask */
+  -webkit-mask: radial-gradient(circle closest-side,
+    transparent calc(100% - var(--reflect-thickness, 0.2rem)),
+    #000 calc(100% - var(--reflect-thickness, 0.2rem))
+  );
+  mask: radial-gradient(circle closest-side,
+    transparent calc(100% - var(--reflect-thickness, 0.2rem)),
+    #000 calc(100% - var(--reflect-thickness, 0.2rem))
+  );
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* v2 only */
+.bubble.v2 { 
+  background-image: inherit;
+  transition: transform 0.1s var(--bubbleTiming), box-shadow 0.2s var(--bubbleTiming), width 0.2s var(--bubbleTiming), height 0.2s var(--bubbleTiming);
+}
+.bubble.v2:after {
+  content: "";
+  position: absolute;
+  top: var(--shadow-base-offset);
+  left: var(--shadow-base-offset);
+  right: calc(var(--shadow-base-offset) * -1);
+  bottom: calc(var(--shadow-base-offset) * -1);
+  border-radius: 1.35rem;
+  background: transparent;
+  box-shadow: 0 0 0 0.0525rem rgba(0,0,0,0.6);
+  filter: blur(4px);
+  transform: translate3d(0,0,-1px);
+  z-index: -2;
+  transition: transform 0.1s var(--bubbleTiming);
+}
+.bubble.v2:hover { animation: none; transform: scale(var(--bubble-hover-scale)); }
+.bubble.v2:hover:after { transform: scale(var(--shadow-hover-counterscale)) translate3d(var(--shadow-hover-shift), var(--shadow-hover-shift), -1px); }
+.bubble.v2:active { animation: none; transform: scale(var(--bubble-active-scale)) scaleY(0.9); }
+.bubble.v2:active:after { transform: scale(var(--shadow-active-counterscale)) translate3d(var(--shadow-active-shift-x), var(--shadow-active-shift-y), -1px); }
+
+/* Float animation (used by .bubble) */
+@keyframes float {
+  from, to { transform: translate(0, 1%); }
+  25% { transform: translate(-1%, 0); }
+  50% { transform: translate(0, -1%); }
+  75% { transform: translate(1%, 0); }
+}
+
+/*-----------------------------------------
+  bubble input overlay for accessibility and click handling
+-----------------------------------------*/
+.bubble {
+  position: relative; /* ensure absolute children position correctly */
+}
+.bubble .bubble-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  opacity: 0; /* keep visuals from the .bubble and .bubble-text */
+}
+/* Mirror the active animation when the input is pressed */
+.bubble.v2:has(.bubble-input:active) { animation: none; transform: scale(var(--bubble-active-scale)) scaleY(0.9); }
+.bubble.v2:has(.bubble-input:active):after { transform: scale(var(--shadow-active-counterscale)) translate3d(var(--shadow-active-shift-x), var(--shadow-active-shift-y), -1px); }
+/* Optional focus ring for keyboard users */
+.bubble:has(.bubble-input:focus-visible) { outline: 2px solid rgba(177, 222, 248, 0.8); outline-offset: 2px; }
 
 
-#list_sections input{
+/* #list_sections input{
   font-family: "Arial", sans-serif;
   font-size: 12px;
   height: 24px;
@@ -56,16 +246,15 @@ body, input, select{
   color: #C4C4C5;
   outline: 3.5px solid #5F646D;
   box-shadow: 2px 2px 5px rgba(100, 100, 100, 0.05);
-}
+} */
 .section-btn-cleared {
-  background-color: #2e5730 !important; /* Green */
-  color: #BCBCBC !important;
-  outline: 3px solid #112607 !important;
-}
-.section-btn-cleared:hover{
-  background-color: #4E703E !important;
-  color: #CECECE !important;
-  outline: 3.5px solid #A8C599 !important;
+    box-shadow: 0.14rem 0.14rem 0.6rem rgba(0,0,0,0.55),
+    0 -0.06rem 0.1rem rgba(255,255,255,0.92) inset,
+    0 -0.15rem 0.4rem rgba(33, 192, 81, 0.95) inset,
+    0 0.05rem 0.05rem rgba(33, 192, 81, 0.95) inset,
+    0.05rem 0 0.1rem rgba(255,255,255,0.95) inset,
+    -0.05rem 0 0.1rem rgba(255,255,255,0.95) inset,
+    0 0.1rem 0.4rem rgba(33, 192, 81, 0.95) inset;
 }
 
 
@@ -529,8 +718,8 @@ body::-webkit-scrollbar { /* chrome, safari, opera */
 /* svg optimization*/
 img[src$=".svg"] {
     image-rendering: optimizeSpeed;
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: -moz-crisp-edges;
+    image-rendering: --webkit-optimize-contrast;
+    image-rendering: --moz-crisp-edges;
     image-rendering: crisp-edges;
     shape-rendering: optimizeSpeed;
     will-change: transform; 
@@ -545,8 +734,8 @@ img[src$=".svg"] {
   height: 20rem !important;
   max-width: 10rem;
   max-height: 20rem;
-  image-rendering: -moz-crisp-edges;
-  image-rendering: -webkit-crisp-edges;
+  image-rendering: --moz-crisp-edges;
+  image-rendering: --webkit-crisp-edges;
   image-rendering: auto;
   image-rendering: auto;
   line-height: 0;
@@ -968,11 +1157,13 @@ td[style*="width: 240px"] {
   pointer-events: none;
   box-shadow: 0 1px 3px rgba(0,0,0,0.35);
   transform-origin: center;
-  z-index: 999; /* above board images */
+  z-index: 999; 
   transition: opacity 200ms linear;
   width: 6px;
   height: 6px;
   background: #fff;
+  transform: translate3d(0,0,0);
+  backface-visibility: hidden;
 }
 #gb_total, #perform {
   will-change: transform;
@@ -1262,3 +1453,71 @@ body {
   animation-duration: 10s;
   opacity: 0.2;
 }
+.bubbles span:nth-child(9) {
+  width: 10px;
+  height: 10px;
+  opacity: 0.5;
+  left: 30%;
+  animation-delay: 5s;
+  animation-duration: 20s;
+  opacity: 0.3;
+}
+
+.bubbles span:nth-child(10) {
+  width: 35px;
+  height: 35px;
+  opacity: 0.5;
+  left: 40%;
+  animation-delay: 8s;
+  animation-duration: 8s;
+  opacity: 0.2;
+}
+
+.bubbles span:nth-child(11) {
+  width: 45px;
+  height: 45px;
+  opacity: 0.5;
+  left: 60%;
+  animation-delay: 10s;
+  animation-duration: 15s;
+  opacity: 0.1;
+}
+.bubbles span:nth-child(12) {
+  width: 10px;
+  height: 10px;
+  opacity: 0.5;
+  left: 30%;
+  animation-delay: 5s;
+  animation-duration: 20s;
+  opacity: 0.3;
+}
+
+.bubbles span:nth-child(13) {
+  width: 35px;
+  height: 35px;
+  opacity: 0.5;
+  left: 40%;
+  animation-delay: 8s;
+  animation-duration: 8s;
+  opacity: 0.2;
+}
+
+.bubbles span:nth-child(14) {
+  width: 45px;
+  height: 45px;
+  opacity: 0.5;
+  left: 60%;
+  animation-delay: 10s;
+  animation-duration: 15s;
+  opacity: 0.1;
+}
+
+
+
+
+
+
+/* ------------------------------------------------------
+idk if im gonna use this
+------------------------------------------------------ */
+

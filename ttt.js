@@ -650,7 +650,7 @@ function RefreshSectionTitle(){
 function RefreshProblemButtons(){
   for(var i = 0; i < SECTION_NUM; i++){
     // if(gProblemsCleared[i])  ShowImage('clear'+ i);
-    var btn = document.getElementById('section' + (i + 1));
+    var btn = document.getElementById('bsection' + (i + 1));
     //if(!btn) continue;
     if(gProblemsCleared[i]){
       btn.classList.add('section-btn-cleared');
