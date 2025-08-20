@@ -31,10 +31,9 @@ Practice PCO with shadow guides when you get stuck!
 Chotia (https://github.com/sakuramochi84/ttpc)
 	the original author of every pco solution
 
---------------------------------------------------------
-thank you for 1 star ^^
-
 Davdav1233 (https://github.com/davdav1233/)
 	for whom this repo is forked from
 
 --------------------------------------------------------
+thank you for 1 star ^^
+
