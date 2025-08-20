@@ -77,10 +77,10 @@ function UIPush(amplitudePx, durationMs){
 _hdParticles = [];
 _hdParticlesRAF = null;
 
-function spawnHarddropParticles(cells, color = '#fff', opts = {}) {
+function spawnHarddropParticles(cells, color, opts = {}) {
   // cells: {col,row} or [{col,row}, ...] in grid coords (0..9, 0..19)
   // opts: {count, life, spread, force, cluster}
-  color = gCurMino.palette;
+  color = color || gCurMino.palette;
   const cfg = Object.assign({ count: 6, life: 400, spread: 80, force: 220, sizeMin: 2, sizeMax: 4, cluster: 1 }, opts);
   if (!cells) return;
   if (!Array.isArray(cells)) cells = [cells];
