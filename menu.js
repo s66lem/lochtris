@@ -1,15 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
     const menuItems = Array.from(document.querySelectorAll('.bubble-input:not(#main_menu_btn)'));
     let currentIndex = 0;
-    const isInGame = () => (typeof gScene !== 'undefined' && String(gScene).toLowerCase() === 'perform');
+    let listenersActive = false;
 
+    let loggingEnabled = false;
+
+    function slog(s) { // log for debugging
+        if (loggingEnabled) {
+            console.log(`[Menu] ${s}`);
+        }
+    }
 
     function updateMenuSelection(shouldScroll = true) {
-        if (isInGame()) { // do nothing while in-game; clear any visual selection
-            clearMenuSelection();
-            return;
-        }
-        
+        slog(`Updating menu selection to index ${currentIndex}`);
         if (!menuItems.length) return;
         // clamp index in case it's out of range
         if (currentIndex < 0) return;
@@ -58,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateMenuSelection();
 
     function clearMenuSelection() {
+        
         menuItems.forEach((btn) => {
             const bubble = btn.closest('.bubble.v2') || btn.closest('.bubble') || btn;
             bubble.classList.remove('selected');
@@ -65,13 +69,18 @@ document.addEventListener('DOMContentLoaded', () => {
         currentIndex = -1;
     }
 
-    document.addEventListener('mousemove', () => {
+    // define listeners ONE SINGULAR TIME at module scope
+    const mousemoveListener = () => {
         if (currentIndex === -1) return;
         clearMenuSelection();
-    }, { passive: true });
+    };
 
-    document.addEventListener('keydown', (event) => {
-        const prevIndex = currentIndex;
+    const keydownListener = (event) => {
+        const key = event.key.toLowerCase();
+        if (![DEFAULT_KEY_MENUUP, DEFAULT_KEY_MENUDOWN, DEFAULT_KEY_MENUSELECT].includes(key)) {
+            return;
+        }
+
         switch (event.key.toLowerCase()) {
             case DEFAULT_KEY_MENULEFT:
                 break;
@@ -109,11 +118,42 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Go back in menu
                 break;
         }
+    };
+
+    function enableMenuListeners() {
+        if (listenersActive) return; // prevent double-adding
         
-    });
+        document.addEventListener('mousemove', mousemoveListener, { passive: true });
+        document.addEventListener('keydown', keydownListener);
+        listenersActive = true;
+        updateMenuSelection();
+    }
 
+    function disableMenuListeners() {
+        if (!listenersActive) return; // nothing to remove
+        
+        document.removeEventListener('keydown', keydownListener);
+        document.removeEventListener('mousemove', mousemoveListener);
+        listenersActive = false;
+        clearMenuSelection();
+    }
 
+    // global function to be called from ttt.js when scene changes
+    window.updateMenuState = function() {
+        
+        if (typeof gScene === 'undefined') {
+            disableMenuListeners();
+            return;
+        }
+        
+        const scene = String(gScene).toLowerCase();
+        if (scene === 'select_section') {
+            enableMenuListeners();
+        } else {
+            disableMenuListeners();
+        }
+    };
 
-
+    // initial setup
+    window.updateMenuState();
 });
-

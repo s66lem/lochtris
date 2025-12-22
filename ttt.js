@@ -440,6 +440,9 @@ function SetupScene(scene){
     gScene = 'select_section';
     break;
   }
+  if (typeof window.updateMenuState === 'function') {
+    window.updateMenuState();
+  }
 }
 /*----------------------------------------------------------------------------------------
  ☆★ Scene ends ★☆
