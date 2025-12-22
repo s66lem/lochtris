@@ -48,6 +48,14 @@ var DEFAULT_KEY_ROTATE_LEFT  = 'ctrl';
 var DEFAULT_KEY_HOLD         = 'c';
 var DEFAULT_KEY_GUIDE        = 'r';
 var DEFAULT_KEY_ROTATE_180  = 'shift'; 
+
+var DEFAULT_KEY_MENULEFT = 'arrowleft';
+var DEFAULT_KEY_MENURIGHT = 'arrowright';
+var DEFAULT_KEY_MENUDOWN = 'arrowdown';
+var DEFAULT_KEY_MENUUP = 'arrowup';
+var DEFAULT_KEY_MENUSELECT = 'enter';
+var DEFAULT_KEY_MENUBACK = 'escape';
+
 var DEFAULT_DAS = 9;
 var DEFAULT_ARR = 3;
 var DEFAULT_SDF = 25; // Soft drop speed

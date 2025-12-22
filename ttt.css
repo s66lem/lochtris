@@ -90,7 +90,6 @@ body, select{
   /* bubble handles scaling; we'll move shadow to ::before */
 }
 
-/* Replace text-shadow animation with a transform-driven shadow layer so it matches bubble/::after exactly */
 .bubble .bubble-text::before {
   content: attr(data-text);
   position: absolute;
@@ -107,11 +106,36 @@ body, select{
 }
 
 .bubble .bubble-text { text-shadow: none; }
-.bubble:hover .bubble-text { text-shadow: none; transform: scale(var(--text-hover-scale)); }
+
+.bubble:hover .bubble-text,
+.bubble.selected .bubble-text { text-shadow: none; transform: scale(var(--text-hover-scale)); }
+
 .bubble:active .bubble-text { text-shadow: none; transform: scale(var(--text-active-scale)); }
 
+.bubble.v2.selected,
+.bubble.selected {
+   box-shadow: 0.14rem 0.14rem 0.6rem rgba(255, 255, 255, 0.55),
+    0 -0.06rem 0.1rem rgba(255,255,255,0.92) inset,
+    0 -0.15rem 0.4rem rgba(177, 222, 248, 0.95) inset,
+    0 0.05rem 0.05rem rgba(177, 222, 248, 0.95) inset,
+    0.05rem 0 0.1rem rgba(255,255,255,0.95) inset,
+    -0.05rem 0 0.1rem rgba(255,255,255,0.95) inset,
+    0 0.1rem 0.4rem rgba(177, 222, 248, 0.95) inset; 
+}
+.bubble.selected.section-btn-cleared,
+.bubble.v2.selected.section-btn-cleared {
+      box-shadow: 0.14rem 0.14rem 0.6rem rgba(255, 255, 255, 0.55),
+    0 -0.06rem 0.1rem rgba(255,255,255,0.92) inset,
+    0 -0.15rem 0.4rem rgba(33, 192, 81, 0.95) inset,
+    0 0.05rem 0.05rem rgba(33, 192, 81, 0.95) inset,
+    0.05rem 0 0.1rem rgba(255,255,255,0.95) inset,
+    -0.05rem 0 0.1rem rgba(255,255,255,0.95) inset,
+    0 0.1rem 0.4rem rgba(33, 192, 81, 0.95) inset;
+}
+
 /* shadow movement */
-.bubble:hover .bubble-text::before {
+.bubble:hover .bubble-text::before,
+.bubble.selected .bubble-text::before {
   transform: scale(var(--shadow-hover-counterscale)) scale(var(--text-hover-counterscale)) translate(
     calc(var(--shadow-base-offset) + var(--shadow-hover-shift)),
     calc(var(--shadow-base-offset) + var(--shadow-hover-shift))
@@ -175,8 +199,12 @@ body, select{
   z-index: -2;
   transition: transform 0.1s var(--bubbleTiming);
 }
-.bubble.v2:hover { animation: none; transform: scale(var(--bubble-hover-scale)); }
-.bubble.v2:hover:after { transform: scale(var(--shadow-hover-counterscale)) translate3d(var(--shadow-hover-shift), var(--shadow-hover-shift), -1px); }
+.bubble.v2:hover,
+.bubble.v2.selected { animation: none; transform: scale(var(--bubble-hover-scale)); }
+
+.bubble.v2:hover:after,
+.bubble.v2.selected:after { transform: scale(var(--shadow-hover-counterscale)) translate3d(var(--shadow-hover-shift), var(--shadow-hover-shift), -1px); }
+
 .bubble.v2:active { animation: none; transform: scale(var(--bubble-active-scale)) scaleY(0.9); }
 .bubble.v2:active:after { transform: scale(var(--shadow-active-counterscale)) translate3d(var(--shadow-active-shift-x), var(--shadow-active-shift-y), -1px); }
 

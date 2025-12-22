@@ -19,7 +19,7 @@ var gScene;           // Scene name
 
 var gPrevScene;       // Scene name in the previous frame ( PREVious SCENE )
 /*
-● Scene structure
+● Scene structure>
  select_sections ⇔ preferences
    ↓↑
  Perform
@@ -330,7 +330,7 @@ function setupCheckboxes() {
  ☆★ Load ★☆
 
  Load settings and progress from cookies.
-----------------------------------------------------------------------------------------*/
+-----------------------------------------------------------------m-----------------------*/
 function LoadData(){
   // Loading Key Settings
 
@@ -522,6 +522,29 @@ function PerformScene(scene){
     break;
   }
 }
+
+(function regMenuBack() {
+  function toKcSafe(name) {
+    try { return (typeof ToKc === 'function' && name) ? ToKc(name) : 0; }
+    catch (e) { return 0; }
+  }
+  const menuBackName = (typeof DEFAULT_KEY_MENUBACK !== 'undefined') ? String(DEFAULT_KEY_MENUBACK).toLowerCase() : '';
+  const menuBackCode = toKcSafe(typeof DEFAULT_KEY_MENUBACK !== 'undefined' ? DEFAULT_KEY_MENUBACK : '');
+
+  document.addEventListener('keydown', (e) => {
+    const code = e.which || e.keyCode || 0;
+    const keyName = String(e.key || '').toLowerCase();
+
+    if ((menuBackCode && code === menuBackCode) || (menuBackName && keyName === menuBackName)) {
+      // emulate main menu button press
+      gButton = 'back';
+      // remove focus from any control so UI doesn't remain focused
+      try { if (document.activeElement && typeof document.activeElement.blur === 'function') document.activeElement.blur(); } catch (err) {}
+      // prevent default navigation/back behavior when applicable
+      e.preventDefault();
+    }
+  }, { passive: false });
+})();
 /*----------------------------------------------------------------------------------------
  ☆★ Problem preparation ★☆
 ----------------------------------------------------------------------------------------*/
