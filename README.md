@@ -1,6 +1,5 @@
 # Lochtris
 A Modern Tetris Trainer
-*just a little side-project, don't mind me, definitely still a WIP*
 
 
 Practice PCO with shadow guides when you get stuck!
