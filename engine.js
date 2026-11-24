@@ -137,6 +137,9 @@
     this.lastRotateStep = 0; // 1 = CW, -1 = CCW, 2 = 180, 0 = not rotate
     this.combo = -1;
     this.b2b = false;
+    this.b2bStreak = 0;
+    this.matrixVersion = 0;
+    this.lastAlignedGuide = null;
 
     // Stats & finesse
     this.elapsedMs = 0;
@@ -215,7 +218,9 @@
 
     this.resetRunMetrics();
     this.resetInputTimers(true);
-    this.dequeue(false);
+    this.matrixVersion++;
+    this.lastAlignedGuide = null;
+    this.dequeue(false, true);
     this.state = 'ready';
     this.dirty = true;
   };
@@ -255,6 +260,8 @@
     this.curHold = null;
     this.resetRunMetrics();
     this.resetInputTimers(true);
+    this.matrixVersion++;
+    this.lastAlignedGuide = null;
 
     var useCd = (this.mode === 'sprint') && !skipCountdown && Boolean(this.handling.sprintCountdown);
     if (useCd) {
@@ -266,7 +273,7 @@
     } else {
       this.countdownMs = 0;
       this.countdownBeat = 0;
-      this.dequeue(false);
+      this.dequeue(false, true);
       this.state = 'ready';
     }
     this.dirty = true;
@@ -279,6 +286,8 @@
     this.clearSpinFlags();
     this.combo = -1;
     this.b2b = false;
+    this.b2bStreak = 0;
+    this.lastAlignedGuide = null;
     this.elapsedMs = 0;
     this.inputs = 0;
     this.piecesPlaced = 0;
@@ -378,9 +387,20 @@
     }
   };
 
+  LochtrisEngine.prototype.checkGuideAlignTransition = function () {
+    if (!this.guideMode || !this.curGuide || !this.curMino) {
+      return;
+    }
+    if (this.lastAlignedGuide === this.curGuide) return;
+    if (this.isGuideAligned()) {
+      this.lastAlignedGuide = this.curGuide;
+      this.emit('guideAlign', { guide: this.curGuide });
+    }
+  };
+
   // Shared spawn setup for dequeue() and doHold(): validates block-out BEFORE sonic drop,
   // and applies preserveDasOnSpawn / DCD consistently.
-  LochtrisEngine.prototype.finalizeSpawn = function (allowIRS) {
+  LochtrisEngine.prototype.finalizeSpawn = function (allowIRS, isFromHold, queueShifted) {
     this.curDir = D.INITIAL_DIR;
     this.curX = D.INITIAL_X;
     this.curY = D.INITIAL_Y;
@@ -436,18 +456,26 @@
     }
 
     this.dirty = true;
+    this.emit('spawn', {
+      pieceKey: this.curMino.key,
+      fromHold: Boolean(isFromHold),
+      queueShifted: queueShifted || 0
+    });
+    this.checkGuideAlignTransition();
     return true;
   };
 
-  LochtrisEngine.prototype.dequeue = function (allowInitialSystems) {
+  LochtrisEngine.prototype.dequeue = function (allowInitialSystems, isInitialLoad) {
     if (this.mode !== 'problem' && this.queue.length < 7) this.refillBag();
     if (this.queue.length === 0 && !this.curHold) {
       this.curMino = null;
       return false;
     }
 
+    var shifted = 0;
     if (this.queue.length > 0) {
       this.curMino = this.queue.shift();
+      shifted = isInitialLoad ? 0 : 1;
     } else {
       this.curMino = this.curHold;
       this.curHold = null;
@@ -456,6 +484,7 @@
     if (this.mode !== 'problem' && this.queue.length < 7) this.refillBag();
 
     this.curGuide = this.guidesQueue.length > 0 ? this.guidesQueue.shift() : null;
+    this.lastAlignedGuide = null;
     this.canHold = true;
 
     // Apply IHS (Initial Hold System) before finalizing spawn
@@ -475,6 +504,7 @@
       if (!this.curHold) {
         this.curHold = this.curMino;
         this.curMino = this.queue.shift();
+        if (!isInitialLoad) shifted++;
       } else {
         var tmp = this.curHold;
         this.curHold = this.curMino;
@@ -485,7 +515,7 @@
       this.emit('hold', { piece: this.curHold, ihs: true });
     }
 
-    return this.finalizeSpawn(allowInitialSystems);
+    return this.finalizeSpawn(allowInitialSystems, false, shifted);
   };
 
   /*--------------------------------------------------------------------------------------
@@ -665,13 +695,22 @@
   LochtrisEngine.prototype.tryHorizontalStep = function (dir, silentWall) {
     if (!this.curMino) return false;
     if (this.canPlace(this.curMino, this.curDir, this.curX + dir, this.curY)) {
+      var prevX = this.curX;
       this.curX += dir;
       this.clearSpinFlags();
       this.setWallPush(0);
       this.onGroundManipulation();
-      this.emit('move', { dir: dir });
+      this.emit('move', {
+        dir: dir,
+        col: this.curX,
+        fromX: prevX,
+        y: this.curY,
+        mino: this.curMino,
+        rotDir: this.curDir
+      });
       if (this.keys.softDrop && this.handling.sdf >= 41) this.sonicDrop(true);
       this.dirty = true;
+      this.checkGuideAlignTransition();
       return true;
     } else {
       this.setWallPush(dir);
@@ -682,6 +721,7 @@
 
   LochtrisEngine.prototype.snapHorizontal = function (dir) {
     if (!this.curMino) return 0;
+    var startX = this.curX;
     var moved = 0;
     while (this.canPlace(this.curMino, this.curDir, this.curX + dir, this.curY)) {
       this.curX += dir;
@@ -691,8 +731,18 @@
     if (moved > 0) {
       this.clearSpinFlags();
       this.onGroundManipulation();
-      this.emit('move', { dir: dir, snapped: true, steps: moved });
+      this.emit('move', {
+        dir: dir,
+        snapped: true,
+        steps: moved,
+        col: this.curX,
+        fromX: startX,
+        y: this.curY,
+        mino: this.curMino,
+        rotDir: this.curDir
+      });
       this.dirty = true;
+      this.checkGuideAlignTransition();
     }
     this.setWallPush(dir);
     return moved;
@@ -740,6 +790,7 @@
         this.emit('softDrop', { sonic: true, dy: dy, color: this.curMino.palette });
       }
       this.dirty = true;
+      this.checkGuideAlignTransition();
     }
     return dy;
   };
@@ -764,6 +815,8 @@
     var kicks = this.curMino.kicks[key];
     if (!kicks) return false;
 
+    var oldX = this.curX;
+    var oldY = this.curY;
     for (var i = 0; i < kicks.length; i++) {
       var nx = this.curX + kicks[i][0];
       var ny = this.curY + kicks[i][1];
@@ -788,10 +841,18 @@
             step: step,
             kickIndex: i,
             isSpin: this.tSpinType > 0 || this.allSpinMino !== null,
-            pieceKey: this.curMino.key
+            pieceKey: this.curMino.key,
+            fromDir: fromDir,
+            toDir: toDir,
+            fromX: oldX,
+            fromY: oldY,
+            x: this.curX,
+            y: this.curY,
+            mino: this.curMino
           });
         }
         this.dirty = true;
+        if (!silent) this.checkGuideAlignTransition();
         return true;
       }
     }
@@ -862,9 +923,11 @@
       return false;
     }
 
+    var holdShifted = 0;
     if (!this.curHold) {
       this.curHold = this.curMino;
       this.curMino = this.queue.shift();
+      holdShifted = 1;
     } else {
       var tmp = this.curHold;
       this.curHold = this.curMino;
@@ -875,7 +938,7 @@
     this.canHold = false;
 
     if (!silent) this.emit('hold', { piece: this.curHold, ihs: false });
-    return this.finalizeSpawn(false);
+    return this.finalizeSpawn(false, true, holdShifted);
   };
 
   LochtrisEngine.prototype.hardDrop = function () {
@@ -887,10 +950,13 @@
     this.curY = toY;
 
     var cells = pieceCells(this.curMino, this.curDir, this.curX, this.curY);
+    var b = this.curMino.bounds[this.curDir];
+    var dropCol = this.curX + (b.minC + b.maxC) * 0.5;
     this.emit('hardDrop', {
       fromY: fromY,
       toY: toY,
       dy: dy,
+      dropCol: dropCol,
       cells: cells,
       color: this.curMino.palette
     });
@@ -926,6 +992,7 @@
         this.matrix[cy][cx] = mino.placedBlockId;
       }
     }
+    this.matrixVersion++;
 
     if (!fromHardDrop) {
       this.emit('lock', { cells: cells, color: mino.palette });
@@ -959,12 +1026,16 @@
     }
 
     var clearedRows = [];
+    var clearedRowBlocks = [];
     for (var r = 0; r < D.MATRIX_HEIGHT; r++) {
       var full = true;
       for (var c = 0; c < D.MATRIX_WIDTH; c++) {
         if (this.matrix[r][c] === 0) { full = false; break; }
       }
-      if (full) clearedRows.push(r);
+      if (full) {
+        clearedRows.push(r);
+        clearedRowBlocks.push(new Uint8Array(this.matrix[r]));
+      }
     }
 
     var numCleared = clearedRows.length;
@@ -987,7 +1058,11 @@
     var isPC = false;
 
     if (numCleared === 0) {
+      var prevCombo = this.combo;
       this.combo = -1;
+      if (prevCombo >= 2) {
+        this.emit('comboBreak', { prevCombo: prevCombo });
+      }
       if (this.tSpinType === 1) { features.push(4); callouts.push('T-SPIN MINI'); }
       else if (this.tSpinType === 2) { features.push(5); callouts.push('T-SPIN'); }
       else if (allSpinKey) {
@@ -1022,8 +1097,13 @@
       }
       if (this.b2b && isDifficult) {
         isB2BTriggered = true;
+        this.b2bStreak++;
         features.push(11);
-        callouts.unshift('BACK-TO-BACK');
+        callouts.unshift(this.b2bStreak >= 2 ? ('B2B x' + this.b2bStreak) : 'BACK-TO-BACK');
+      } else if (isDifficult) {
+        this.b2bStreak = 0;
+      } else {
+        this.b2bStreak = 0;
       }
       this.b2b = isDifficult;
 
@@ -1038,10 +1118,13 @@
       if (this.mode === 'problem') this.applyRequirements(features);
       this.emit('lineClear', {
         rows: clearedRows,
+        rowBlocks: clearedRowBlocks,
+        pieceColor: mino.palette,
         count: numCleared,
         tSpin: this.tSpinType,
         allSpin: allSpinKey,
         isB2B: isB2BTriggered,
+        b2bStreak: this.b2bStreak,
         combo: this.combo,
         isPC: isPC,
         callouts: callouts

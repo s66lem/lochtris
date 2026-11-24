@@ -13,6 +13,8 @@
   var settings = S.loadSettings();
   var engine = null;
   var renderer = null;
+  var backdrop = null;
+  var lastBackdropTick = 0;
 
   var currentView = 'menu';
   var prefsOpen = false;
@@ -71,6 +73,7 @@
 
   function cacheDom() {
     dom.oceanBackdrop = document.getElementById('ocean-backdrop');
+    dom.backdropCanvas = document.getElementById('backdrop-canvas');
     dom.viewMenu = document.getElementById('view-menu');
     dom.viewPlay = document.getElementById('view-play');
     dom.prefsModal = document.getElementById('prefs-modal');
@@ -89,15 +92,16 @@
     dom.playArena = document.getElementById('play-arena');
     dom.stage = document.getElementById('playfield-stage');
     dom.boardCol = document.getElementById('board-col');
+    dom.boardFrame = document.getElementById('board-frame');
     dom.boardCanvas = document.getElementById('board-canvas');
     dom.holdCanvas = document.getElementById('hold-canvas');
     dom.nextCanvas = document.getElementById('next-canvas');
     dom.holdBox = document.getElementById('hold-box');
     dom.holdHint = document.getElementById('hold-hint');
 
+    dom.lockDock = document.getElementById('lock-dock');
     dom.lockBarFill = document.getElementById('lock-bar-fill');
     dom.pipGrid = document.getElementById('pip-grid');
-    dom.lockResetNum = document.getElementById('lock-reset-num');
     dom.boardOverlay = document.getElementById('board-overlay');
     dom.overlayTitle = document.getElementById('overlay-title');
     dom.overlayMeta = document.getElementById('overlay-meta');
@@ -211,7 +215,10 @@
 
   function syncBackdropPause() {
     if (!dom.oceanBackdrop) return;
-    dom.oceanBackdrop.classList.toggle('is-paused', Boolean(prefsOpen || document.hidden));
+    var paused = Boolean(prefsOpen || document.hidden);
+    dom.oceanBackdrop.classList.toggle('is-paused', paused);
+    if (paused) stopLoop();
+    else ensureLoop();
   }
 
   function advanceEngineTo(now) {
@@ -233,14 +240,16 @@
   }
 
   /*--------------------------------------------------------------------------------------
-    Demand-Driven rAF Loop (0 CPU/GPU idle wakeups on Menu & behind Preferences)
+    Demand-Driven rAF Loop (0 CPU/GPU wakeups when hidden, behind Preferences, or reduced motion)
   --------------------------------------------------------------------------------------*/
   function shouldKeepLoopAlive() {
-    if (currentView !== 'play' || prefsOpen) return false;
-    if (document.hidden) return false;
-    if (engine.state === 'playing' || engine.state === 'countdown') return true;
-    if (renderer.hasPendingVFX()) return true;
-    if (engine.guideMode && engine.curGuide && !renderer.reducedMotion) return true;
+    if (prefsOpen || document.hidden) return false;
+    if (currentView === 'play') {
+      if (engine.state === 'playing' || engine.state === 'countdown') return true;
+      if (renderer && renderer.hasPendingVFX()) return true;
+      if (engine.guideMode && engine.curGuide && renderer && !renderer.reducedMotion) return true;
+    }
+    if (backdrop && renderer && !renderer.reducedMotion) return true;
     return false;
   }
 
@@ -436,13 +445,17 @@
     resetRunClock();
     engine.state = 'idle';
     engine.resetInputTimers(true);
+    Audio.stopGameplay();
     renderer.clearVFX();
+    pulseBoardRim(null);
+    pulseOceanShock(0, 0);
     clearCallouts();
     hideOverlay();
     dom.viewPlay.classList.add('is-hidden');
     dom.viewMenu.classList.remove('is-hidden');
     dom.oceanBackdrop.classList.remove('is-playing');
     refreshMenuProgress();
+    ensureLoop();
   }
 
   function showPlayView() {
@@ -478,6 +491,7 @@
     dom.playSectionTitle.textContent = modeName === 'sprint' ? '40L Sprint' : 'Zen Practice';
     dom.btnPlayGuide.classList.add('is-hidden');
     renderer.clearVFX();
+    pulseBoardRim(null);
     clearCallouts();
     hideOverlay();
     resetRunClock();
@@ -495,6 +509,7 @@
       return;
     }
     renderer.clearVFX();
+    pulseBoardRim(null);
     clearCallouts();
     hideOverlay();
     resetRunClock();
@@ -581,24 +596,38 @@
   }
 
   function updateDynamicHud() {
-    if (activeMode === 'sprint') {
-      setTextCached('vq', dom.valQuestion, String(Math.max(0, engine.targetLines - engine.linesCleared)));
-    } else if (activeMode === 'zen') {
-      setTextCached('vq', dom.valQuestion, String(engine.linesCleared));
+    var countersSig = engine.inputs + ':' + engine.piecesPlaced + ':' + engine.linesCleared + ':' + engine.finesseFaults;
+    if (hudCache.countersSig !== countersSig) {
+      hudCache.countersSig = countersSig;
+      if (activeMode === 'sprint') {
+        setTextCached('vq', dom.valQuestion, String(Math.max(0, engine.targetLines - engine.linesCleared)));
+      } else if (activeMode === 'zen') {
+        setTextCached('vq', dom.valQuestion, String(engine.linesCleared));
+      }
+
+      setTextCached('inp', dom.valInputs, engine.inputs + ',');
+      setTextCached('kpp', dom.valKpp, engine.getKPP().toFixed(2));
+
+      if (activeMode !== 'problem') {
+        setTextCached('ff', dom.valFinesseFaults, String(engine.finesseFaults));
+        setTextCached('fp', dom.valFinessePct, ' · ' + engine.getFinessePct() + '%');
+      }
+      setTextCached('pps', dom.valPps, engine.getPPS().toFixed(2));
     }
 
-    setTextCached('pps', dom.valPps, engine.getPPS().toFixed(2));
-    setTextCached('inp', dom.valInputs, engine.inputs + ',');
-    setTextCached('kpp', dom.valKpp, engine.getKPP().toFixed(2));
+    var elapsedFloor = Math.floor(engine.elapsedMs);
+    if (hudCache.elapsedFloor !== elapsedFloor) {
+      hudCache.elapsedFloor = elapsedFloor;
+      var tParts = formatTimeParts(elapsedFloor);
+      setTextCached('tm', dom.valTimeMain, tParts.main);
+      setTextCached('tms', dom.valTimeMs, tParts.ms);
 
-    if (activeMode !== 'problem') {
-      setTextCached('ff', dom.valFinesseFaults, String(engine.finesseFaults));
-      setTextCached('fp', dom.valFinessePct, ' · ' + engine.getFinessePct() + '%');
+      var ppsBucket = Math.floor(elapsedFloor / 50);
+      if (hudCache.ppsBucket !== ppsBucket) {
+        hudCache.ppsBucket = ppsBucket;
+        setTextCached('pps', dom.valPps, engine.getPPS().toFixed(2));
+      }
     }
-
-    var tParts = formatTimeParts(engine.elapsedMs);
-    setTextCached('tm', dom.valTimeMain, tParts.main);
-    setTextCached('tms', dom.valTimeMs, tParts.ms);
 
     var grounded = engine.isGrounded();
     var lockProg = engine.getLockProgress();
@@ -619,9 +648,11 @@
       for (var i = 0; i < pipEls.length; i++) {
         pipEls[i].classList.toggle('is-spent', i >= remPips);
       }
-      if (dom.lockResetNum) {
-        dom.lockResetNum.textContent = (grounded || remPips < D.LOCK_RESET_LIMIT) ? String(remPips) : '';
-        dom.lockResetNum.classList.toggle('is-low', remPips <= 4);
+      var showDock = grounded || remPips < D.LOCK_RESET_LIMIT;
+      var isLowResets = remPips <= 4;
+      if (dom.lockDock) {
+        dom.lockDock.classList.toggle('is-grounded', showDock);
+        dom.lockDock.classList.toggle('is-low', isLowResets);
       }
     }
 
@@ -633,37 +664,112 @@
     }
   }
 
+  var calloutTimers = [];
+  var rimTimer = null;
+  var rimToggle = false;
+  var holdToggle = false;
+  var beatToggle = false;
+  var goHideTimer = null;
+
   function clearCallouts() {
-    if (calloutTimer) { clearTimeout(calloutTimer); calloutTimer = null; }
-    if (dom.calloutStack) dom.calloutStack.innerHTML = '';
+    while (calloutTimers.length > 0) {
+      clearTimeout(calloutTimers.pop());
+    }
+    if (dom.calloutStack) {
+      dom.calloutStack.innerHTML = '';
+    }
   }
 
+  function matrixRowToViewportNormY(matrixRow) {
+    if (!dom.boardCanvas || typeof matrixRow !== 'number') return 0.52;
+    var rect = dom.boardCanvas.getBoundingClientRect();
+    var vh = root.innerHeight || 800;
+    if (!rect.height || !vh) return 0.52;
+    var visRow = matrixRow - (D.DEADLINE_HEIGHT - D.PEEK_ROWS) + 0.5;
+    var totalRows = D.VISIBLE_HEIGHT + D.PEEK_ROWS;
+    var pxY = rect.top + (visRow / totalRows) * rect.height;
+    return pxY / vh;
+  }
+
+  function pulseOceanShock(amp, durMs, kind, originNormY) {
+    if (!backdrop) return;
+    if (!amp || (renderer && renderer.reducedMotion)) {
+      backdrop.pulse(null, 0);
+      if (renderer && renderer.reducedMotion) backdrop.renderStatic();
+      return;
+    }
+    backdrop.pulse(kind || 'cyan', amp, originNormY);
+    ensureLoop();
+  }
+
+  function pulseBoardRim(kind) {
+    if (!dom.boardFrame) return;
+    dom.boardFrame.classList.remove(
+      'is-rim-spin-a', 'is-rim-spin-b',
+      'is-rim-quad-a', 'is-rim-quad-b',
+      'is-rim-pc-a', 'is-rim-pc-b'
+    );
+    if (rimTimer) { clearTimeout(rimTimer); rimTimer = null; }
+    if (!kind || renderer.reducedMotion) return;
+    rimToggle = !rimToggle;
+    var cls = 'is-rim-' + kind + (rimToggle ? '-a' : '-b');
+    dom.boardFrame.classList.add(cls);
+    rimTimer = setTimeout(function () {
+      if (dom.boardFrame) dom.boardFrame.classList.remove(cls);
+      rimTimer = null;
+    }, kind === 'pc' ? 560 : (kind === 'quad' ? 400 : 340));
+  }
+
+  function pulseHoldPanel() {
+    if (!dom.holdBox || renderer.reducedMotion) return;
+    holdToggle = !holdToggle;
+    dom.holdBox.classList.remove('is-hold-flash-a', 'is-hold-flash-b');
+    dom.holdBox.classList.add(holdToggle ? 'is-hold-flash-a' : 'is-hold-flash-b');
+  }
+
+  // Non-destructive callout lane: appends new callouts without wiping active pops
   function pushCallouts(list) {
     if (!dom.calloutStack || !list || !list.length) return;
-    dom.calloutStack.innerHTML = '';
     var hasPC = false;
     for (var i = 0; i < list.length; i++) {
-      var item = document.createElement('div');
       var text = list[i];
+      var item = document.createElement('div');
       item.className = 'callout-item';
       if (text.indexOf('PERFECT CLEAR') !== -1) { item.classList.add('is-pc'); hasPC = true; }
-      else if (text.indexOf('BACK-TO-BACK') !== -1) item.classList.add('is-b2b');
+      else if (text.indexOf('BACK-TO-BACK') !== -1 || text.indexOf('B2B ') === 0) item.classList.add('is-b2b');
       else if (text.indexOf('SPIN') !== -1) item.classList.add('is-spin');
       else if (text.indexOf('COMBO') !== -1) item.classList.add('is-combo');
       item.textContent = text;
       dom.calloutStack.appendChild(item);
+
+      while (dom.calloutStack.children.length > 3) {
+        dom.calloutStack.removeChild(dom.calloutStack.firstChild);
+      }
+
+      (function (node, holdMs) {
+        var t1 = setTimeout(function () {
+          if (node.parentNode) node.classList.add('is-leaving');
+          var t2 = setTimeout(function () {
+            if (node.parentNode) node.parentNode.removeChild(node);
+          }, renderer.reducedMotion ? 0 : 210);
+          calloutTimers.push(t2);
+        }, holdMs);
+        calloutTimers.push(t1);
+      })(item, hasPC ? 1550 : 1050);
     }
-    if (calloutTimer) clearTimeout(calloutTimer);
-    calloutTimer = setTimeout(function () {
-      if (dom.calloutStack) dom.calloutStack.innerHTML = '';
-    }, hasPC ? 1850 : 1300);
   }
 
   function showCountdownOverlay(label) {
     if (!dom.boardOverlay) return;
+    if (goHideTimer) { clearTimeout(goHideTimer); goHideTimer = null; }
     dom.boardOverlay.classList.remove('is-hidden', 'is-clear', 'is-fail');
     dom.boardOverlay.classList.add('is-countdown');
     dom.overlayTitle.textContent = label;
+    if (!renderer.reducedMotion) {
+      beatToggle = !beatToggle;
+      dom.overlayTitle.classList.remove('is-beat-a', 'is-beat-b');
+      dom.overlayTitle.classList.add(beatToggle ? 'is-beat-a' : 'is-beat-b');
+    }
     dom.overlayMeta.textContent = label === 'GO!' ? '' : 'Hold direction to pre-charge DAS';
     dom.overlaySub.textContent = '';
     if (dom.overlayActions) dom.overlayActions.classList.add('is-hidden');
@@ -671,8 +777,10 @@
 
   function showOverlay(kind, title, meta, sub, primaryLabel, showGuideBtn) {
     if (!settings.visuals.textOverlay || !dom.boardOverlay) return;
+    if (goHideTimer) { clearTimeout(goHideTimer); goHideTimer = null; }
     dom.boardOverlay.classList.remove('is-hidden', 'is-clear', 'is-fail', 'is-countdown');
     dom.boardOverlay.classList.add(kind === 'clear' ? 'is-clear' : 'is-fail');
+    dom.overlayTitle.classList.remove('is-beat-a', 'is-beat-b');
     dom.overlayTitle.textContent = title;
     dom.overlayMeta.textContent = meta || '';
     dom.overlaySub.textContent = sub || '';
@@ -684,9 +792,11 @@
   }
 
   function hideOverlay() {
+    if (goHideTimer) { clearTimeout(goHideTimer); goHideTimer = null; }
     if (!dom.boardOverlay) return;
     dom.boardOverlay.classList.add('is-hidden');
     dom.boardOverlay.classList.remove('is-countdown', 'is-clear', 'is-fail');
+    if (dom.overlayTitle) dom.overlayTitle.classList.remove('is-beat-a', 'is-beat-b');
     if (dom.overlayActions) dom.overlayActions.classList.add('is-hidden');
   }
 
@@ -719,26 +829,44 @@
           showCountdownOverlay(ev.label);
         } else {
           showCountdownOverlay('GO!');
-          setTimeout(function () {
-            if (engine && engine.state === 'playing' && dom.boardOverlay && dom.boardOverlay.classList.contains('is-countdown')) {
+          goHideTimer = setTimeout(function () {
+            goHideTimer = null;
+            if (dom.boardOverlay && dom.boardOverlay.classList.contains('is-countdown')) {
               hideOverlay();
             }
           }, 260);
         }
         break;
-      case 'move': Audio.move(); break;
+      case 'spawn':
+        renderer.onSpawn(ev);
+        break;
+      case 'guideAlign':
+        Audio.guideAlign();
+        renderer.onGuideAlign();
+        break;
+      case 'comboBreak':
+        Audio.comboBreak();
+        break;
+      case 'move':
+        Audio.move(ev && ev.col);
+        renderer.onMove(ev);
+        break;
       case 'wallHit': Audio.wall(); break;
       case 'wallPush': renderer.onWallPush(ev.dir); break;
       case 'rotate':
-        Audio.rotate(ev.isSpin, ev.pieceKey);
+        Audio.rotate(ev.isSpin, ev.pieceKey, ev.step);
         renderer.onRotate(ev);
+        if (ev.isSpin) {
+          pulseBoardRim('spin');
+          pulseOceanShock(0.46, 520, 'spin', matrixRowToViewportNormY((ev.y || 18) + 1));
+        }
         break;
       case 'softDrop':
         if (!ev.sonic) Audio.softDrop();
         renderer.onSoftDrop(ev);
         break;
       case 'hardDrop':
-        Audio.hardDrop();
+        Audio.hardDrop(ev && ev.dy, ev && ev.dropCol);
         renderer.onHardDrop(ev);
         break;
       case 'lock':
@@ -747,13 +875,35 @@
         break;
       case 'lockWarn':
         Audio.lockWarn();
+        renderer.onLockWarn();
         break;
-      case 'hold': Audio.hold(); break;
+      case 'hold':
+        Audio.hold();
+        pulseHoldPanel();
+        break;
       case 'holdDenied': Audio.holdDenied(); break;
       case 'lineClear':
-        Audio.lineClear(ev.count, ev.tSpin > 0 || Boolean(ev.allSpin), ev.isB2B, ev.combo, ev.isPC);
+        Audio.lineClear(ev.count, ev.tSpin > 0 || Boolean(ev.allSpin), ev.isB2B, ev.combo, ev.isPC, ev.b2bStreak);
         renderer.onLineClear(ev);
         pushCallouts(ev.callouts);
+        var clearNormY = 0.65;
+        if (ev.rows && ev.rows.length > 0) {
+          var rowSum = 0;
+          for (var cri = 0; cri < ev.rows.length; cri++) rowSum += ev.rows[cri];
+          clearNormY = matrixRowToViewportNormY(rowSum / ev.rows.length);
+        }
+        if (ev.isPC) {
+          pulseBoardRim('pc');
+          pulseOceanShock(0.98, 1300, 'pc', clearNormY);
+        } else if (ev.tSpin > 0 || ev.allSpin) {
+          pulseBoardRim('spin');
+          pulseOceanShock(0.74, 860, 'spin', clearNormY);
+        } else if (ev.count >= 4 || ev.isB2B) {
+          pulseBoardRim('quad');
+          pulseOceanShock(0.76, 880, 'cyan', clearNormY);
+        } else {
+          pulseOceanShock(0.34 + Math.min(0.28, Math.max(0, ev.combo || 0) * 0.05), 520, 'cyan', clearNormY);
+        }
         break;
       case 'problemClear':
         syncWallElapsed(now);
@@ -971,7 +1121,11 @@
         advanceEngineTo(stamp);
         engine.pressAction(action);
         if (engine.dirty) {
-          renderer.render(engine, stamp);
+          renderer.renderBoard(engine, stamp);
+          if (action === 'hold' || action === 'hardDrop') {
+            renderer.renderHold(engine);
+            renderer.renderNext(engine, false);
+          }
           engine.dirty = false;
           updateDynamicHud();
         }
@@ -1007,11 +1161,15 @@
         engine.resetInputTimers(true);
       }
       stopLoop();
+      Audio.stopGameplay();
     } else {
       if (autoPausedByVisibility && currentView === 'play' && !prefsOpen && engine) {
         autoPausedByVisibility = false;
         resumeRunClock(now);
         engine.setPaused(false);
+        if (engine.state === 'playing' && dom.boardOverlay && dom.boardOverlay.classList.contains('is-countdown')) {
+          hideOverlay();
+        }
         ensureLoop();
       }
     }
@@ -1077,6 +1235,7 @@
       pauseRunClock(now);
       engine.setPaused(true);
     }
+    Audio.stopGameplay();
     stopLoop();
     draftSettings = JSON.parse(JSON.stringify(settings));
     prefsOpen = true;
@@ -1114,6 +1273,9 @@
     if (prefsReturnToPlay && engine) {
       resumeRunClock(performance.now());
       engine.setPaused(false);
+      if (engine.state === 'playing' && dom.boardOverlay && dom.boardOverlay.classList.contains('is-countdown')) {
+        hideOverlay();
+      }
       ensureLoop();
     }
     if (prefsTriggerEl && typeof prefsTriggerEl.focus === 'function' && prefsTriggerEl.offsetParent !== null) {
@@ -1525,8 +1687,10 @@
 
       var needsGuidePulse = Boolean(engine.guideMode && engine.curGuide && !renderer.reducedMotion);
       if (engine.dirty || fx.canvasDirty || needsGuidePulse) {
-        renderer.render(engine, now);
+        renderer.render(engine, now, fx.nextDirty);
         engine.dirty = false;
+      } else if (fx.nextDirty) {
+        renderer.renderNext(engine, true);
       }
 
       if (engine.state === 'playing' || engine.state === 'ready' || engine.state === 'countdown') {
@@ -1541,6 +1705,15 @@
           fpsFrames = 0;
           fpsLastSample = now;
         }
+      }
+    }
+
+    if (backdrop && renderer && !renderer.reducedMotion && !prefsOpen && !document.hidden) {
+      var bgActive = (currentView === 'play' && (engine.state === 'playing' || engine.state === 'countdown')) || backdrop.hasActivePulse();
+      if (bgActive || (now - lastBackdropTick >= 32)) {
+        var bgDt = lastBackdropTick > 0 ? Math.min(50, now - lastBackdropTick) : dtMs;
+        lastBackdropTick = now;
+        backdrop.updateAndRender(bgDt);
       }
     }
 
@@ -1567,8 +1740,31 @@
       nextCanvas: dom.nextCanvas,
       boardColEl: dom.boardCol,
       stageEl: dom.stage,
-      arenaEl: dom.playArena
+      arenaEl: dom.playArena,
+      onReducedMotionChange: function () {
+        pulseBoardRim(null);
+        pulseOceanShock(0, 0);
+        if (backdrop) {
+          if (renderer.reducedMotion) {
+            backdrop.renderStatic();
+          } else {
+            ensureLoop();
+          }
+        }
+        if (currentView === 'play' && engine) {
+          renderer.render(engine, performance.now());
+        }
+      }
     }, settings.visuals);
+
+    if (root.LochtrisBackdrop && dom.backdropCanvas) {
+      backdrop = new root.LochtrisBackdrop(dom.backdropCanvas);
+      if (renderer.reducedMotion) backdrop.renderStatic();
+      else {
+        backdrop.renderStatic();
+        ensureLoop();
+      }
+    }
 
     buildMenu();
     bindPreferencesEvents();
@@ -1652,6 +1848,10 @@
     root.addEventListener('resize', function () {
       if (resizeTimer) clearTimeout(resizeTimer);
       resizeTimer = setTimeout(function () {
+        if (backdrop) {
+          backdrop.resize();
+          if (renderer && renderer.reducedMotion) backdrop.renderStatic();
+        }
         if (currentView === 'play' && renderer.resize()) {
           renderer.render(engine, performance.now());
         }

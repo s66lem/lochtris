@@ -598,3 +598,66 @@ test('40L Sprint completes cleanly on 40 lines cleared and tracks Finesse faults
   assert.equal(eng.linesCleared, 40);
   assert.equal(eng.state, 'cleared');
 });
+
+test('Animation & audio event payloads include rowBlocks, queueShifted, guideAlign, b2bStreak & comboBreak', () => {
+  const events = [];
+  const eng = new Eng({
+    rng: makeRng(77),
+    handling: { das: 4, arr: 0, dcd: 0, sdf: 20 },
+    onEvent: (t, e) => events.push({ t, e })
+  });
+  eng.startFreeMode('zen');
+  const initSpawn = events.find((x) => x.t === 'spawn');
+  assert.ok(initSpawn && initSpawn.e.fromHold === false && initSpawn.e.queueShifted === 0, 'initial spawn has queueShifted=0');
+
+  // Empty-slot hold consumes 1 from queue -> queueShifted=1; subsequent swap -> queueShifted=0
+  eng.pressAction('hold');
+  const holdSpawn = events.filter((x) => x.t === 'spawn').pop();
+  assert.equal(holdSpawn.e.fromHold, true);
+  assert.equal(holdSpawn.e.queueShifted, 1, 'empty hold shifts queue by 1');
+
+  // ARR=0 snap emits move with fromX, col, steps, mino
+  eng.pressAction('right');
+  eng.update(5 * D.FRAME_MS);
+  const snapEv = events.find((x) => x.t === 'move' && x.e.snapped);
+  assert.ok(snapEv && typeof snapEv.e.fromX === 'number' && typeof snapEv.e.col === 'number' && snapEv.e.mino);
+
+  // Rotate emits fromDir/toDir/mino
+  eng.curMino = ctx.T; eng.curDir = 0; eng.curX = 4; eng.curY = 10;
+  eng.rotate(1, false);
+  const rotEv = events.find((x) => x.t === 'rotate');
+  assert.ok(rotEv && rotEv.e.fromDir === 0 && rotEv.e.toDir === 1 && rotEv.e.mino);
+
+  // Line clear emits rowBlocks, b2bStreak, and increments matrixVersion; dropping combo >= 2 emits comboBreak
+  const mvBefore = eng.matrixVersion;
+  eng.combo = 2;
+  eng.matrix[D.MATRIX_HEIGHT - 1].fill(11);
+  eng.matrix[D.MATRIX_HEIGHT - 1][4] = 0;
+  eng.matrix[D.MATRIX_HEIGHT - 1][5] = 0;
+  eng.matrix[D.MATRIX_HEIGHT - 1][6] = 0;
+  eng.matrix[D.MATRIX_HEIGHT - 1][7] = 0;
+  eng.curMino = ctx.I; eng.curDir = 0; eng.curX = 4; eng.curY = D.MATRIX_HEIGHT - 2;
+  eng.lockCurrentPiece(true);
+  assert.ok(eng.matrixVersion > mvBefore, 'matrixVersion increments on lock');
+  const lcEv = events.find((x) => x.t === 'lineClear');
+  assert.ok(lcEv && Array.isArray(lcEv.e.rowBlocks) && lcEv.e.rowBlocks.length === 1);
+  assert.equal(lcEv.e.rowBlocks[0][0], 11);
+
+  // Non-clearing placement after combo >= 2 emits comboBreak
+  eng.pressAction('hardDrop');
+  assert.ok(events.some((x) => x.t === 'comboBreak' && x.e.prevCombo >= 2), 'comboBreak emitted when combo >= 2 ends');
+
+  // Target-scoped guideAlign transition emits once per aligned target
+  const alignEvents = [];
+  const gEng = new Eng({ onEvent: (t, e) => { if (t === 'guideAlign') alignEvents.push(e); } });
+  const op1 = ctx.LochtrisTechniques.getTechniqueProblems().openers[0];
+  gEng.loadProblem(op1, true);
+  gEng.startPlayingIfReady();
+  const g0 = op1.guides[0];
+  gEng.curDir = g0.dir; gEng.curX = g0.x - 1;
+  gEng.tryHorizontalStep(1, true);
+  assert.equal(alignEvents.length, 1, 'guideAlign emitted when stepping into target');
+  gEng.tryHorizontalStep(-1, true);
+  gEng.tryHorizontalStep(1, true);
+  assert.equal(alignEvents.length, 1, 'guideAlign does not refire when leaving and returning to same target');
+});

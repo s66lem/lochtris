@@ -18,22 +18,28 @@
   <script defer src="ui.js"></script>
 </head>
 <body>
-  <!-- Deep-loch ocean backdrop: layered SVG surface waves, dual caustics, and varied rising bubbles -->
+  <!-- Deep-loch underwater backdrop: volumetric light canvas + distant submerged loch ridges -->
   <div id="ocean-backdrop" class="ocean-backdrop" aria-hidden="true">
-    <div class="ocean-caustics"></div>
-    <div class="ocean-caustics-2"></div>
-    <svg class="ocean-waves" viewBox="0 0 1440 190" preserveAspectRatio="none">
-      <path class="wave wave-back" d="M0,104 C220,162 460,46 720,104 C980,162 1220,52 1440,108 L1440,0 L0,0 Z"></path>
-      <path class="wave wave-mid" d="M0,78 C270,32 520,132 800,76 C1080,20 1260,114 1440,68 L1440,0 L0,0 Z"></path>
-      <path class="wave wave-front" d="M0,52 C220,92 460,18 720,56 C980,94 1220,24 1440,54 L1440,0 L0,0 Z"></path>
-      <path class="wave wave-foam" d="M0,52 C220,92 460,18 720,56 C980,94 1220,24 1440,54"></path>
+    <canvas id="backdrop-canvas" class="backdrop-canvas"></canvas>
+    <svg class="loch-ridges" viewBox="0 0 1440 320" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="ridge-far-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#0b3449" stop-opacity="0.46"></stop>
+          <stop offset="100%" stop-color="#03121d" stop-opacity="0.82"></stop>
+        </linearGradient>
+        <linearGradient id="ridge-mid-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#062233" stop-opacity="0.64"></stop>
+          <stop offset="100%" stop-color="#020c14" stop-opacity="0.92"></stop>
+        </linearGradient>
+        <linearGradient id="ridge-near-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#031521" stop-opacity="0.82"></stop>
+          <stop offset="100%" stop-color="#01080e" stop-opacity="0.98"></stop>
+        </linearGradient>
+      </defs>
+      <path fill="url(#ridge-far-grad)" d="M0,210 C170,132 320,118 490,174 C670,232 820,122 1030,152 C1210,178 1330,118 1440,148 L1440,320 L0,320 Z"></path>
+      <path fill="url(#ridge-mid-grad)" d="M0,248 C210,178 410,232 630,192 C850,152 1010,246 1210,198 C1325,170 1390,188 1440,204 L1440,320 L0,320 Z"></path>
+      <path fill="url(#ridge-near-grad)" d="M0,276 C240,236 470,286 740,252 C980,222 1210,272 1440,240 L1440,320 L0,320 Z"></path>
     </svg>
-    <div class="ocean-bubbles">
-      <span></span><span></span><span></span><span></span>
-      <span></span><span></span><span></span><span></span>
-      <span></span><span></span><span></span><span></span>
-      <span></span><span></span><span></span><span></span>
-    </div>
   </div>
 
   <!-- MAIN MENU VIEW -->
@@ -154,7 +160,7 @@
 
         <!-- CENTER COLUMN: PLAYFIELD + LOCK DELAY BAR + 15 GROUPED PIPS -->
         <div id="board-col" class="board-col">
-          <div class="board-frame">
+          <div id="board-frame" class="board-frame">
             <canvas id="board-canvas"></canvas>
             <div id="board-overlay" class="board-overlay is-hidden" aria-live="polite">
               <div id="overlay-title" class="overlay-title"></div>
@@ -167,12 +173,11 @@
               </div>
             </div>
           </div>
-          <div class="lock-bar-track" aria-hidden="true">
-            <div id="lock-bar-fill" class="lock-bar-fill"></div>
-          </div>
-          <div class="pip-row" aria-hidden="true">
+          <div id="lock-dock" class="lock-dock" aria-hidden="true">
+            <div class="lock-bar-track">
+              <div id="lock-bar-fill" class="lock-bar-fill"></div>
+            </div>
             <div id="pip-grid" class="pip-grid"></div>
-            <span id="lock-reset-num" class="lock-reset-num"></span>
           </div>
         </div>
 
