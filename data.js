@@ -1,651 +1,501 @@
 /*========================================================================================
-□■ data.js ■□
+  data.js — Tetromino definitions, SRS+ kick tables, section metadata, and constants.
+  Pure data module (no DOM dependencies) so it can be imported directly in Node tests.
 ========================================================================================*/
-/*----------------------------------------------------------------------------------------
-☆★ Constant list ★☆
-----------------------------------------------------------------------------------------*/
-var MATRIX_WIDTH = 10;               // Number of horizontal blocks in the matrix
+(function (root) {
+  'use strict';
 
-var DEADLINE_HEIGHT = 3;             // The height at which block information is held above the deadline
+  var MATRIX_WIDTH = 10;
+  var BUFFER_HEIGHT = 4;        // Hidden rows above the 20 visible rows (2 peek visibly)
+  var VISIBLE_HEIGHT = 20;
+  var MATRIX_HEIGHT = VISIBLE_HEIGHT + BUFFER_HEIGHT; // 24 total rows
+  var DEADLINE_HEIGHT = BUFFER_HEIGHT;                // Index where visible row 0 begins
+  var PEEK_ROWS = 2;            // Visible buffer rows above skyline
 
-var MATRIX_HEIGHT = 23;              // Number of vertical blocks in the matrix. Includes more than deadlines
+  var NEXT_MINOS = 5;
+  var SECTION_NUM = 24;
 
-var SOFT_DROP_SPAN = 1;              // <Frame> Time to proceed to 1 square with soft drop
+  // Timing constants (milliseconds, based on 60 FPS frame = 16.6667ms)
+  var FRAME_MS = 1000 / 60;
+  var BASE_GRAVITY_INTERVAL_MS = 50 * FRAME_MS;
+  var LOCK_DELAY_MS = 30 * FRAME_MS;            // 500ms (modern guideline)
+  var LOCK_RESET_LIMIT = 15;                    // 15 ground move/rotate resets
+  var SPRINT_COUNTDOWN_MS = 1800;               // 3-2-1-GO (600ms per beat)
 
-var NATURAL_DROP_SPAN = 50;          // <Frame> Time to advance to 1 square when natural falls
+  var INITIAL_DIR = 0;
+  var INITIAL_X = 3;
+  var INITIAL_Y = DEADLINE_HEIGHT - 2;          // Spawns just above skyline
 
-var LINE_CLEAR_DURATION = 1;        // <Frame> Line Erase Performance Time
+  // Keys that must never be bound to gameplay actions
+  var RESERVED_KEY_CODES = {
+    Escape: true,
+    Tab: true,
+    F5: true,
+    F11: true,
+    F12: true,
+    PrintScreen: true
+  };
 
-var DISPLAY_FEATURES_DURATION = 45;  // <Frame> Display time for the triggered move
+  // Default controls using KeyboardEvent.code (physical key, layout-independent)
+  var DEFAULT_KEYS = {
+    left: 'ArrowLeft',
+    right: 'ArrowRight',
+    softDrop: 'ArrowDown',
+    hardDrop: 'Space',
+    rotCW: 'ArrowUp',
+    rotCCW: 'ControlLeft',
+    rot180: 'ShiftLeft',
+    hold: 'KeyC',
+    guide: 'KeyR',
+    retry: 'F4'
+  };
 
-var LOCK_DELAY_DURATION = 50;      // <Frame> Time it takes from the moment mino reaches the deadline to the moment it is locked - - - - - - - - !!!!!
+  var DEFAULT_HANDLING = {
+    das: 8.0,                     // Frames (0.1F precision)
+    arr: 1.5,                     // Frames (0.0F = instant wall snap)
+    dcd: 1.0,                     // Frames (DAS cut delay on lock/spawn/rotate)
+    sdf: 20,                      // Multiplier (41 = Infinity / instant sonic drop)
+    irs: 'hold',                  // 'off' | 'tap' | 'hold'
+    ihs: 'hold',                  // 'off' | 'tap' | 'hold'
+    spinRule: 'all-mini+',        // 't-spins' | 'all-mini+' | 'all'
+    sprintCountdown: true,        // 3-2-1-GO countdown in 40L Sprint (DAS/IRS/IHS allowed)
+    cancelDasOnDirChange: true,
+    preserveDasOnSpawn: true
+  };
 
-var LOCK_DELAY_INPUTMAX = 15;  // <Rotation> Maximum number of rotations/movements during lock delay before locked - - - - - - - - - - - - - - - !!!!!
+  var DEFAULT_VISUALS = {
+    skin: 'modern',               // 'modern' | 'flat' | 'neon'
+    bounce: 60,                   // 0..100 board bounce intensity
+    particles: true,              // Hard-drop beam & impact sparks
+    explodeOnFail: false,         // Canvas shatter explosion on fail
+    ghostOpacity: 35,             // 0..100
+    gridOpacity: 40,              // 0..100
+    textOverlay: true,            // Clear / Fail overlay on playfield
+    showFps: false,               // Subtle FPS counter
+    sfxVolume: 50                 // 0..100
+  };
 
-var NEXT_MINOS = 5;                  // Next display number
+  var HANDLING_PRESETS = {
+    tetrio: { label: 'TETR.IO Default', das: 10.0, arr: 2.0, dcd: 1.0, sdf: 6 },
+    snappy: { label: 'Snappy',          das: 6.5,  arr: 0.0, dcd: 1.0, sdf: 41 },
+    speed:  { label: 'Speed',           das: 4.5,  arr: 0.0, dcd: 0.0, sdf: 41 }
+  };
 
-var ROTATE_RULES = 5;                // Number of rotation rules
-
-var HORIZONTAL_CHARGE_DURATION = 7;  // <Frame> Time from the start of pressing the key to the start of horizontal movement repeat
-
-var HORIZONTAL_REPEAT_SPAN = 1;      // <Frame> Time sense of lateral movement
-
-
-
-var INITIAL_DIR = 0;                  // Mino's orientation when it appears
-
-var INITIAL_X = 3;                    // The X coordinate of the mino at the time of appearance
-
-var INITIAL_Y = DEADLINE_HEIGHT - 2;  // Y coordinate of mino when it appeared
-
-
-var DEFAULT_KEY_MOVE_LEFT    = 'arrowleft';
-var DEFAULT_KEY_MOVE_RIGHT   = 'arrowright';
-var DEFAULT_KEY_SOFTDROP     = 'arrowdown';
-var DEFAULT_KEY_HARDDROP     = 'space';
-var DEFAULT_KEY_ROTATE_RIGHT = 'arrowup';
-var DEFAULT_KEY_ROTATE_LEFT  = 'ctrl';
-var DEFAULT_KEY_HOLD         = 'c';
-var DEFAULT_KEY_GUIDE        = 'r';
-var DEFAULT_KEY_ROTATE_180  = 'shift'; 
-
-var DEFAULT_KEY_MENULEFT = 'arrowleft';
-var DEFAULT_KEY_MENURIGHT = 'arrowright';
-var DEFAULT_KEY_MENUDOWN = 'arrowdown';
-var DEFAULT_KEY_MENUUP = 'arrowup';
-var DEFAULT_KEY_MENUSELECT = 'enter';
-var DEFAULT_KEY_MENUBACK = 'escape';
-
-var DEFAULT_DAS = 9;
-var DEFAULT_ARR = 3;
-var DEFAULT_SDF = 25; // Soft drop speed
-
-
-var DUMP_GUIDE_DATA = false;            // For guide array dump
-
-
-var SECTION_NUM = 21;            // For guide array dump
-
-console.log('feel free to look around the code,\ni pinky promise i\'m not stealing your data, \ni hate javascript too much to even try to figure out how to do that \nsincerely,\ns6lem');
-
-/*----------------------------------------------------------------------------------------
-☆★ Matrix array [y][x] ★☆
-
-An arrangement of installed blocks. Falling blocks etc. will be managed separately.
-----------------------------------------------------------------------------------------*/
-var gMatrix = [];
-for(var i = 0; i < MATRIX_HEIGHT; i++){
-  gMatrix.push([]);
-  for(var j = 0; j < MATRIX_WIDTH; j++){
-    gMatrix[i].push(0);
-  }
-}
-/*----------------------------------------------------------------------------------------
-☆★ Object: Various blocks ★☆
-----------------------------------------------------------------------------------------*/
-function Block(id){
-  this.id = id;
-  this.toVanish = (id == 2);           // blocks being erased
-
-
-  switch(id){
-    case 0: // Vacant (w/ grid)
-    case 3: // Empty
-
-    this.passable = true;    // Can you slip through?
-
-    break;
-    case 1:  // Grey Block
-
-    this.passable = false;
-    break;
-    case 2:  // Blocks undergoing an erasure. RemoveReservedLines is erased at once
-
-    
-
-    this.passable = true;
-    break;
-
-    // Each other block
-
-    case 11: case 12: case 13: case 14: case 15: case 16: case 17:
-    case 31: 
-    case 41: case 42: case 43: case 44: case 45: case 46: case 47:
-    case 51: case 52: case 53: case 54: case 55: case 56: case 57:
-    this.passable = false;
-    break;
-    // If other numbers (non-existent blocks) do not cache images
-
-    default:
-    this.passable = false;
-    return;
-  }
-
-  this.image = 'img/b' + id + '.svg';  // image. 24 x 24 pixels
-
-  this.cache = new Image();
-  this.cache.src = this.image;
-}
-/*----------------------------------------------------------------------------------------
-☆★ Access to block objects ★☆
-----------------------------------------------------------------------------------------*/
-var gBlocks = [];
-//for(var i = 0; i <= 57; i++) gBlocks.push(new Block(i));
-
-for(var i = 0; i <= 57; i++) gBlocks.push(new Block(i));
-function BlkEmpty(){return gBlocks[0] }
-function BlkVanishing(){return gBlocks[2] }
-
-/*----------------------------------------------------------------------------------------
-☆★ Object: Preview Images ★☆
-----------------------------------------------------------------------------------------*/
-function PreviewImg(id){
-    switch(id){
-        case 1: this.image = 'img/imino.svg'; break;
-        case 2: this.image = 'img/tmino.svg'; break;
-        case 3: this.image = 'img/jmino.svg'; break;
-        case 4: this.image = 'img/lmino.svg'; break;
-        case 5: this.image = 'img/zmino.svg'; break;
-        case 6: this.image = 'img/smino.svg'; break;
-        case 7: this.image = 'img/omino.svg'; break;
-        default: this.image = 'img/b3.svg'; break;
+  var KEY_PRESETS = {
+    lochtris: {
+      label: 'Lochtris Classic',
+      keys: {
+        left: 'ArrowLeft', right: 'ArrowRight', softDrop: 'ArrowDown', hardDrop: 'Space',
+        rotCW: 'ArrowUp', rotCCW: 'ControlLeft', rot180: 'ShiftLeft', hold: 'KeyC', guide: 'KeyR', retry: 'F4'
+      }
+    },
+    guideline: {
+      label: 'Guideline',
+      keys: {
+        left: 'ArrowLeft', right: 'ArrowRight', softDrop: 'ArrowDown', hardDrop: 'Space',
+        rotCW: 'ArrowUp', rotCCW: 'KeyZ', rot180: 'KeyA', hold: 'KeyC', guide: 'KeyR', retry: 'F4'
+      }
     }
-    
-    // pre-rasterize preview imgs
-    this.canvas = document.createElement('canvas');
-    this.canvas.width = 80;
-    this.canvas.height = 60;
-    this.ctx = this.canvas.getContext('2d');
-    
-    this.cache = new Image();
-    this.cache.onload = () => {
-        // rasterize to canvas
-        this.ctx.clearRect(0, 0, 80, 60);
-        this.ctx.drawImage(this.cache, 0, 0, 80, 60);
+  };
+
+  /*--------------------------------------------------------------------------------------
+    SRS+ Kick Tables (screen coordinates: +x right, +y down)
+    - JLSTZ 90°: standard Guideline SRS
+    - JLSTZ 180°: SRS+ 180° kick table
+    - I 90°: symmetric SRS+ I-piece kick table
+      (mirror-symmetric across vertical axis; reverse rotations prioritize the closer kick)
+    - I 180°: minimal in-place / 1-cell alignment kicks for wall/floor 180° flips
+  --------------------------------------------------------------------------------------*/
+  var KICKS_JLSTZ = {
+    '0>1': [[0, 0], [-1, 0], [-1, -1], [0, 2], [-1, 2]],
+    '1>0': [[0, 0], [ 1, 0], [ 1,  1], [0,-2], [ 1,-2]],
+    '1>2': [[0, 0], [ 1, 0], [ 1,  1], [0,-2], [ 1,-2]],
+    '2>1': [[0, 0], [-1, 0], [-1, -1], [0, 2], [-1, 2]],
+    '2>3': [[0, 0], [ 1, 0], [ 1, -1], [0, 2], [ 1, 2]],
+    '3>2': [[0, 0], [-1, 0], [-1,  1], [0,-2], [-1,-2]],
+    '3>0': [[0, 0], [-1, 0], [-1,  1], [0,-2], [-1,-2]],
+    '0>3': [[0, 0], [ 1, 0], [ 1, -1], [0, 2], [ 1, 2]],
+    // SRS+ 180° kicks (+y down)
+    '0>2': [[0, 0], [0, -1], [ 1, -1], [-1, -1], [ 1, 0], [-1, 0]],
+    '2>0': [[0, 0], [0,  1], [-1,  1], [ 1,  1], [-1, 0], [ 1, 0]],
+    '1>3': [[0, 0], [ 1, 0], [ 1, -2], [ 1, -1], [0, -2], [0, -1]],
+    '3>1': [[0, 0], [-1, 0], [-1, -2], [-1, -1], [0, -2], [0, -1]]
+  };
+
+  var KICKS_I = {
+    // Symmetric SRS+ I-piece 90° kicks (+y down)
+    '0>1': [[0, 0], [ 1, 0], [-2, 0], [-2,  1], [ 1, -2]],
+    '1>0': [[0, 0], [-1, 0], [ 2, 0], [-1,  2], [ 2, -1]],
+    '1>2': [[0, 0], [-1, 0], [ 2, 0], [-1, -2], [ 2,  1]],
+    '2>1': [[0, 0], [-2, 0], [ 1, 0], [-2, -1], [ 1,  2]],
+    '2>3': [[0, 0], [ 2, 0], [-1, 0], [ 2, -1], [-1,  2]],
+    '3>2': [[0, 0], [ 1, 0], [-2, 0], [ 1, -2], [-2,  1]],
+    '3>0': [[0, 0], [ 1, 0], [-2, 0], [ 1,  2], [-2, -1]],
+    '0>3': [[0, 0], [-1, 0], [ 2, 0], [ 2,  1], [-1, -2]],
+    // I-piece 180° alignment kicks (+y down)
+    '0>2': [[0, 0], [0, -1]],
+    '2>0': [[0, 0], [0,  1]],
+    '1>3': [[0, 0], [ 1, 0]],
+    '3>1': [[0, 0], [-1, 0]]
+  };
+
+  var KICKS_O = {
+    '0>1': [[0, 0]], '1>0': [[0, 0]], '1>2': [[0, 0]], '2>1': [[0, 0]],
+    '2>3': [[0, 0]], '3>2': [[0, 0]], '3>0': [[0, 0]], '0>3': [[0, 0]],
+    '0>2': [[0, 0]], '2>0': [[0, 0]], '1>3': [[0, 0]], '3>1': [[0, 0]]
+  };
+
+  /*--------------------------------------------------------------------------------------
+    Tetrominoes — precomputes flat [col, row] offset tuples per orientation for zero GC
+  --------------------------------------------------------------------------------------*/
+  function makeMino(id, key, placedBlockId, palette, kicks, shape) {
+    var cells = [];
+    var bounds = [];
+    for (var d = 0; d < 4; d++) {
+      var list = [];
+      var minC = 4, maxC = -1, minR = 4, maxR = -1;
+      for (var r = 0; r < 4; r++) {
+        for (var c = 0; c < 4; c++) {
+          if (shape[d][r][c]) {
+            list.push([c, r]);
+            if (c < minC) minC = c;
+            if (c > maxC) maxC = c;
+            if (r < minR) minR = r;
+            if (r > maxR) maxR = r;
+          }
+        }
+      }
+      cells.push(list);
+      bounds.push({ minC: minC, maxC: maxC, minR: minR, maxR: maxR });
+    }
+    return {
+      id: id,
+      key: key,
+      activeBlockId: placedBlockId,
+      placedBlockId: placedBlockId,
+      ghostBlockId: 31,
+      guideBlockId: 40 + id,
+      ghostGuideBlockId: 50 + id,
+      palette: palette,
+      kicks: kicks,
+      shape: shape,
+      cells: cells,
+      bounds: bounds
     };
-    this.cache.src = this.image;
-}
-function GetPreviewImage(mino) {
-    if (!mino) return "img/b3.svg";
-    
-    const previewImg = gPreviewImg[mino.id];
-    if (previewImg && previewImg.canvas) {
-        // Return data URL of pre-rasterized canvas
-        return previewImg.canvas.toDataURL();
-    }
-    
-    // Fallback
-    switch(mino.id) {
-        case 1: return "img/imino.svg";
-        case 2: return "img/tmino.svg";
-        case 3: return "img/jmino.svg";
-        case 4: return "img/lmino.svg";
-        case 5: return "img/zmino.svg";
-        case 6: return "img/smino.svg";
-        case 7: return "img/omino.svg";
-        default: return "img/b3.svg";
-    }
-}
-
-var gPreviewImg = [];
-for(var i = 0; i <= 7; i++) gPreviewImg.push(new PreviewImg(i));
-
-/*----------------------------------------------------------------------------------------
-☆★ Object: General Rotation Rules (ROTation RULE -GENeral) ★☆
-----------------------------------------------------------------------------------------*/
-function RotRuleGen(){
-  // [Rotation direction (0=right, 1=left)][Mode of mino before rotation (0=on appearance, 1=right, 2=reverse, 3=left)][Rule ID]
-
-  this.dx = 
-  [[[0, -1, -1,  0, -1],    // i → r
-
-  [0,  1,  1,  0,  1],    // r → v
-
-  [0,  1,  1,  0,  1],    // v → l
-
-  [0, -1, -1,  0, -1]],   // l → i
-
-  [[0,  1,  1,  0,  1],    // i → l
-
-  [0,  1,  1,  0,  1],    // r → i
-
-  [0, -1, -1,  0, -1],    // v → r
-
-  [0, -1, -1,  0, -1]]];  // l → v
-
-  this.dy = [[[0,  0, -1,  2,  2],    // i → r
-
-  [0,  0,  1, -2, -2],    // r → v
-
-  [0,  0, -1,  2,  2],    // v → l
-
-  [0,  0,  1, -2, -2]],   // l → i
-
-  [[0,  0, -1,  2,  2],    // i → l
-
-  [0,  0,  1, -2, -2],    // r → i
-
-  [0,  0, -1,  2,  2],    // v → r
-
-  [0,  0,  1, -2, -2]]];  // l → v
-
-  this.dx180 = [
-  // [from][rule#]
-  // 0: spawn→rev, 1: right→left, 2: rev→spawn, 3: left→right
-  [0,  1, -1,  0,  2, -2,  1, -1,  0], // 0->2
-  [0,  1, -1,  0,  2, -2,  1, -1,  0], // 1->3
-  [0,  1, -1,  0,  2, -2,  1, -1,  0], // 2->0
-  [0,  1, -1,  0,  2, -2,  1, -1,  0], // 3->1
-  ];
-  this.dy180 = [
-  [0,  0,  0,  1,  0,  0, -1, -1, -2], // 0->2
-  [0,  0,  0, -1,  0,  0,  1,  1,  2], // 1->3
-  [0,  0,  0, -1,  0,  0,  1,  1,  2], // 2->0
-  [0,  0,  0,  1,  0,  0, -1, -1, -2], // 3->1
-  ];
-
-
-  return this;
-}
-/*----------------------------------------------------------------------------------------
-☆★ Object: I ROTation RULE -I ★☆
-----------------------------------------------------------------------------------------*/
-function RotRuleI(){
-  // [Rotation direction (0=right, 1=left)][Mode of mino before rotation (0=on appearance, 1=right, 2=reverse, 3=left)][Rule ID]
-
-  this.dx = [[[0, -2,  1, -2,  1],    // i → r
-
-  [0, -1,  2, -1,  2],    // r → v
-
-  [0,  2, -1,  2, -1],    // v → l
-
-  [0,  1, -2,  1, -2]],   // l → i
-
-  [[0, -1,  2, -1,  2],    // i → l
-
-  [0,  2, -1,  2, -1],    // r → i
-
-  [0,  1, -2,  1, -2],    // v → r
-
-  [0, -2,  1, -2,  1]]];  // l → v
-
-  this.dy = [[[0,  0,  0,  1, -2],    // i → r
-
-  [0,  0,  0, -2,  1],    // r → v
-
-  [0,  0,  0, -1,  2],    // v → l
-
-  [0,  0,  0,  2, -1]],   // l → i
-
-  [[0,  0,  0, -2,  1],    // i → l
-
-  [0,  0,  0, -1,  2],    // r → i
-
-  [0,  0,  0,  2, -1],    // v → r
-
-  [0,  0,  0,  1, -2]]];  // l → v
-
-  this.dx180 = [
-  [0, -2,  1, -2,  1,  0,  0,  0,  0], // 0->2
-  [0,  2, -1,  2, -1,  0,  0,  0,  0], // 1->3
-  [0,  2, -1,  2, -1,  0,  0,  0,  0], // 2->0
-  [0, -2,  1, -2,  1,  0,  0,  0,  0], // 3->1
-  ];
-  this.dy180 = [
-  [0,  0,  0,  1, -1,  2, -2,  3, -3], // 0->2
-  [0,  0,  0, -1,  1, -2,  2, -3,  3], // 1->3
-  [0,  0,  0, -1,  1, -2,  2, -3,  3], // 2->0
-  [0,  0,  0,  1, -1,  2, -2,  3, -3], // 3->1
-];
-
-
-
-  return this;
-}
-/*----------------------------------------------------------------------------------------
-☆★ Access settings for each rotation rule ★☆
-----------------------------------------------------------------------------------------*/
-var gRotationRuleGeneral = new RotRuleGen();
-var gRotationRuleI = new RotRuleI();
-/*----------------------------------------------------------------------------------------
-☆★ Object: Various Minoh ★☆
-----------------------------------------------------------------------------------------*/
-function IMino(){
-  this.id = 1;
-  // [Mino orientation (0=on occurrence, 1=right, 2=reverse, 3=left)][ Y coordinate][ X coordinate]
-
-  this.shape = [[[0, 0, 0, 0],
-  [1, 1, 1, 1],
-  [0, 0, 0, 0],
-  [0, 0, 0, 0]],
-
-  [[0, 0, 1, 0],
-  [0, 0, 1, 0],
-  [0, 0, 1, 0],
-  [0, 0, 1, 0]],
-
-  [[0, 0, 0, 0],
-  [0, 0, 0, 0],
-  [1, 1, 1, 1],
-  [0, 0, 0, 0]],
-
-  [[0, 1, 0, 0],
-  [0, 1, 0, 0],
-  [0, 1, 0, 0],
-  [0, 1, 0, 0]]];
-  this.activeBlockId = 11;            // falling
-  this.placedBlockId = 11;            // placed
-  this.ghostBlockId  = 31;            // ghost 
-  this.guideBlockId  = 41;            // guide on black bg
-  this.ghostGuideBlockId = 51;        // guide on ghost bg
-  this.rotationRule = gRotationRuleI;
-  this.palette = '#32B484'; // I mino color
-  return this;
-}
-//----------------------------------------------------------------------------------------
-function TMino(){
-  this.id = 2;
-  // [Mino orientation (0=on occurrence, 1=right, 2=reverse, 3=left)][ Y coordinate][ X coordinate]
-
-  this.shape = [[[0, 1, 0, 0],
-  [1, 1, 1, 0],
-  [0, 0, 0, 0],
-  [0, 0, 0, 0]],
-
-  [[0, 1, 0, 0],
-  [0, 1, 1, 0],
-  [0, 1, 0, 0],
-  [0, 0, 0, 0]],
-
-  [[0, 0, 0, 0],
-  [1, 1, 1, 0],
-  [0, 1, 0, 0],
-  [0, 0, 0, 0]],
-
-  [[0, 1, 0, 0],
-  [1, 1, 0, 0],
-  [0, 1, 0, 0],
-  [0, 0, 0, 0]]];
-  this.activeBlockId = 12;
-  this.placedBlockId = 12;
-  this.ghostBlockId  = 31;
-  this.guideBlockId  = 42;
-  this.ghostGuideBlockId = 52;
-  this.rotationRule = gRotationRuleGeneral;
-  this.palette = '#A53E9B';
-  return this;
-}
-//----------------------------------------------------------------------------------------
-function JMino(){
-  this.id = 3;
-  // [Mino orientation (0=on occurrence, 1=right, 2=reverse, 3=left)][ Y coordinate][ X coordinate]
-
-  this.shape = [[[1, 0, 0, 0],
-  [1, 1, 1, 0],
-  [0, 0, 0, 0],
-  [0, 0, 0, 0]],
-
-  [[0, 1, 1, 0],
-  [0, 1, 0, 0],
-  [0, 1, 0, 0],
-  [0, 0, 0, 0]],
-
-  [[0, 0, 0, 0],
-  [1, 1, 1, 0],
-  [0, 0, 1, 0],
-  [0, 0, 0, 0]],
-
-  [[0, 1, 0, 0],
-  [0, 1, 0, 0],
-  [1, 1, 0, 0],
-  [0, 0, 0, 0]]];
-  this.activeBlockId = 13;
-  this.placedBlockId = 13;
-  this.ghostBlockId  = 31;
-  this.guideBlockId  = 43;
-  this.ghostGuideBlockId = 53;
-  this.rotationRule = gRotationRuleGeneral;
-  this.palette = '#6553BB';
-  return this;
-}
-//----------------------------------------------------------------------------------------
-function LMino(){
-  this.id = 4;
-  // [Mino orientation (0=on occurrence, 1=right, 2=reverse, 3=left)][ Y coordinate][ X coordinate]
-
-  this.shape = [[[0, 0, 1, 0],
-  [1, 1, 1, 0],
-  [0, 0, 0, 0],
-  [0, 0, 0, 0]],
-
-  [[0, 1, 0, 0],
-  [0, 1, 0, 0],
-  [0, 1, 1, 0],
-  [0, 0, 0, 0]],
-
-  [[0, 0, 0, 0],
-  [1, 1, 1, 0],
-  [1, 0, 0, 0],
-  [0, 0, 0, 0]],
-
-  [[1, 1, 0, 0],
-  [0, 1, 0, 0],
-  [0, 1, 0, 0],
-  [0, 0, 0, 0]]];
-  this.activeBlockId = 14;
-  this.placedBlockId = 14;
-  this.ghostBlockId  = 31;
-  this.guideBlockId  = 44;
-  this.ghostGuideBlockId = 54;
-  this.rotationRule = gRotationRuleGeneral;
-  this.palette = '#C17342';
-  return this;
-}
-//----------------------------------------------------------------------------------------
-function ZMino(){
-  this.id = 5;
-  // [Mino orientation (0=on occurrence, 1=right, 2=reverse, 3=left)][ Y coordinate][ X coordinate]
-
-  this.shape = [[[1, 1, 0, 0],
-  [0, 1, 1, 0],
-  [0, 0, 0, 0],
-  [0, 0, 0, 0]],
-
-  [[0, 0, 1, 0],
-  [0, 1, 1, 0],
-  [0, 1, 0, 0],
-  [0, 0, 0, 0]],
-
-  [[0, 0, 0, 0],
-  [1, 1, 0, 0],
-  [0, 1, 1, 0],
-  [0, 0, 0, 0]],
-
-  [[0, 1, 0, 0],
-  [1, 1, 0, 0],
-  [1, 0, 0, 0],
-  [0, 0, 0, 0]]];
-  this.activeBlockId = 15;
-  this.placedBlockId = 15;
-  this.ghostBlockId  = 31;
-  this.guideBlockId  = 45;
-  this.ghostGuideBlockId = 55;
-  this.rotationRule = gRotationRuleGeneral;
-  this.palette = '#C24047';
-  return this;
-}
-//----------------------------------------------------------------------------------------
-function SMino(){
-  this.id = 6;
-  // [Mino orientation (0=on occurrence, 1=right, 2=reverse, 3=left)][ Y coordinate][ X coordinate]
-
-  this.shape = [[[0, 1, 1, 0],
-  [1, 1, 0, 0],
-  [0, 0, 0, 0],
-  [0, 0, 0, 0]],
-
-  [[0, 1, 0, 0],
-  [0, 1, 1, 0],
-  [0, 0, 1, 0],
-  [0, 0, 0, 0]],
-
-  [[0, 0, 0, 0],
-  [0, 1, 1, 0],
-  [1, 1, 0, 0],
-  [0, 0, 0, 0]],
-
-  [[1, 0, 0, 0],
-  [1, 1, 0, 0],
-  [0, 1, 0, 0],
-  [0, 0, 0, 0]]];
-  this.activeBlockId = 16;
-  this.placedBlockId = 16;
-  this.ghostBlockId  = 31;
-  this.guideBlockId  = 46;
-  this.ghostGuideBlockId = 56;
-  this.rotationRule = gRotationRuleGeneral;
-  this.palette = '#92C044';
-  return this;
-}
-//----------------------------------------------------------------------------------------
-function OMino(){
-  this.id = 7;
-  // [Mino orientation (0=on occurrence, 1=right, 2=reverse, 3=left)][ Y coordinate][ X coordinate]
-
-  this.shape = [[[0, 1, 1, 0],
-  [0, 1, 1, 0],
-  [0, 0, 0, 0],
-  [0, 0, 0, 0]],
-
-  [[0, 1, 1, 0],
-  [0, 1, 1, 0],
-  [0, 0, 0, 0],
-  [0, 0, 0, 0]],
-
-  [[0, 1, 1, 0],
-  [0, 1, 1, 0],
-  [0, 0, 0, 0],
-  [0, 0, 0, 0]],
-
-  [[0, 1, 1, 0],
-  [0, 1, 1, 0],
-  [0, 0, 0, 0],
-  [0, 0, 0, 0]]];
-  this.activeBlockId = 17;
-  this.placedBlockId = 17;
-  this.ghostBlockId  = 31;
-  this.guideBlockId  = 47;
-  this.ghostGuideBlockId = 57;
-  this.rotationRule = gRotationRuleGeneral;  // It's not necessary but for convenience
-  this.palette = '#C3AC49';
-
-  return this;
-}
-/*----------------------------------------------------------------------------------------
-★☆ Block position used for T-SPIN judgment ☆★
-
-Called from within TsType in ttt.js. [dir][y][x]
-If more than three of the 1 locations (4 locations each) cannot pass, it is judged as T-SPIN.
-----------------------------------------------------------------------------------------*/
-var gTsTiles = [[[1, 0, 1, 0],
-[0, 0, 0, 0],
-[1, 0, 1, 0],
-[0, 0, 0, 0]],
-[[1, 0, 1, 0],
-[0, 0, 0, 0],
-[1, 0, 1, 0],
-[0, 0, 0, 0]],
-[[1, 0, 1, 0],
-[0, 0, 0, 0],
-[1, 0, 1, 0],
-[0, 0, 0, 0]],
-[[1, 0, 1, 0],
-[0, 0, 0, 0],
-[1, 0, 1, 0],
-[0, 0, 0, 0]]];
-/*----------------------------------------------------------------------------------------
-★☆ Block position used for T-SPIN MINI judgment ☆★
-
-Called from within TsType in ttt.js. [dir][y][x]
-//-------------------------
-If T-SPIN is true, it is determined whether it is a normal T-SPIN or a T-SPIN MINI.
-If two locations marked 1 (two locations each) cannot pass through, then the T-SPIN is placed, otherwise the T-SPIN
-It is judged as MINI. Exceptionally, if you rotate the fifth candidate just before, it will not become a T-SPIN MINI.
-(TST wind rotation, "T-SPIN FIN" etc.).
-----------------------------------------------------------------------------------------*/
-var gTssTiles = [[[1, 0, 1, 0],
-[0, 0, 0, 0],
-[0, 0, 0, 0],
-[0, 0, 0, 0]],
-[[0, 0, 1, 0],
-[0, 0, 0, 0],
-[0, 0, 1, 0],
-[0, 0, 0, 0]],
-[[0, 0, 0, 0],
-[0, 0, 0, 0],
-[1, 0, 1, 0],
-[0, 0, 0, 0]],
-[[1, 0, 0, 0],
-[0, 0, 0, 0],
-[1, 0, 0, 0],
-[0, 0, 0, 0]]];
-/*----------------------------------------------------------------------------------------
-☆★ Access settings for each mino ★☆
-----------------------------------------------------------------------------------------*/
-var I = new IMino();
-var T = new TMino();
-var J = new JMino();
-var L = new LMino();
-var Z = new ZMino();
-var S = new SMino();
-var O = new OMino();
-var gMino = [null, I, T, J, L, Z, S, O];
-/*----------------------------------------------------------------------------------------
-☆★ Object: Guide ★☆
-
-Mino will automatically choose what you are currently running.
-----------------------------------------------------------------------------------------*/
-function Guide(mino, dir, x, y){
-  this.mino = mino;
-  this.dir = dir;
-  this.x = x;
-  this.y = y;  // Do not include deadlines
-
-}
-/*----------------------------------------------------------------------------------------
-☆★ Simplified description of guide object generation ★☆
-----------------------------------------------------------------------------------------*/
-function G(mino, dir, x, y){
-  return new Guide(mino, dir, x, y);
-}
-/*----------------------------------------------------------------------------------------
-☆★ Get section name ★☆
-
-Gets the <id>th section name. If you edit this, don't forget to reflect it in index.html.
-----------------------------------------------------------------------------------------*/
-function SectionTitle(id){
-  switch(id){
-    case  0: return '[1] Creating the Template (w/ Guide)'; break;
-    case  1: return '[2] Vertical I-Mino, 14 patterns (w/ Guide)'; break;
-    case  2: return '[3] Vertical I-Mino, 20q'; break;
-    case  3: return '[4] I-Mino 1st Layer, 6 patterns (w/ Guide)'; break;
-    case  4: return '[5] I-Mino 1st Layer, 20q'; break;
-    case  5: return '[6] I-Mino 3rd Layer, Flat Placement, 4 patterns (w/ Guide)'; break;
-    case  6: return '[7] I-Mino 3rd Layer, Flat Placement, 20q'; break;
-    case  7: return '[8] IILO, 2 patterns (w/ Guide)'; break;
-    case  8: return '[9] IILO, 10q'; break;
-    case  9: return '[10] 3rd Layer I-Mino, 3 patterns (w/ Guide)'; break;
-    case 10: return '[11] 3rd Layer I-Mino, 20q'; break;
-    case 11: return '[12] Midterm Test 20q'; break;
-    case 12: return '[13] LSIO type 1 pattern (w/ Guide)'; break;
-    case 13: return '[14] LSIO type 12q'; break;
-    case 14: return '[15] Final Exam, 30q'; break;
-    case 15: return '[16] Graduation test (+mirror q\'s) 100q'; break;
-    case 16: return '[17] Skimming Patterns'; break;
-    case 17: return '[18] Vertical I-Mino, 514q'; break;
-    case 18: return '[19] Horizontal I-Mino, 196q'; break;
-    case 19: return '[20] All 711q'; break;
-    case 20: return '[21] 711q mirror (Not Checked)'; break;
   }
-  return "?";
-}
+
+  var I = makeMino(1, 'I', 11, '#32B484', KICKS_I, [
+    [[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]],
+    [[0,0,1,0],[0,0,1,0],[0,0,1,0],[0,0,1,0]],
+    [[0,0,0,0],[0,0,0,0],[1,1,1,1],[0,0,0,0]],
+    [[0,1,0,0],[0,1,0,0],[0,1,0,0],[0,1,0,0]]
+  ]);
+
+  var T = makeMino(2, 'T', 12, '#A53E9B', KICKS_JLSTZ, [
+    [[0,1,0,0],[1,1,1,0],[0,0,0,0],[0,0,0,0]],
+    [[0,1,0,0],[0,1,1,0],[0,1,0,0],[0,0,0,0]],
+    [[0,0,0,0],[1,1,1,0],[0,1,0,0],[0,0,0,0]],
+    [[0,1,0,0],[1,1,0,0],[0,1,0,0],[0,0,0,0]]
+  ]);
+
+  var J = makeMino(3, 'J', 13, '#5B51C4', KICKS_JLSTZ, [
+    [[1,0,0,0],[1,1,1,0],[0,0,0,0],[0,0,0,0]],
+    [[0,1,1,0],[0,1,0,0],[0,1,0,0],[0,0,0,0]],
+    [[0,0,0,0],[1,1,1,0],[0,0,1,0],[0,0,0,0]],
+    [[0,1,0,0],[0,1,0,0],[1,1,0,0],[0,0,0,0]]
+  ]);
+
+  var L = makeMino(4, 'L', 14, '#C8743B', KICKS_JLSTZ, [
+    [[0,0,1,0],[1,1,1,0],[0,0,0,0],[0,0,0,0]],
+    [[0,1,0,0],[0,1,0,0],[0,1,1,0],[0,0,0,0]],
+    [[0,0,0,0],[1,1,1,0],[1,0,0,0],[0,0,0,0]],
+    [[1,1,0,0],[0,1,0,0],[0,1,0,0],[0,0,0,0]]
+  ]);
+
+  var Z = makeMino(5, 'Z', 15, '#C73F47', KICKS_JLSTZ, [
+    [[1,1,0,0],[0,1,1,0],[0,0,0,0],[0,0,0,0]],
+    [[0,0,1,0],[0,1,1,0],[0,1,0,0],[0,0,0,0]],
+    [[0,0,0,0],[1,1,0,0],[0,1,1,0],[0,0,0,0]],
+    [[0,1,0,0],[1,1,0,0],[1,0,0,0],[0,0,0,0]]
+  ]);
+
+  var S = makeMino(6, 'S', 16, '#8CC03F', KICKS_JLSTZ, [
+    [[0,1,1,0],[1,1,0,0],[0,0,0,0],[0,0,0,0]],
+    [[0,1,0,0],[0,1,1,0],[0,0,1,0],[0,0,0,0]],
+    [[0,0,0,0],[0,1,1,0],[1,1,0,0],[0,0,0,0]],
+    [[1,0,0,0],[1,1,0,0],[0,1,0,0],[0,0,0,0]]
+  ]);
+
+  var O = makeMino(7, 'O', 17, '#C9B043', KICKS_O, [
+    [[0,1,1,0],[0,1,1,0],[0,0,0,0],[0,0,0,0]],
+    [[0,1,1,0],[0,1,1,0],[0,0,0,0],[0,0,0,0]],
+    [[0,1,1,0],[0,1,1,0],[0,0,0,0],[0,0,0,0]],
+    [[0,1,1,0],[0,1,1,0],[0,0,0,0],[0,0,0,0]]
+  ]);
+
+  var gMino = [null, I, T, J, L, Z, S, O];
+
+  var BLOCK_COLORS = {
+    1:  '#6C7582',
+    11: I.palette,
+    12: T.palette,
+    13: J.palette,
+    14: L.palette,
+    15: Z.palette,
+    16: S.palette,
+    17: O.palette
+  };
+
+  var T_CORNERS = [
+    { front: [[0,0],[2,0]], back: [[0,2],[2,2]] },
+    { front: [[2,0],[2,2]], back: [[0,0],[0,2]] },
+    { front: [[0,2],[2,2]], back: [[0,0],[2,0]] },
+    { front: [[0,0],[0,2]], back: [[2,0],[2,2]] }
+  ];
+
+  function Guide(mino, dir, x, y, opts) {
+    this.mino = mino;
+    this.dir = dir;
+    this.x = x;
+    this.y = y;
+    this.requiresSpin = Boolean(opts && opts.requiresSpin);
+    this.requires180 = Boolean(opts && opts.requires180);
+  }
+
+  function G(mino, dir, x, y, opts) {
+    return new Guide(mino, dir, x, y, opts);
+  }
+
+  /*--------------------------------------------------------------------------------------
+    Curriculum & Technique Sections
+  --------------------------------------------------------------------------------------*/
+  var SECTION_GROUPS = [
+    {
+      id: 'group1',
+      title: 'Introduction',
+      rate: null,
+      sections: [
+        { id: 0, num: 1, title: 'Creating the Template', meta: '1 pattern · Guide', guided: true }
+      ]
+    },
+    {
+      id: 'group2',
+      title: 'Vertical I-Mino Placement',
+      rate: 'PCO 61%',
+      rateTip: 'Share of solvable PCO queues covered by Vertical I patterns',
+      sections: [
+        { id: 1, num: 2, title: 'Vertical I-Mino, 14 patterns', meta: '14 patterns · Guide', guided: true },
+        { id: 2, num: 3, title: 'Vertical I-Mino, 20q', meta: '20 random · Drill', guided: false }
+      ]
+    },
+    {
+      id: 'group3',
+      title: 'Horizontal I-Mino Placement',
+      rate: 'PCO 84%',
+      rateTip: 'Cumulative solvable PCO queue coverage with Horizontal I patterns',
+      sections: [
+        { id: 3,  num: 4,  title: 'I-Mino 1st Layer, 6 patterns', meta: '6 patterns · Guide', guided: true },
+        { id: 4,  num: 5,  title: 'I-Mino 1st Layer, 20q', meta: '20 random · Drill', guided: false },
+        { id: 5,  num: 6,  title: 'I-Mino 3rd Layer, Flat Placement, 4 patterns', meta: '4 patterns · Guide', guided: true },
+        { id: 6,  num: 7,  title: 'I-Mino 3rd Layer, Flat Placement, 20q', meta: '20 random · Drill', guided: false },
+        { id: 7,  num: 8,  title: 'IILO, 2 patterns', meta: '2 patterns · Guide', guided: true },
+        { id: 8,  num: 9,  title: 'IILO, 10q', meta: '10 random · Drill', guided: false },
+        { id: 9,  num: 10, title: '3rd Layer I-Mino, 3 patterns', meta: '3 patterns · Guide', guided: true },
+        { id: 10, num: 11, title: '3rd Layer I-Mino, 20q', meta: '20 random · Drill', guided: false }
+      ]
+    },
+    {
+      id: 'group4',
+      title: 'Horizontal I-Mino Summary',
+      rate: null,
+      note: 'Covers 710 of 711 solvable PCO queues. Learn LSIO below for the final case.',
+      sections: [
+        { id: 11, num: 12, title: 'Midterm Test', meta: '20 random · Exam', guided: false }
+      ]
+    },
+    {
+      id: 'group5',
+      title: 'LSIO Type',
+      rate: 'PCO 84.6%',
+      rateTip: 'Full PCO coverage including the final LSIO queue case',
+      sections: [
+        { id: 12, num: 13, title: 'LSIO Type, 1 pattern', meta: '1 pattern · Guide', guided: true },
+        { id: 13, num: 14, title: 'LSIO Type, 12q', meta: '12 shuffled · Drill', guided: false }
+      ]
+    },
+    {
+      id: 'group6',
+      title: 'Summary',
+      rate: null,
+      sections: [
+        { id: 14, num: 15, title: 'Final Exam', meta: '30 random · Exam', guided: false },
+        { id: 15, num: 16, title: 'Graduation Test (+ Mirror)', meta: '100 random · Exam', guided: false }
+      ]
+    },
+    {
+      id: 'group7',
+      title: 'Bonus',
+      rate: null,
+      sections: [
+        { id: 16, num: 17, title: 'Skimming Patterns', meta: '27 patterns · Guide', guided: true },
+        { id: 17, num: 18, title: 'Vertical I-Mino, All 514q', meta: '514 shuffled · Endurance', guided: false },
+        { id: 18, num: 19, title: 'Horizontal I-Mino, All 196q', meta: '196 shuffled · Endurance', guided: false },
+        { id: 19, num: 20, title: 'All 711q', meta: '711 shuffled · Endurance', guided: false },
+        { id: 20, num: 21, title: 'All 711q Mirror', meta: '711 mirrored · Endurance', guided: false }
+      ]
+    },
+    {
+      id: 'group8',
+      title: 'Techniques & Openers',
+      rate: null,
+      sections: [
+        { id: 21, num: 22, title: 'T-Spin Mastery', meta: '7 patterns · Guide', guided: true, category: 'tech' },
+        { id: 22, num: 23, title: 'All-Spin & 180° Kicks', meta: '5 patterns · Guide', guided: true, category: 'tech' },
+        { id: 23, num: 24, title: 'Modern Openers & Combos', meta: '5 patterns · Guide', guided: true, category: 'tech' }
+      ]
+    }
+  ];
+
+  var SECTIONS = [];
+  for (var gi = 0; gi < SECTION_GROUPS.length; gi++) {
+    for (var si = 0; si < SECTION_GROUPS[gi].sections.length; si++) {
+      SECTIONS.push(SECTION_GROUPS[gi].sections[si]);
+    }
+  }
+
+  function SectionTitle(id) {
+    var sec = SECTIONS[id];
+    if (!sec) return '?';
+    return '[' + sec.num + '] ' + sec.title;
+  }
+
+  function getTechProblemIds(groupKey) {
+    if (!root.LochtrisAllProblemsMeta) return [];
+    return (root.LochtrisAllProblemsMeta[groupKey] || []).slice();
+  }
+
+  function getSectionPool(sectionIndex) {
+    if (typeof getProblemIdList !== 'function') return [];
+    switch (sectionIndex) {
+      case 0:  return getProblemIdList(WARMING_UP);
+      case 1:  return getProblemIdList(GUIDANCE_VERTICAL);
+      case 2:  return getProblemIdList(PROB840_VERTICAL);
+      case 3:  return getProblemIdList(GUIDANCE_HORIZONTAL_1);
+      case 4:  return getProblemIdList(PROB840_HORIZONTAL_1);
+      case 5:  return getProblemIdList(GUIDANCE_HORIZONTAL_LAYDOWN);
+      case 6:  return getProblemIdList(PROB840_HORIZONTAL_LAYDOWN);
+      case 7:  return getProblemIdList(GUIDANCE_HORIZONTAL_IILO);
+      case 8:  return getProblemIdList(PROB840_HORIZONTAL_IILO);
+      case 9:  return getProblemIdList(GUIDANCE_HORIZONTAL_3);
+      case 10: return getProblemIdList(PROB840_HORIZONTAL_3);
+      case 11:
+      case 18:
+        return getProblemIdList(PROB840_HORIZONTAL_1)
+          .concat(getProblemIdList(PROB840_HORIZONTAL_LAYDOWN))
+          .concat(getProblemIdList(PROB840_HORIZONTAL_IILO))
+          .concat(getProblemIdList(PROB840_HORIZONTAL_3));
+      case 12: return getProblemIdList(GUIDANCE_LSIO);
+      case 13: return getProblemIdList(PROB840_LSIO);
+      case 14: return getProblemIdList(PROB840);
+      case 15: return getProblemIdList(PROB840).concat(getProblemIdList(PROB840_MIRROR));
+      case 16: return getProblemIdList(GUIDANCE_OTHER_WISE);
+      case 17: return getProblemIdList(PROB840_VERTICAL);
+      case 19: return getProblemIdList(PROB840);
+      case 20: return getProblemIdList(PROB840_MIRROR);
+      case 21: return getTechProblemIds('tSpins');
+      case 22: return getTechProblemIds('allSpins');
+      case 23: return getTechProblemIds('openers');
+      default: return [];
+    }
+  }
+
+  function buildSectionRun(sectionIndex) {
+    if (typeof getProblemIdList !== 'function') return [];
+    var pool;
+    switch (sectionIndex) {
+      case 0:  return getProblemIdList(WARMING_UP);
+      case 1:  return getProblemIdList(GUIDANCE_VERTICAL);
+      case 2:  return shuffle(getProblemIdList(PROB840_VERTICAL)).slice(0, 20);
+      case 3:  return getProblemIdList(GUIDANCE_HORIZONTAL_1);
+      case 4:  return shuffle(getProblemIdList(PROB840_HORIZONTAL_1)).slice(0, 20);
+      case 5:  return getProblemIdList(GUIDANCE_HORIZONTAL_LAYDOWN);
+      case 6:  return shuffle(getProblemIdList(PROB840_HORIZONTAL_LAYDOWN)).slice(0, 20);
+      case 7:  return getProblemIdList(GUIDANCE_HORIZONTAL_IILO);
+      case 8:  return shuffle(getProblemIdList(PROB840_HORIZONTAL_IILO)).slice(0, 10);
+      case 9:  return getProblemIdList(GUIDANCE_HORIZONTAL_3);
+      case 10: return shuffle(getProblemIdList(PROB840_HORIZONTAL_3)).slice(0, 20);
+      case 11:
+        pool = getSectionPool(11);
+        return shuffle(pool).slice(0, 20);
+      case 12: return getProblemIdList(GUIDANCE_LSIO);
+      case 13: return shuffle(getProblemIdList(PROB840_LSIO));
+      case 14: return shuffle(getProblemIdList(PROB840)).slice(0, 30);
+      case 15:
+        return shuffle(
+          shuffle(getProblemIdList(PROB840)).slice(0, 50)
+            .concat(shuffle(getProblemIdList(PROB840_MIRROR)).slice(0, 50))
+        );
+      case 16: return getProblemIdList(GUIDANCE_OTHER_WISE);
+      case 17: return shuffle(getProblemIdList(PROB840_VERTICAL));
+      case 18: return shuffle(getSectionPool(18));
+      case 19: return shuffle(getProblemIdList(PROB840));
+      case 20: return shuffle(getProblemIdList(PROB840_MIRROR));
+      case 21: return getTechProblemIds('tSpins');
+      case 22: return getTechProblemIds('allSpins');
+      case 23: return getTechProblemIds('openers');
+      default: return [];
+    }
+  }
+
+  root.I = I;
+  root.T = T;
+  root.J = J;
+  root.L = L;
+  root.Z = Z;
+  root.S = S;
+  root.O = O;
+  root.gMino = gMino;
+  root.Guide = Guide;
+  root.G = G;
+  root.SectionTitle = SectionTitle;
+
+  root.LochtrisData = {
+    MATRIX_WIDTH: MATRIX_WIDTH,
+    BUFFER_HEIGHT: BUFFER_HEIGHT,
+    VISIBLE_HEIGHT: VISIBLE_HEIGHT,
+    MATRIX_HEIGHT: MATRIX_HEIGHT,
+    DEADLINE_HEIGHT: DEADLINE_HEIGHT,
+    PEEK_ROWS: PEEK_ROWS,
+    NEXT_MINOS: NEXT_MINOS,
+    SECTION_NUM: SECTION_NUM,
+    FRAME_MS: FRAME_MS,
+    BASE_GRAVITY_INTERVAL_MS: BASE_GRAVITY_INTERVAL_MS,
+    LOCK_DELAY_MS: LOCK_DELAY_MS,
+    LOCK_RESET_LIMIT: LOCK_RESET_LIMIT,
+    SPRINT_COUNTDOWN_MS: SPRINT_COUNTDOWN_MS,
+    INITIAL_DIR: INITIAL_DIR,
+    INITIAL_X: INITIAL_X,
+    INITIAL_Y: INITIAL_Y,
+    RESERVED_KEY_CODES: RESERVED_KEY_CODES,
+    DEFAULT_KEYS: DEFAULT_KEYS,
+    DEFAULT_HANDLING: DEFAULT_HANDLING,
+    DEFAULT_VISUALS: DEFAULT_VISUALS,
+    HANDLING_PRESETS: HANDLING_PRESETS,
+    KEY_PRESETS: KEY_PRESETS,
+    KICKS_JLSTZ: KICKS_JLSTZ,
+    KICKS_I: KICKS_I,
+    KICKS_O: KICKS_O,
+    T_CORNERS: T_CORNERS,
+    BLOCK_COLORS: BLOCK_COLORS,
+    MINOS: gMino,
+    SECTION_GROUPS: SECTION_GROUPS,
+    SECTIONS: SECTIONS,
+    SectionTitle: SectionTitle,
+    getSectionPool: getSectionPool,
+    buildSectionRun: buildSectionRun
+  };
+
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = root.LochtrisData;
+  }
+})(typeof globalThis !== 'undefined' ? globalThis : window);
