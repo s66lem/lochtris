@@ -1,451 +1,398 @@
-<html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Lochtris</title>
-    <!--Load external css -->
-    <link href="ttt.css" rel="stylesheet" type="text/css">
-    <!--Please refer to each js file for detailed operation -->
-    <script type="text/javascript" src="jsgmod.js"></script>
-    <script type="text/javascript" src="data.js"></script>
-    <script type="text/javascript" src="problemData.js"></script>
-    <script type="text/javascript" src="problem.js"></script>
-    <script type="text/javascript" src="gameboard.js"></script>
-    <script type="text/javascript" src="ttt.js"></script>
-    <script type="text/javascript" src="stats.js"></script>
-    <script type="text/javascript" src="anim.js"></script>
-    <script type="text/javascript" src="menu.js"></script>
-    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-      <script src="anim.js"></script>
-  </head>
-  <body onLoad="Execute()">
-    <div class="ocean">
-      <div class="bubbles">
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lochtris</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
+  <link rel="stylesheet" href="ttt.css">
+  <script defer src="data.js"></script>
+  <script defer src="problemData.js"></script>
+  <script defer src="problem.js"></script>
+  <script defer src="techniques.js"></script>
+  <script defer src="storage.js"></script>
+  <script defer src="audio.js"></script>
+  <script defer src="engine.js"></script>
+  <script defer src="renderer.js"></script>
+  <script defer src="ui.js"></script>
+</head>
+<body>
+  <!-- Deep-loch ocean backdrop: layered SVG surface waves, dual caustics, and varied rising bubbles -->
+  <div id="ocean-backdrop" class="ocean-backdrop" aria-hidden="true">
+    <div class="ocean-caustics"></div>
+    <div class="ocean-caustics-2"></div>
+    <svg class="ocean-waves" viewBox="0 0 1440 190" preserveAspectRatio="none">
+      <path class="wave wave-back" d="M0,104 C220,162 460,46 720,104 C980,162 1220,52 1440,108 L1440,0 L0,0 Z"></path>
+      <path class="wave wave-mid" d="M0,78 C270,32 520,132 800,76 C1080,20 1260,114 1440,68 L1440,0 L0,0 Z"></path>
+      <path class="wave wave-front" d="M0,52 C220,92 460,18 720,56 C980,94 1220,24 1440,54 L1440,0 L0,0 Z"></path>
+      <path class="wave wave-foam" d="M0,52 C220,92 460,18 720,56 C980,94 1220,24 1440,54"></path>
+    </svg>
+    <div class="ocean-bubbles">
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <!-- MAIN MENU VIEW -->
+  <main id="view-menu" class="view-menu">
+    <div class="menu-shell">
+      <header class="menu-header">
+        <div class="brand-row">
+          <h1 class="brand-title">Lochtris</h1>
+          <span id="menu-summary" class="menu-summary">0 / 24 sections cleared</span>
+        </div>
+        <p class="brand-subtitle">
+          Perfect Clear Opener, T-Spin, All-Spin &amp; Modern Opener trainer.
+          Press <kbd>R</kbd> anytime for the guide · <a href="TetrisPerfectClear.xlsx">PCO rates (.xlsx)</a>
+        </p>
+
+        <div class="quick-bar">
+          <button type="button" id="btn-mode-sprint" class="quick-btn">
+            <span class="quick-btn-title">40L Sprint</span>
+            <span id="sprint-pb-badge" class="quick-btn-meta">Race to 40</span>
+          </button>
+          <button type="button" id="btn-mode-zen" class="quick-btn">
+            <span class="quick-btn-title">Zen Practice</span>
+            <span class="quick-btn-meta">No fail state</span>
+          </button>
+          <button type="button" id="btn-menu-prefs" class="quick-btn quick-btn-accent">
+            <span class="quick-btn-title">Preferences</span>
+            <span class="quick-btn-meta">Handling &amp; Keys</span>
+          </button>
+        </div>
+      </header>
+
+      <div id="menu-sections" class="menu-sections"></div>
+
+      <footer class="menu-footer">
+        <span><kbd>↑</kbd> <kbd>↓</kbd> <kbd>Enter</kbd> or type to jump · SRS+ &amp; custom handling</span>
+        <span>Original PCO curriculum by <a href="https://github.com/sakuramochi84" target="_blank" rel="noopener">Chotia</a> · rebuilt by s6lem</span>
+      </footer>
+    </div>
+  </main>
+
+  <!-- PLAY VIEW -->
+  <section id="view-play" class="view-play is-hidden" aria-label="Gameboard">
+    <header class="play-topbar">
+      <div class="play-topbar-left">
+        <button type="button" id="btn-play-back" class="bar-btn" title="Main Menu (Esc)">← Menu</button>
+        <span id="play-section-title" class="play-title"></span>
       </div>
-    </div>
-    <form name="fMain">
-
-      <div id="list_sections" class="layer">
-        <p id="title" class="center">
-          Lochtris
-        </p>
-        <p class="subtitle">
-            <b><i>Originally created by <a href=https://github.com/sakuramochi84>Chotia</a>, Translated & Refreshed by s6lem. </i></b>
-        </p>
-
-        <p>
-          <br>
-          <p id="header2" style="font-size: 1.2em;">
-          Lochtris is a simple, yet modern PCO training tool.
-          </p>
-          <p id="header2" style="font-size: 1.1em; color: red; font-style: italic;">
-          please note that firefox is not currently supported, and will be very laggy :,)
-          </p>
-        </p>
-        <p>
-
-            <p id="header2">
-            Can't figure out the solve? Press 'R' for the guide!
-            </p>
-            <p id="subheader">
-              For success rates per pattern, please refer to <a href="TetrisPerfectClear.xlsx">this</a>
-            </p>
-        </p>
-        <hr style="height: 0px; border: none; margin: -5px;">
-        <p>
-      <div class="bubble-wrapper">
-        <div class="bubble v2">
-          <input type="button" class="bubble-input" onClick="gButton='preferences'" aria-label="preferences">
-          <span class="bubble-text" data-text="preferences">preferences</span>
-        </div>
+      <div class="play-topbar-right">
+        <button type="button" id="btn-play-guide" class="bar-btn" title="Show Guide (R)">Guide</button>
+        <button type="button" id="btn-play-retry" class="bar-btn" title="Retry (F4)">Retry</button>
+        <button type="button" id="btn-play-mute" class="bar-btn" title="Toggle Sound">SFX 50%</button>
+        <button type="button" id="btn-play-prefs" class="bar-btn" title="Preferences">Settings</button>
       </div>
-      </p>
-      <!-- <p id="subheader">
-        <i>Minos stuttering/moving too quickly? Try reloading!</i>
-      </p> -->
-      <!--If you edit a section, please also reflect it in the SectionTitle in data.js-->
-      <p>
-        <p class="section-group" id="group1">
-          Introduction
-        </p>
-        <div class="bubble-wrapper">
-          <div id="bsection1" class="bubble v2">
-            <input type="button" id="section1" class="bubble-input" onClick="gButton='section1'" aria-label="[1] Creating the Template (w/ Guide)">
-            <span class="bubble-text" data-text="[1] Creating the Template (w/ Guide)">[1] Creating the Template (w/ Guide)</span>
-          </div>
-        </div>
-      </p>
-      <p>
-        <p class="section-group" id="group2">
-        Vertical I-Mino Placement [61%]
-        </p>
-        <div class="bubble-wrapper">
-          <div id="bsection2" class="bubble v2">
-            <input type="button" id="section2" class="bubble-input" onClick="gButton='section2'" aria-label="[2] Vertical I-Mino, 14 patterns (w/ Guide)">
-            <span class="bubble-text" data-text="[2] Vertical I-Mino, 14 patterns (w/ Guide)">[2] Vertical I-Mino, 14 patterns (w/ Guide)</span>
-          </div>
-        </div>
-        <div class="bubble-wrapper">
-          <div id="bsection3" class="bubble v2">
-            <input type="button" id="section3" class="bubble-input" onClick="gButton='section3'" aria-label="[3] Vertical I-Mino, 20q">
-            <span class="bubble-text" data-text="[3] Vertical I-Mino, 20q">[3] Vertical I-Mino, 20q</span>
-          </div>
-        </div>
-      </p>
+    </header>
 
-      <p>
-      <p class="section-group" id="group3">
-        Horizontal I-Mino Placement [84%]
-      </p>
-        <div class="bubble-wrapper">
-          <div id="bsection4" class="bubble v2">
-            <input type="button" id="section4" class="bubble-input" onClick="gButton='section4'" aria-label="[4] I-Mino 1st Layer, 6 patterns (w/ Guide)">
-            <span class="bubble-text" data-text="[4] I-Mino 1st Layer, 6 patterns (w/ Guide)">[4] I-Mino 1st Layer, 6 patterns (w/ Guide)</span>
+    <div id="play-arena" class="play-arena">
+      <div id="playfield-stage" class="playfield-stage">
+        <!-- LEFT COLUMN: HOLD + CALLOUTS + STATS -->
+        <aside class="side-col side-left">
+          <div id="hold-box" class="piece-panel">
+            <div class="panel-label">HOLD</div>
+            <canvas id="hold-canvas"></canvas>
+            <div id="hold-hint" class="hold-hint is-hidden">SWAP</div>
           </div>
-        </div>
-        <div class="bubble-wrapper">
-          <div id="bsection5" class="bubble v2">
-            <input type="button" id="section5" class="bubble-input" onClick="gButton='section5'" aria-label="[5] I-Mino 1st Layer, 20q">
-            <span class="bubble-text" data-text="[5] I-Mino 1st Layer, 20q">[5] I-Mino 1st Layer, 20q</span>
-          </div>
-        </div>
-        <div class="bubble-wrapper">
-          <div id="bsection6" class="bubble v2">
-            <input type="button" id="section6" class="bubble-input" onClick="gButton='section6'" aria-label="[6] I-Mino 3rd Layer, Flat Placement, 4 patterns (w/ Guide)">
-            <span class="bubble-text" data-text="[6] I-Mino 3rd Layer, Flat Placement, 4 patterns (w/ Guide)">[6] I-Mino 3rd Layer, Flat Placement, 4 patterns (w/ Guide)</span>
-          </div>
-        </div>
 
-        <div class="bubble-wrapper">
-          <div id="bsection7" class="bubble v2">
-            <input type="button" id="section7" class="bubble-input" onClick="gButton='section7'" aria-label="[7] I-Mino 3rd Layer, Flat Placement, 20q">
-            <span class="bubble-text" data-text="[7] I-Mino 3rd Layer, Flat Placement, 20q">[7] I-Mino 3rd Layer, Flat Placement, 20q</span>
-          </div>
-        </div>
-
-        <div class="bubble-wrapper">
-          <div class="bubble v2">
-            <input id="bsection8" type="button" id="section8" class="bubble-input" onClick="gButton='section8'" aria-label="[8] IILO, 2 patterns (w/ Guide)">
-            <span class="bubble-text" data-text="[8] IILO, 2 patterns (w/ Guide)">[8] IILO, 2 patterns (w/ Guide)</span>
-          </div>
-        </div>
-
-        <div class="bubble-wrapper">
-          <div id="bsection9" class="bubble v2">
-            <input type="button" id="section9" class="bubble-input" onClick="gButton='section9'" aria-label="[9] IILO, 10q">
-            <span class="bubble-text" data-text="[9] IILO, 10q">[9] IILO, 10q</span>
-          </div>
-        </div>
-
-        <div class="bubble-wrapper">
-          <div id="bsection10" class="bubble v2">
-            <input type="button" id="section10" class="bubble-input" onClick="gButton='section10'" aria-label="[10] 3rd Layer I-Mino, 3 patterns (w/ Guide)">
-            <span class="bubble-text" data-text="[10] 3rd Layer I-Mino, 3 patterns (w/ Guide)">[10] 3rd Layer I-Mino, 3 patterns (w/ Guide)</span>
-          </div>
-        </div>
-
-        <div class="bubble-wrapper">
-          <div id="bsection11" class="bubble v2">
-            <input type="button" id="section11" class="bubble-input" onClick="gButton='section11'" aria-label="[11] 3rd Layer I-Mino, 20q">
-            <span class="bubble-text" data-text="[11] 3rd Layer I-Mino, 20q">[11] 3rd Layer I-Mino, 20q</span>
-          </div>
-        </div>
-
-      </p>
-
-      <p>
-        <p class="section-group" id="group4"> 
-          Horizontal I-Mino Summary
-        </p>
-        <div class="bubble-wrapper">
-          <div id="bsection12" class="bubble v2">
-            <input type="button" id="section12" class="bubble-input" onClick="gButton='section12'" aria-label="[12] Midterm Test 20q">
-            <span class="bubble-text" data-text="[12] Midterm Test 20q">[12] Midterm Test 20q</span>
-          </div>
-        </div>
-      </p>
-
-      <p>
-        If you can remember this much, you’ll have memorized 710 of the 711 </br> possible combos for a perfect clear, <br>
-          If you have the energy, try learning the last combo, LSIO types. <br>
-      </p>
-      <p>
-        <p class="section-group" id="group5">
-        LSIO type [84.6%]
-        </p>
-        <div class="bubble-wrapper">
-          <div id="bsection13" class="bubble v2">
-            <input type="button" id="section13" class="bubble-input" onClick="gButton='section13'" aria-label="[13] LSIO type 1 pattern (w/ Guide)">
-            <span class="bubble-text" data-text="[13] LSIO type 1 pattern (w/ Guide)">[13] LSIO type 1 pattern (w/ Guide)</span>
-          </div>
-        </div>
-
-        <div class="bubble-wrapper">
-          <div id="bsection14" class="bubble v2">
-            <input type="button" id="section14" class="bubble-input" onClick="gButton='section14'" aria-label="[14] LSIO type 12q">
-            <span class="bubble-text" data-text="[14] LSIO type 12q">[14] LSIO type 12q</span>
-          </div>
-        </div>
-
-      </p>
-
-      <p>
-        <p class="section-group" id="group6">
-          Summary
-        </p>
-
-        <div class="bubble-wrapper">
-          <div id="bsection15" class="bubble v2">
-            <input type="button" id="section15" class="bubble-input" onClick="gButton='section15'" aria-label="[15] Final Exam, 30q">
-            <span class="bubble-text" data-text="[15] Final Exam, 30q">[15] Final Exam, 30q</span>
-          </div>
-        </div>
-
-        <div class="bubble-wrapper">
-          <div id="bsection16" class="bubble v2">
-            <input type="button" id="section16" class="bubble-input" onClick="gButton='section16'" aria-label="[16] Graduation test (+mirror q's) 100q">
-            <span class="bubble-text" data-text="[16] Graduation test (+mirror q's) 100q">[16] Graduation test (+mirror q's) 100q</span>
-          </div>
-        </div>
-      </p>
-      <p>
-        <p class="section-group" id="group7">
-          Bonus
-        </p>
-        <div class="bubble-wrapper">
-          <div id="bsection17" class="bubble v2">
-            <input type="button" id="section17" class="bubble-input" onClick="gButton='section17'" aria-label="[17] Skimming Patterns">
-            <span class="bubble-text" data-text="[17] Skimming Patterns">[17] Skimming Patterns</span>
-          </div>
-        </div>
-
-        <div class="bubble-wrapper">
-          <div id="bsection18" class="bubble v2">
-            <input type="button" id="section18" class="bubble-input" onClick="gButton='section18'" aria-label="[18] Vertical I-Mino, 514q">
-            <span class="bubble-text" data-text="[18] Vertical I-Mino, 514q">[18] Vertical I-Mino, 514q</span>
-          </div>
-        </div>
-
-        <div class="bubble-wrapper">
-          <div id="bsection19" class="bubble v2">
-            <input type="button" id="section19" class="bubble-input" onClick="gButton='section19'" aria-label="[19] Horizontal I-Mino, 196q">
-            <span class="bubble-text" data-text="[19] Horizontal I-Mino, 196q">[19] Horizontal I-Mino, 196q</span>
-          </div>
-        </div>
-
-        <div class="bubble-wrapper">
-          <div id="bsection20" class="bubble v2">
-            <input type="button" id="section20" class="bubble-input" onClick="gButton='section20'" aria-label="[20] All 711q">
-            <span class="bubble-text" data-text="[20] All 711q">[20] All 711q</span>
-          </div>
-        </div>
-
-        <div class="bubble-wrapper">
-          <div id="bsection21" class="bubble v2">
-            <input type="button" id="section21" class="bubble-input" onClick="gButton='section21'" aria-label="[21] 711q mirror (Not Checked)">
-            <span class="bubble-text" data-text="[21] 711q mirror (Not Checked)">[21] 711q mirror (Not Checked)</span>
-          </div>
-        </div>
-      </p>
-      
-      <p>
-        ■ Contributors <br>
-        <a href="https://form1ssl.fc2.com/form/?id=685FCA71E208118a">Chotia</a><br>
-      </p>
-      <!-- <p>
-        ■Reference sites and topics<br>
-        <a href="http://taninkona.web.fc2.com/ttt/">Tetris Trainer Trevian</a><br>
-        <a href="https://docs.google.com/spreadsheets/d/1bVY3t_X96xRmUL0qdgB9tViSIGenu6RMKX4RW7qWg8Y/edit#gid=376091749">Tetris PC Template Success Rate</a><br>
-        <a href="http://waka.nu/tetris/">Kitakeya Honpo</a><br>
-        <a href="http://harddrop.com/wiki/Main_Page">Hard Drop Wiki</a><br>
-        <a href="http://www46.atwiki.jp/tojkazuto/">Tetris Strategy and Tournament Information Collection</a><br>
-        <a href="http://www59.atwiki.jp/tetple/pages/1.html">Tetristemplate technique summary</a><br>
-      </p>
-      <p>
-      ■Play Tetris for free! <br>
-      <a href="http://www.tetr.io/">TETR.IO</a><br>
-      <a href="https://www.youtube.com/watch?v=Lf0y3dZXXbk">9 Beginner Tips for TETR.IO! (sec)</a><br>
-      <a href="https://youtube.com/playlist?list=PLYU_jykh138wCGC-omwpyqHxkVeJAiUWD&si=av2YPlND9prTeZBd">Complete Guide to TETR.IO (KezDaBez)</a><br>
-      <br>
-      <br>
-      </p> -->
-    </div>
-    <div id="list_problems" class="layer">
-      <!-- <p>
-        <input type="text" id="section_title" class="center" style="width: 560px;">
-      </p>
-      <p>
-        <input type="button" id="prob0" value="" onClick="gButton='problem1'"><br>
-        <input type="button" id="prob1" value="" onClick="gButton='problem2'"><br>
-      </p>
-      <p>
-        <input type="button" value="←前" onClick="gButton='previous'">
-        <input type="button" value="次→" onClick="gButton='next'">
-      </p>
-      <p>
-        <input type="button" value="最初の画面に戻る" onClick="gButton='back'">
-      </p> -->
-    </div>
-    <div id="perform" class="layer center">
-      <p>
-        <input type="text" id="perform_caption" class="center" style="width: 560px;"><br>
-      </p>
-      <table id="gb_total" style="margin: 0 auto;">
-        <tr>
-        <!-- HOLD and STATS -->
-        <td id="gb_left">
-            <div id="hold" >
-              <img src="img/b3.svg" id="hold_display" style="display: block;">
+          <div class="hud-top">
+            <div class="stat-block">
+              <div id="lbl-question" class="stat-label">QUESTION</div>
+              <div id="val-question" class="stat-val stat-val-lg">1/20</div>
             </div>
-          <div id="stats" class="Stats">
-            <div id="sgInformation" class="sgInformation">
-              <div id="sQuestions" class="sQuestions">
-                <div id="stQuestions" class="Stquestions">QUESTION</div>
-                <div id="svQuestions" class="Svquestions">1/20</div>
-              </div>
-              <div id="sPattern" class="sPattern">
-                <div id="stPattern" class="stPattern">PATTERN</div>
-                <div id="svPatterns" class="svPatterns">0</div>
+            <div class="stat-block">
+              <div id="lbl-pattern" class="stat-label">PATTERN</div>
+              <div id="val-pattern" class="stat-val">#1</div>
+            </div>
+          </div>
+
+          <div id="callout-stack" class="callout-stack" aria-live="polite"></div>
+
+          <div class="hud-bottom">
+            <div class="stat-block">
+              <div class="stat-label">PPS</div>
+              <div class="stat-inline">
+                <span id="val-pps" class="stat-val">0.00</span>
+                <span class="stat-unit">/s</span>
               </div>
             </div>
-            <div id="sgStatistics" class="sgStatistics">
-              <div id="sPPS" class="sPPS">
-                <div id="stPPS" class="stPPS">PPS</div>
-                <div id="sPPSInner" class="sPPSInner">
-                  <div id="svPPS" class="svPPS">0.00</div>
-                  <div id="suPPS" class="suPPS">/s</div>
-                </div>
+            <div class="stat-block">
+              <div class="stat-label">INPUTS</div>
+              <div class="stat-inline">
+                <span id="val-inputs" class="stat-val">0,</span>
+                <span id="val-kpp" class="stat-val-sub">0.00</span>
+                <span class="stat-unit">/p</span>
               </div>
-              <div id="sInputs" class="sInputs">
-                <div id="Inputs" class="Inputs">INPUTS</div>
-                <div id="sInputsInner" class="sInputsInner">
-                  <div id="svInputs" class="svInputs">0,</div>
-                  <div id="saInputs" class="saInputs" style="padding-left: 3px;">0.00</div>
-                  <div id="suInputs" class="suInputs">/p</div>
-                </div>
+            </div>
+            <div id="stat-finesse" class="stat-block is-hidden">
+              <div class="stat-label">FINESSE</div>
+              <div class="stat-inline">
+                <span id="val-finesse-faults" class="stat-val">0</span>
+                <span id="val-finesse-pct" class="stat-unit"> · 100%</span>
               </div>
-              <div id="sTime" class="sTime">
-                <div id="stTime" class="stTime">TIME</div>
-                <div id="sInputsInner" class="sInputsInner">
-                  <div id="svTime" class="svTime">0:00</div>
-                  <div id="smTime" class="smTime">.000</div>
-                </div>
+            </div>
+            <div class="stat-block">
+              <div class="stat-label stat-label-bright">TIME</div>
+              <div class="stat-inline">
+                <span id="val-time-main" class="stat-val stat-val-bright">0:00</span>
+                <span id="val-time-ms" class="stat-unit stat-val-bright">.000</span>
               </div>
-              <div id="sPb" class="sPb">
-                <div id="stPb" class="stPb">PB</div>
-                <div id="sPbInner" class="sPbInner">
-                  <div id="svPb" class="svPb">0:00</div>
-                  <div id="smPb" class="smPb">.000</div>
-                </div>
+            </div>
+            <div id="stat-pb" class="stat-block">
+              <div class="stat-label stat-label-muted">PB</div>
+              <div class="stat-inline">
+                <span id="val-pb-main" class="stat-val stat-val-muted">-:--</span>
+                <span id="val-pb-ms" class="stat-unit stat-val-muted">.---</span>
               </div>
             </div>
           </div>
-        </td>
+        </aside>
 
-    <!-- GAMEBOARD -->
-      <td id="gb_center">
-      <div id="gb-wrapper">  
-        <div id="gb-overlay" aria-hidden="true">Overlay text</div>
-        <div id="gb-overlaysub" aria-hidden="true">Subtext</div>
-        <div id="gb">
-          <canvas id="gameboard-canvas" style="display: block; background: #000;"></canvas>
+        <!-- CENTER COLUMN: PLAYFIELD + LOCK DELAY BAR + 15 GROUPED PIPS -->
+        <div id="board-col" class="board-col">
+          <div class="board-frame">
+            <canvas id="board-canvas"></canvas>
+            <div id="board-overlay" class="board-overlay is-hidden" aria-live="polite">
+              <div id="overlay-title" class="overlay-title"></div>
+              <div id="overlay-meta" class="overlay-meta"></div>
+              <div id="overlay-sub" class="overlay-sub"></div>
+              <div id="overlay-actions" class="overlay-actions is-hidden">
+                <button type="button" id="btn-overlay-primary" class="overlay-btn overlay-btn-primary">Next</button>
+                <button type="button" id="btn-overlay-guide" class="overlay-btn is-hidden">Show Guide</button>
+                <button type="button" id="btn-overlay-menu" class="overlay-btn">Menu</button>
+              </div>
+            </div>
+          </div>
+          <div class="lock-bar-track" aria-hidden="true">
+            <div id="lock-bar-fill" class="lock-bar-fill"></div>
+          </div>
+          <div class="pip-row" aria-hidden="true">
+            <div id="pip-grid" class="pip-grid"></div>
+            <span id="lock-reset-num" class="lock-reset-num"></span>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN: NEXT QUEUE + HINTS + FPS -->
+        <aside class="side-col side-right">
+          <div class="piece-panel">
+            <div class="panel-label">NEXT</div>
+            <canvas id="next-canvas"></canvas>
+          </div>
+
+          <div id="guide-badge" class="guide-badge is-hidden">GUIDE ACTIVE</div>
+          <div id="hint-box" class="hint-box is-hidden"></div>
+          <div id="fps-badge" class="fps-badge is-hidden"><span id="fps-value">60</span> FPS</div>
+        </aside>
+      </div>
+    </div>
+
+    <footer class="play-footer">
+      <span id="key-legend">R Guide · F4 Retry · ESC Menu</span>
+    </footer>
+  </section>
+
+  <!-- PREFERENCES MODAL -->
+  <div id="prefs-modal" class="modal-backdrop is-hidden" role="dialog" aria-modal="true" aria-labelledby="prefs-heading">
+    <div class="prefs-dialog">
+      <header class="prefs-header">
+        <h2 id="prefs-heading" class="prefs-heading">Preferences</h2>
+        <div class="prefs-tabs" role="tablist" aria-label="Preference sections">
+          <button type="button" id="tab-handling" class="prefs-tab is-active" data-tab="handling" role="tab" aria-selected="true" aria-controls="panel-handling" tabindex="0">Handling</button>
+          <button type="button" id="tab-controls" class="prefs-tab" data-tab="controls" role="tab" aria-selected="false" aria-controls="panel-controls" tabindex="-1">Controls</button>
+          <button type="button" id="tab-visuals" class="prefs-tab" data-tab="visuals" role="tab" aria-selected="false" aria-controls="panel-visuals" tabindex="-1">Audio &amp; Visuals</button>
+        </div>
+      </header>
+
+      <div class="prefs-body">
+        <!-- HANDLING TAB -->
+        <div id="panel-handling" class="prefs-panel" data-panel="handling" role="tabpanel" aria-labelledby="tab-handling">
+          <div class="preset-row">
+            <span class="preset-label">Presets</span>
+            <button type="button" class="preset-btn" data-handling-preset="tetrio">TETR.IO Default</button>
+            <button type="button" class="preset-btn" data-handling-preset="snappy">Snappy (0F ARR)</button>
+            <button type="button" class="preset-btn" data-handling-preset="speed">Speed (4.5F DAS)</button>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label for="pref-arr">ARR</label>
+              <span class="setting-desc">Auto Repeat Rate · 0F snaps to wall instantly</span>
+            </div>
+            <input type="range" id="pref-arr" min="0" max="5" step="0.1" value="1.5">
+            <span id="pref-arr-val" class="setting-readout">1.5F · 25ms</span>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label for="pref-das">DAS</label>
+              <span class="setting-desc">Delayed Auto Shift · charge before repeat starts</span>
+            </div>
+            <input type="range" id="pref-das" min="1" max="20" step="0.1" value="8.0">
+            <span id="pref-das-val" class="setting-readout">8.0F · 133ms</span>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label for="pref-dcd">DCD</label>
+              <span class="setting-desc">DAS Cut Delay · brief pause on spawn, hold &amp; rotate</span>
+            </div>
+            <input type="range" id="pref-dcd" min="0" max="20" step="0.1" value="1.0">
+            <span id="pref-dcd-val" class="setting-readout">1.0F · 17ms</span>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label for="pref-sdf">SDF</label>
+              <span class="setting-desc">Soft Drop Factor · max is ∞ (instant sonic drop)</span>
+            </div>
+            <input type="range" id="pref-sdf" min="5" max="41" step="1" value="20">
+            <span id="pref-sdf-val" class="setting-readout">20x</span>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label for="pref-irs">IRS (Initial Rotation)</label>
+              <span class="setting-desc">Rotate incoming piece on spawn</span>
+            </div>
+            <select id="pref-irs" class="pref-select">
+              <option value="hold">Hold key</option>
+              <option value="tap">Tap buffer</option>
+              <option value="off">Off</option>
+            </select>
+            <span class="setting-readout"></span>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label for="pref-ihs">IHS (Initial Hold)</label>
+              <span class="setting-desc">Swap incoming piece on spawn</span>
+            </div>
+            <select id="pref-ihs" class="pref-select">
+              <option value="hold">Hold key</option>
+              <option value="tap">Tap buffer</option>
+              <option value="off">Off</option>
+            </select>
+            <span class="setting-readout"></span>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <label for="pref-spin-rule">Spin Detection Rule</label>
+              <span class="setting-desc">Default scores immobile non-T spins as Mini</span>
+            </div>
+            <select id="pref-spin-rule" class="pref-select">
+              <option value="all-mini+">All-Mini+ (Default)</option>
+              <option value="all">All-Spin (Full)</option>
+              <option value="t-spins">T-Spins Only</option>
+            </select>
+            <span class="setting-readout"></span>
+          </div>
+
+          <label class="toggle-row">
+            <span>Cancel DAS when changing direction</span>
+            <input type="checkbox" id="pref-cancel-das" checked>
+          </label>
+          <label class="toggle-row">
+            <span>Preserve DAS charge across piece spawns</span>
+            <input type="checkbox" id="pref-preserve-das" checked>
+          </label>
+          <label class="toggle-row">
+            <span>40L Sprint 3-2-1-GO countdown (allows pre-DAS)</span>
+            <input type="checkbox" id="pref-sprint-countdown" checked>
+          </label>
+        </div>
+
+        <!-- CONTROLS TAB -->
+        <div id="panel-controls" class="prefs-panel is-hidden" data-panel="controls" role="tabpanel" aria-labelledby="tab-controls">
+          <div class="preset-row">
+            <span class="preset-label">Presets</span>
+            <button type="button" class="preset-btn" data-key-preset="lochtris">Lochtris Classic</button>
+            <button type="button" class="preset-btn" data-key-preset="guideline">Guideline (Z / A)</button>
+          </div>
+          <div id="keybind-conflict-msg" class="conflict-msg is-hidden">Duplicate keybinds detected — reassign highlighted keys before saving.</div>
+          <div id="keybind-reserved-msg" class="conflict-msg is-hidden"></div>
+          <div class="keybind-grid">
+            <div class="keybind-row"><span>Move Left</span><button type="button" class="keybind-btn" data-action="left">LEFT</button></div>
+            <div class="keybind-row"><span>Move Right</span><button type="button" class="keybind-btn" data-action="right">RIGHT</button></div>
+            <div class="keybind-row"><span>Soft Drop</span><button type="button" class="keybind-btn" data-action="softDrop">DOWN</button></div>
+            <div class="keybind-row"><span>Hard Drop</span><button type="button" class="keybind-btn" data-action="hardDrop">SPACE</button></div>
+            <div class="keybind-row"><span>Rotate CW</span><button type="button" class="keybind-btn" data-action="rotCW">UP</button></div>
+            <div class="keybind-row"><span>Rotate CCW</span><button type="button" class="keybind-btn" data-action="rotCCW">L-CTRL</button></div>
+            <div class="keybind-row"><span>Rotate 180°</span><button type="button" class="keybind-btn" data-action="rot180">L-SHIFT</button></div>
+            <div class="keybind-row"><span>Hold</span><button type="button" class="keybind-btn" data-action="hold">C</button></div>
+            <div class="keybind-row"><span>Show Guide</span><button type="button" class="keybind-btn" data-action="guide">R</button></div>
+            <div class="keybind-row"><span>Quick Retry</span><button type="button" class="keybind-btn" data-action="retry">F4</button></div>
+          </div>
+        </div>
+
+        <!-- AUDIO & VISUALS TAB -->
+        <div id="panel-visuals" class="prefs-panel is-hidden" data-panel="visuals" role="tabpanel" aria-labelledby="tab-visuals">
+          <div class="setting-row">
+            <div class="setting-info"><label for="pref-sfx">SFX Volume</label></div>
+            <input type="range" id="pref-sfx" min="0" max="100" step="5" value="50">
+            <span id="pref-sfx-val" class="setting-readout">50%</span>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info"><label for="pref-skin">Block Style</label></div>
+            <select id="pref-skin" class="pref-select">
+              <option value="modern">Modern</option>
+              <option value="flat">Flat</option>
+              <option value="neon">Neon</option>
+            </select>
+            <canvas id="pref-skin-preview" class="skin-preview" width="148" height="24" aria-hidden="true"></canvas>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info"><label for="pref-bounce">Board Bounce</label></div>
+            <input type="range" id="pref-bounce" min="0" max="100" step="5" value="60">
+            <span id="pref-bounce-val" class="setting-readout">60%</span>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info"><label for="pref-ghost">Ghost Opacity</label></div>
+            <input type="range" id="pref-ghost" min="0" max="100" step="5" value="35">
+            <span id="pref-ghost-val" class="setting-readout">35%</span>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info"><label for="pref-grid">Grid Opacity</label></div>
+            <input type="range" id="pref-grid" min="0" max="100" step="5" value="40">
+            <span id="pref-grid-val" class="setting-readout">40%</span>
+          </div>
+
+          <label class="toggle-row">
+            <span>Hard drop beam &amp; particles</span>
+            <input type="checkbox" id="pref-particles" checked>
+          </label>
+          <label class="toggle-row">
+            <span>Block shatter on fail</span>
+            <input type="checkbox" id="pref-explode">
+          </label>
+          <label class="toggle-row">
+            <span>Clear / Fail text overlay</span>
+            <input type="checkbox" id="pref-overlay" checked>
+          </label>
+          <label class="toggle-row">
+            <span>Show FPS counter</span>
+            <input type="checkbox" id="pref-fps">
+          </label>
+
+          <div class="danger-row">
+            <button type="button" id="btn-reset-progress" class="danger-btn">Reset Progress &amp; PBs</button>
+          </div>
         </div>
       </div>
-        <div id="pip-grid"></div>
-        <div id="lock_timer_container" style=" height: 2px; background-color: #444; margin-top: 10px;">
-          <div id="lock_timer_bar" ></div>
-        </div>
-      </td>
 
-        <!-- NEXT QUEUE -->
-        <td id="gb_right">
-          <div id="next-container">
-             <img src="img/b3.svg" id="next_display_0">
-             <img src="img/b3.svg" id="next_display_1">
-             <img src="img/b3.svg" id="next_display_2">
-             <img src="img/b3.svg" id="next_display_3">
-             <img src="img/b3.svg" id="next_display_4">
-           </div>
-           <div id="fps" class="fps">
-             <span id="fps_value">60</span>FPS
-        </td>
-        
-          <!-- MAIN MENU BUTTON -->
-          <td style="vertical-align: top; width: 180px; text-align: center;">
-            <p>
-            <input id="main_menu_btn" type="button" value="Main Menu" onClick="gButton='back'" style="width: 160px; height: 30px;"><br>
-            <textarea type="text" id="perform_hint" style="width: 288px; height: 96px; background-color: #2a2c3000; color: #ffffff00; border: none; resize: none; display: none;" ></textarea>
-          </p>
-          </td>
-        </tr>
-        </table>
-        
-</div>
-      </div>
-
-
-      <div id="preferences" class="layer prefs-container">
-        <div class="prefs-title">Keybinds</div>
-        <div class="key-setting-row"><span>Move Left</span><button id="key_left_btn" type="button">ARROWLEFT</button></div>
-        <div class="key-setting-row"><span>Move Right</span><button id="key_right_btn" type="button">ARROWRIGHT</button></div>
-        <div class="key-setting-row"><span>Soft Drop</span><button id="key_softdrop_btn" type="button">ARROWDOWN</button></div>
-        <div class="key-setting-row"><span>Hard Drop</span><button id="key_harddrop_btn" type="button">SPACE</button></div>
-        <div class="key-setting-row"><span>Rotate Clockwise</span><button id="key_rot_left_btn" type="button">CTRL</button></div>
-        <div class="key-setting-row"><span>Rotate Counterclockwise</span><button id="key_rot_right_btn" type="button">ARROWUP</button></div>
-        <div class="key-setting-row"><span>Rotate 180</span><button id="key_rot_180_btn" type="button">SHIFT</button></div>
-        <div class="key-setting-row"><span>Hold</span><button id="key_hold_btn" type="button">C</button></div>
-        <div class="key-setting-row"><span>See Guide</span><button id="key_guide_btn" type="button">G</button></div>
-      <p>
-        <div class="prefs-title">Handling</div>
-          <div class="slider-setting-row">
-          <label for="arr_slider" class="slider-label" style="margin-right:10px;" title="Automatic Repeat Rate: # of Frames between repeated movement after DAS.">ARR</label>
-          <input type="range" class="slider" id="arr_slider" min="0.0" max="5.0" value="3.0" step="0.1" />
-          <span class="slider-value-label">
-            <span class="slider-value" id="arr_value">3</span>F
-          </span>
-        </div>
-          <div class="slider-setting-row">
-          <label for="das_slider" class="slider-label" style="margin-right:10px;" title="Delayed Auto Shift: # of Frames between initial movement press and automatic repeat.">DAS</label>
-          <input type="range" class="slider" id="das_slider" min="1.0" max="20.0" value="9.0" step="0.1" />
-          <span class="slider-value-label">
-            <span class="slider-value" id="das_value">9</span>F
-          </span>
-        </div>
-        <div class="slider-setting-row">
-          <label for="sdf_slider" class="slider-label" style="margin-right:10px;" title="Soft Drop Factor: Factor by which gravity is changed when soft dropping.">SDF</label>
-          <input type="range" class="slider" id="sdf_slider" min="5" max="40" value="10" />
-          <span class="slider-value-label">
-            <span class="slider-value" id="sdf_value">10</span>x
-          </span>
-        </div>
-      </p>
-        <div class="prefs-title">Display</div>
-        <div class="display-row, cb"><span>Explosion Effects (broken, lol)</span><input type="checkbox" id="cb_explosion_effects"/></div>
-        <div class="display-row, cb"><span>Text Overlay</span><input type="checkbox" id="cb_text_overlay" checked/></div>
-      </p>
-        <p>
-          <input type="button" value="Apply" class="prefs-appcan" onClick="gButton='ok'">
-          <input type="button" value="Cancel" class="prefs-appcan" onClick="gButton='cancel'">
-        </p>
-      </div>
-      </div>
-
-    </form>
-  </body>
+      <footer class="prefs-footer">
+        <button type="button" id="btn-prefs-cancel" class="modal-btn">Cancel</button>
+        <button type="button" id="btn-prefs-save" class="modal-btn modal-btn-primary">Apply</button>
+      </footer>
+    </div>
+  </div>
+</body>
 </html>
-
